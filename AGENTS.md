@@ -9,6 +9,10 @@ A public table tennis Elo ladder for Ashdown House, MIT. No accounts, names
 only, every rating derived from a public append-only match log. Read
 `README.md` first for the product in one page.
 
+Human commitments for operating or developing this app belong in Google Tasks
+`Hub`. Use the installed `anders-environment` skill for current list IDs and
+verified writes.
+
 ## Read before changing
 
 - Product shape and the reasons for it: `docs/architecture.md`
