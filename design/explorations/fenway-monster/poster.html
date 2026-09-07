@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashdown.win — the board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  :root {
+    --green: #2d4f3e;
+    --green-deep: #1b3126;
+    --green-lit: #3b6a51;
+    --cream: #f1e9d4;
+    --paint: #f6f2e6;
+    --yellow: #efc340;
+    --red: #d9382c;
+    --lamp-green: #4fbf5a;
+    --steel: #7a7f76;
+    --plate-font: "Alfa Slab One", "Rockwell", "Roboto Slab", serif;
+    --caps-font: "Oswald", "Impact", "Arial Narrow", sans-serif;
+    --prose-font: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #14201a;
+    font-family: var(--prose-font);
+    color: var(--paint);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    display: flex; justify-content: center; align-items: flex-start;
+    min-height: 100vh; padding: 12mm 0;
+  }
+  .sheet {
+    width: 210mm; height: 297mm; flex: 0 0 auto;
+    position: relative; overflow: hidden;
+    background-color: var(--green);
+    background-image:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.06), transparent 55%),
+      radial-gradient(ellipse at 80% 90%, rgba(0,0,0,.25), transparent 60%),
+      repeating-linear-gradient(97deg, rgba(255,255,255,.018) 0 2px, transparent 2px 7px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 4px);
+    box-shadow: 0 10mm 30mm rgba(0,0,0,.7);
+    padding: 9mm 12mm 8mm 10mm;
+    display: flex; flex-direction: column; gap: 4mm;
+  }
+  @media print {
+    body { background: none; padding: 0; min-height: 0; display: block; }
+    .sheet { box-shadow: none; margin: 0; }
+  }
+
+  /* bolts in the sheet corners */
+  .bolt { position: absolute; width: 3.6mm; height: 3.6mm; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #c9ccc4, #7a7f76 55%, #3c3f3a 100%);
+    box-shadow: 0 .5mm 1mm rgba(0,0,0,.7), inset 0 0 0 .3mm rgba(0,0,0,.35); }
+  .bolt::after { content: ""; position: absolute; left: 50%; top: 20%; width: .5mm; height: 60%;
+    background: #2c2e2a; transform: translateX(-50%) rotate(35deg); border-radius: 1mm; }
+  .bolt.tl { left: 3.5mm; top: 3.5mm; } .bolt.tr { right: 3.5mm; top: 3.5mm; }
+  .bolt.bl { left: 3.5mm; bottom: 3.5mm; } .bolt.br { right: 3.5mm; bottom: 3.5mm; }
+
+  /* morse stripe on the right edge */
+  .stripe { position: absolute; right: 5.2mm; top: 12mm; bottom: 12mm; width: 2.4mm;
+    display: flex; flex-direction: column; justify-content: center; gap: 1.6mm; }
+  .stripe i { display: block; width: 100%; background: var(--paint); opacity: .92; }
+  .stripe i.dot { height: 2.4mm; } .stripe i.dash { height: 6.5mm; } .stripe i.gap { height: 2.4mm; background: none; }
+
+  .painted { font-family: var(--caps-font); text-transform: uppercase; letter-spacing: .08em; color: var(--paint); }
+  .painted.small { font-size: 3.4mm; font-weight: 500; letter-spacing: .18em; opacity: .85; }
+  .rule { height: .7mm; background: var(--paint); opacity: .9; border-radius: .3mm; }
+
+  /* ---- header ---- */
+  header { display: flex; flex-direction: column; gap: 2mm; }
+  .kicker { display: flex; justify-content: space-between; align-items: center; }
+  h1 { margin: 0; font-family: var(--caps-font); font-weight: 700; text-transform: uppercase;
+    font-size: 14.5mm; line-height: .95; letter-spacing: .02em; color: var(--paint);
+    text-shadow: .6mm .8mm 0 rgba(0,0,0,.45); }
+  .lede { font-size: 4.1mm; line-height: 1.35; margin: .5mm 0 0; max-width: 175mm; color: #ece6d6; }
+
+  /* ---- slots and plates ---- */
+  .slot { background: var(--green-deep); padding: .9mm; display: inline-flex; align-items: stretch; justify-content: stretch;
+    box-shadow: inset 0 0 0 .25mm rgba(0,0,0,.6), 0 .3mm 0 rgba(255,255,255,.08); }
+  .plate { display: flex; align-items: center; justify-content: center; font-family: var(--plate-font);
+    color: var(--green-deep); background: linear-gradient(180deg, #f7f0dd 0%, var(--cream) 60%, #e6dcc2 100%);
+    box-shadow: inset 1.2mm 1.4mm 2.2mm rgba(0,0,0,.42), inset -.3mm -.3mm 0 rgba(255,255,255,.7);
+    line-height: 1; }
+  .plate.yellow { background: linear-gradient(180deg, #f6d05a 0%, var(--yellow) 60%, #d9ad2c 100%); }
+
+  /* ---- board ---- */
+  .board { display: grid; grid-template-columns: 1fr 55mm; gap: 6mm; align-items: start; }
+  .rows { display: flex; flex-direction: column; gap: 1.3mm; }
+  .hdr { display: grid; grid-template-columns: 11mm 1fr 20mm 20mm; gap: 2.5mm; align-items: end; padding: 0 1mm; margin-bottom: .5mm; }
+  .hdr span { font-family: var(--caps-font); font-size: 3.1mm; letter-spacing: .2em; opacity: .85; }
+  .hdr span:nth-child(3), .hdr span:nth-child(4) { text-align: center; }
+  .row { display: grid; grid-template-columns: 11mm 1fr 20mm 20mm; gap: 2.5mm; align-items: center; }
+  .row .slot .plate { width: 100%; height: 7mm; font-size: 4.4mm; }
+  .row .name { font-family: var(--caps-font); font-weight: 700; text-transform: uppercase; font-size: 5mm;
+    letter-spacing: .06em; color: var(--paint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 1mm; }
+  .row .rec { font-family: var(--caps-font); font-size: 4mm; letter-spacing: .1em; text-align: center; opacity: .85; }
+  .legend { font-size: 3.3mm; line-height: 1.35; color: #d9d2bf; margin-top: 2.5mm; display: flex; gap: 2mm; align-items: center; }
+  .legend .sw { width: 5mm; height: 4mm; flex: 0 0 auto; }
+
+  .side { display: flex; flex-direction: column; gap: 3mm; }
+  .side .lamps { display: flex; flex-direction: column; gap: 2.5mm; background: rgba(0,0,0,.18); padding: 3.5mm 3.5mm 3mm;
+    border: .35mm solid rgba(246,242,230,.55); }
+  .lamprow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2mm; }
+  .lamprow .lbl { font-family: var(--caps-font); font-weight: 500; font-size: 3.8mm; letter-spacing: .14em; }
+  .lampset { display: flex; gap: 1.6mm; }
+  .lamp { width: 4.2mm; height: 4.2mm; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4a4f48, #1d201c 70%);
+    box-shadow: inset 0 0 0 .35mm #0d120f, 0 .3mm .4mm rgba(0,0,0,.6); }
+  .lamp.on-red { background: radial-gradient(circle at 40% 35%, #ff8f7f, var(--red) 55%, #8b1d14 100%); }
+  .lamp.on-green { background: radial-gradient(circle at 40% 35%, #b6f3b7, var(--lamp-green) 55%, #1f6e2c 100%); }
+  .side p { font-size: 3.4mm; line-height: 1.35; margin: 0; color: #d9d2bf; }
+
+  /* ---- how it works ---- */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
+  .step { display: grid; grid-template-columns: 14mm 1fr; gap: 3mm; align-items: start; }
+  .step .slot .plate { width: 100%; height: 14mm; font-size: 9mm; }
+  .step h3 { margin: 0 0 1mm; font-family: var(--caps-font); font-weight: 700; text-transform: uppercase; font-size: 5mm; letter-spacing: .06em; }
+  .step p { margin: 0; font-size: 3.5mm; line-height: 1.35; color: #e2dbc9; }
+
+  /* ---- elo band ---- */
+  .elo { border-top: .7mm solid var(--paint); border-bottom: .7mm solid var(--paint); padding: 2.6mm 1mm;
+    display: flex; align-items: center; justify-content: space-between; gap: 4mm; }
+  .elo .formula { font-family: var(--plate-font); font-size: 4.7mm; letter-spacing: .02em; white-space: nowrap; color: var(--paint); }
+  .elo .formula sup { font-size: 60%; }
+  .elo .consts { font-family: var(--caps-font); font-size: 3.6mm; letter-spacing: .12em; text-transform: uppercase; text-align: right; line-height: 1.4; }
+
+  /* ---- url + qr ---- */
+  .url { display: grid; grid-template-columns: 1fr 44mm; gap: 6mm; align-items: center; }
+  .plates { display: flex; flex-direction: column; gap: 1.8mm; }
+  .plates .line { display: flex; gap: 1.8mm; }
+  .plates .slot { flex: 1 1 0; }
+  .plates .plate { width: 100%; height: 21mm; font-size: 16mm; letter-spacing: -.02em; }
+  .plates .line.short .slot { flex: 0 0 auto; width: calc((100% - 6 * 1.8mm) / 7); }
+  .qr { width: 44mm; height: 44mm; }
+  .qr .plate { width: 100%; height: 100%; padding: 2.5mm; }
+  .qr svg { width: 100%; height: 100%; display: block; }
+  .qr-cap { font-family: var(--caps-font); font-size: 3mm; letter-spacing: .2em; text-align: center; margin-top: 1.5mm; opacity: .85; }
+
+  footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 6mm; }
+  footer .painted.small { font-size: 3.2mm; white-space: nowrap; letter-spacing: .14em; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <i class="bolt tl"></i><i class="bolt tr"></i><i class="bolt bl"></i><i class="bolt br"></i>
+
+  <!-- Morse: A S H D O W N -->
+  <div class="stripe" aria-hidden="true">
+    <i class="dot"></i><i class="dash"></i><i class="gap"></i>
+    <i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="gap"></i>
+    <i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="gap"></i>
+    <i class="dash"></i><i class="dot"></i><i class="dot"></i><i class="gap"></i>
+    <i class="dash"></i><i class="dash"></i><i class="dash"></i><i class="gap"></i>
+    <i class="dot"></i><i class="dash"></i><i class="dash"></i><i class="gap"></i>
+    <i class="dash"></i><i class="dot"></i>
+  </div>
+
+  <header>
+    <div class="kicker">
+      <span class="painted small">Ashdown House &middot; Cambridge, Mass. &middot; One table</span>
+      <span class="painted small">Board in operation since 2026</span>
+    </div>
+    <div class="rule"></div>
+    <h1>The Ashdown<br>Table Tennis Board</h1>
+    <p class="lede">A public rating ladder for the table in the basement. No accounts, no sign-up. Anyone records a match; the winner takes points off the loser and the board changes the moment you file it.</p>
+  </header>
+
+  <section class="board">
+    <div class="rows">
+      <div class="hdr"><span>Rk</span><span>Player</span><span>W&ndash;L</span><span>Rating</span></div>
+      <div class="row"><span class="slot"><span class="plate">1</span></span><span class="name">Priya Raman</span><span class="rec">16&ndash;5</span><span class="slot"><span class="plate">1142</span></span></div>
+      <div class="row"><span class="slot"><span class="plate">2</span></span><span class="name">Tomás Ferreira</span><span class="rec">12&ndash;5</span><span class="slot"><span class="plate">1108</span></span></div>
+      <div class="row"><span class="slot"><span class="plate">3</span></span><span class="name">Anders Bekkevard</span><span class="rec">9&ndash;5</span><span class="slot"><span class="plate">1071</span></span></div>
+      <div class="row"><span class="slot"><span class="plate">4</span></span><span class="name">jchen26</span><span class="rec">6&ndash;3</span><span class="slot"><span class="plate">1054</span></span></div>
+      <div class="row"><span class="slot"><span class="plate">5</span></span><span class="name">Mei Nakamura</span><span class="rec">6&ndash;5</span><span class="slot"><span class="plate">1033</span></span></div>
+      <div class="row"><span class="slot"><span class="plate">6</span></span><span class="name">Daniel Okafor</span><span class="rec">3&ndash;3</span><span class="slot"><span class="plate">1012</span></span></div>
+      <div class="row"><span class="slot"><span class="plate">7</span></span><span class="name">Sofia Almeida</span><span class="rec">0&ndash;0</span><span class="slot"><span class="plate yellow">1000</span></span></div>
+      <div class="row"><span class="slot"><span class="plate">8</span></span><span class="name">Lukas Weber</span><span class="rec">2&ndash;3</span><span class="slot"><span class="plate">987</span></span></div>
+      <div class="legend"><span class="slot sw"><span class="plate yellow" style="width:100%;height:100%"></span></span><span>A yellow plate is a player with no match yet, like an inning still in progress. Everyone starts at 1000.</span></div>
+    </div>
+    <div class="side">
+      <div class="lamps">
+        <div class="lamprow"><span class="lbl">Singles win</span><span class="lampset"><i class="lamp on-green"></i><i class="lamp on-green"></i><i class="lamp"></i></span></div>
+        <div class="lamprow"><span class="lbl">Singles loss</span><span class="lampset"><i class="lamp on-red"></i><i class="lamp"></i><i class="lamp"></i></span></div>
+        <div class="lamprow"><span class="lbl">Doubles</span><span class="lampset"><i class="lamp on-green"></i><i class="lamp"></i><i class="lamp"></i></span></div>
+      </div>
+      <p>Green lamp, you took points. Red lamp, you gave them up. Doubles is played as the average of the two partners and counts for half.</p>
+      <p>Every match ever filed is public. Filed one wrong? Delete it; the deletion goes on the board like anything else.</p>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="steps">
+    <div class="step">
+      <span class="slot"><span class="plate">1</span></span>
+      <div><h3>Create your name</h3><p>Once, under your full name or your MIT username. That is the whole sign-up.</p></div>
+    </div>
+    <div class="step">
+      <span class="slot"><span class="plate">2</span></span>
+      <div><h3>Record a match</h3><p>Two names, tap the winner, done. Toggle doubles for a second name on each side.</p></div>
+    </div>
+    <div class="step">
+      <span class="slot"><span class="plate">3</span></span>
+      <div><h3>Watch the board</h3><p>Ratings are replayed from the whole match log every time, so nothing hides.</p></div>
+    </div>
+  </section>
+
+  <section class="elo">
+    <span class="formula">R&prime; = R + K(S &minus; E),&nbsp; E = 1 / (1 + 10<sup>(R<sub>opp</sub> &minus; R) / 400</sup>)</span>
+    <span class="consts">K = 32 singles &middot; 16 doubles<br>start 1000 &middot; S = 1 win, 0 loss</span>
+  </section>
+
+  <section class="url">
+    <div class="plates" aria-label="ashdown.win">
+      <div class="line">
+        <span class="slot"><span class="plate">a</span></span><span class="slot"><span class="plate">s</span></span><span class="slot"><span class="plate">h</span></span><span class="slot"><span class="plate">d</span></span><span class="slot"><span class="plate">o</span></span><span class="slot"><span class="plate">w</span></span><span class="slot"><span class="plate">n</span></span>
+      </div>
+      <div class="line short">
+        <span class="slot dot"><span class="plate">.</span></span><span class="slot"><span class="plate">w</span></span><span class="slot"><span class="plate">i</span></span><span class="slot"><span class="plate">n</span></span>
+      </div>
+    </div>
+    <div>
+      <div class="qr slot"><span class="plate">
+        <svg viewBox="0 0 21 21" shape-rendering="crispEdges" aria-label="QR code placeholder">
+          <rect width="21" height="21" fill="#f1e9d4"/>
+          <g fill="#1b3126">
+            <path d="M0 0h7v7H0z M14 0h7v7h-7z M0 14h7v7H0z"/>
+            <path d="M1 1h5v5H1z M15 1h5v5h-5z M1 15h5v5H1z" fill="#f1e9d4"/>
+            <path d="M2 2h3v3H2z M16 2h3v3h-3z M2 16h3v3H2z"/>
+            <path d="M8 0h1v2H8z M10 0h2v1h-2z M9 2h2v1H9z M8 3h1v1H8z M10 4h2v1h-2z M8 5h1v2H8z M11 6h1v1h-1z M0 8h1v1H0z M2 8h2v1H2z M5 8h1v1H5z M7 8h2v1H7z M10 8h1v2h-1z M12 8h2v1h-2z M15 8h2v1h-2z M18 8h1v1h-1z M20 8h1v1h-1z M1 10h1v1H1z M3 10h1v1H3z M6 10h2v1H6z M9 10h1v1H9z M12 10h1v1h-1z M14 10h1v1h-1z M16 10h1v2h-1z M19 10h2v1h-2z M0 12h2v1H0z M4 12h1v1H4z M7 12h2v1H7z M10 12h2v1h-2z M13 12h1v1h-1z M18 12h1v1h-1z M20 12h1v1h-1z M8 14h1v1H8z M10 14h2v1h-2z M14 14h2v1h-2z M17 14h2v1h-2z M20 14h1v1h-1z M9 16h1v1H9z M12 16h1v1h-1z M15 16h1v1h-1z M19 16h1v1h-1z M8 18h2v1H8z M11 18h1v1h-1z M14 18h1v1h-1z M16 18h2v1h-2z M20 18h1v1h-1z M9 20h1v1H9z M13 20h1v1h-1z M17 20h2v1h-2z"/>
+          </g>
+        </svg>
+      </span></div>
+      <div class="qr-cap">Scan at the table</div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="painted small">open source: github.com/andersbekkevard/ashdown-win</span>
+    <span class="painted small">Numbers changed by hand</span>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashdown.win · Table tennis ladder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ---------- theme (derived from ---site-hue like lila) ---------- */
+:root {
+  ---site-hue: 37deg;
+  --c-bg-page: hsl(var(---site-hue) 10% 8%);
+  --c-bg: hsl(var(---site-hue) 7% 14%);
+  --c-bg-mid: hsl(var(---site-hue) 7% 16%);
+  --c-bg-low: hsl(var(---site-hue) 7% 22%);
+  --c-bg-zebra: hsl(var(---site-hue) 5% 19%);
+  --c-bg-zebra2: hsl(var(---site-hue) 5% 24%);
+  --c-bg-input: hsl(var(---site-hue) 10% 12%);
+  --c-metal-top: hsl(var(---site-hue) 7% 22%);
+  --c-metal-bottom: hsl(var(---site-hue) 5% 19%);
+  --c-metal-top-hover: hsl(var(---site-hue) 7% 25%);
+  --c-metal-bottom-hover: hsl(var(---site-hue) 5% 22%);
+  --c-font: hsl(0 0% 73%);
+  --c-font-dim: hsl(0 0% 58%);
+  --c-font-dimmer: hsl(0 0% 42%);
+  --c-font-clear: hsl(0 0% 80%);
+  --c-font-clearer: hsl(0 0% 89%);
+  --c-border: hsl(0 0% 25%);
+  --c-border-page: hsl(0 0% 22%);
+  --c-primary: hsl(209 79% 56%);
+  --c-primary-dim: hsl(209 60% 48%);
+  --c-good: hsl(88 62% 37%);
+  --c-bad: hsl(0 60% 50%);
+  --c-brag: hsl(var(---site-hue) 74% 43%);
+  --c-accent: hsl(22 100% 42%);
+  --c-over: white;
+  --c-dimmer: black;
+  --shadow: 0 2px 2px 0 rgb(0 0 0 / .3), 0 1px 5px 0 rgb(0 0 0 / .2);
+  --radius: 7px;
+}
+html.light {
+  --c-bg-page: hsl(var(---site-hue) 10% 92%);
+  --c-bg: hsl(0 0% 100%);
+  --c-bg-mid: hsl(var(---site-hue) 7% 97%);
+  --c-bg-low: hsl(0 0% 89%);
+  --c-bg-zebra: hsl(var(---site-hue) 12% 96.5%);
+  --c-bg-zebra2: hsl(var(---site-hue) 12% 92%);
+  --c-bg-input: hsl(var(---site-hue) 10% 97%);
+  --c-metal-top: hsl(0 0% 96%);
+  --c-metal-bottom: hsl(0 0% 93%);
+  --c-metal-top-hover: hsl(0 0% 98%);
+  --c-metal-bottom-hover: hsl(0 0% 95%);
+  --c-font: hsl(0 0% 30%);
+  --c-font-dim: hsl(0 0% 47%);
+  --c-font-dimmer: hsl(0 0% 70%);
+  --c-font-clear: hsl(0 0% 12%);
+  --c-font-clearer: black;
+  --c-border: hsl(0 0% 85%);
+  --c-border-page: hsl(0 0% 80%);
+  --c-primary: hsl(209 77% 46%);
+  --c-primary-dim: hsl(209 60% 40%);
+  --c-brag: hsl(var(---site-hue) 74% 48%);
+  --c-dimmer: white;
+  --shadow: 0 2px 2px 0 rgb(0 0 0 / .12), 0 1px 5px 0 rgb(0 0 0 / .08);
+}
+
+/* ---------- base ---------- */
+* { box-sizing: border-box; }
+html {
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  background: var(--c-bg-page);
+  color: var(--c-font);
+}
+body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+a { color: var(--c-primary); text-decoration: none; }
+a:hover { color: hsl(from var(--c-primary) h 100% 70%); }
+h1, h2, h3 { font-family: Roboto, sans-serif; font-weight: 300; margin: 0; color: var(--c-font-clear); }
+h1 { font-size: 1.9em; }
+h2 { font-size: 1.45em; }
+h3 { font-size: 1.1em; text-transform: uppercase; letter-spacing: .05em; color: var(--c-font-dim); }
+p { margin: 0 0 1em; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+input { font: inherit; }
+.shy { font-size: .85em; opacity: .65; }
+.hidden { display: none !important; }
+good { color: var(--c-good); }
+bad { color: var(--c-bad); }
+.rp { white-space: nowrap; font-weight: 600; }
+.rp::before { content: ""; display: inline-block; width: .8em; height: .8em; margin-right: .15em; vertical-align: -.05em; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 13 13 3M6 3h7v7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 13 13 3M6 3h7v7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+bad.rp::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3l10 10M6 13h7V6' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3l10 10M6 13h7V6' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+rating { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--c-font-clear); }
+rating.prov::after { content: "?"; color: var(--c-font-dim); font-weight: 400; }
+
+/* ---------- header ---------- */
+.site-header {
+  height: 50px; display: flex; align-items: center; gap: .5rem;
+  padding: 0 .7rem; background: var(--c-bg); box-shadow: var(--shadow);
+  position: sticky; top: 0; z-index: 5;
+}
+.site-title { font-family: Roboto, sans-serif; font-weight: 300; font-size: 1.35em; color: var(--c-font-clearer); display: inline-flex; align-items: center; gap: .3em; letter-spacing: .01em; white-space: nowrap; }
+.site-title:hover { color: var(--c-font-clearer); }
+.site-title .paddle { width: 1.15em; height: 1.15em; color: var(--c-font-dim); }
+.site-title b { font-weight: 300; color: var(--c-font-dim); }
+.site-nav { display: flex; gap: .1rem; margin-left: auto; }
+.site-nav a { color: var(--c-font-dim); padding: .45em .4em; border-radius: var(--radius); font-size: .9em; white-space: nowrap; }
+.site-nav a:hover { background: var(--c-bg-low); color: var(--c-font-clear); }
+.site-nav a.active { color: var(--c-font-clearer); }
+.theme-toggle { width: 30px; height: 30px; flex: none; border-radius: var(--radius); display: grid; place-items: center; color: var(--c-font-dim); }
+.theme-toggle:hover { background: var(--c-bg-low); color: var(--c-font-clear); }
+.theme-toggle svg { width: 18px; height: 18px; }
+html:not(.light) .icon-sun { display: none; }
+html.light .icon-moon { display: none; }
+
+/* ---------- layout ---------- */
+main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .75rem 2rem; }
+.screen { display: none; }
+.screen.active { display: block; }
+.box { background: var(--c-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.box + .box, .box + .actions, .actions + .box { margin-top: 1rem; }
+.box__pad { padding: 1.2rem; }
+.box__top { display: flex; align-items: baseline; gap: .6rem; padding: 1rem 1.2rem .6rem; }
+.box__top .shy { margin-left: auto; }
+
+/* ---------- buttons (lila .button) ---------- */
+.button {
+  font-family: Roboto, sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: .02em;
+  color: var(--c-over); background: var(--c-primary); border-radius: var(--radius);
+  padding: .8em 1em; display: inline-flex; align-items: center; justify-content: center; gap: .5em;
+  text-shadow: .5px .5px 0 rgb(0 0 0 / .5); user-select: none; transition: filter .15s, background .15s;
+  box-shadow: inset 0 1px 0 hsl(from var(--c-primary) h s calc(l + 30%)), inset 0 -1px 0 hsl(from var(--c-primary) h s calc(l - 18%)), 0 1px 3px rgb(0 0 0 / .25);
+}
+.button:hover:not(:disabled) { filter: brightness(1.12); color: var(--c-over); }
+.button:disabled { opacity: .45; cursor: not-allowed; }
+.button-green { background: var(--c-good); box-shadow: inset 0 1px 0 hsl(from var(--c-good) h s calc(l + 30%)), inset 0 -1px 0 hsl(from var(--c-good) h s calc(l - 12%)), 0 1px 3px rgb(0 0 0 / .25); }
+.button-metal { color: var(--c-font-clear); text-shadow: none; background: linear-gradient(to bottom, var(--c-metal-top), var(--c-metal-bottom)); box-shadow: inset 0 1px 3px -2px hsl(0 0% 45%), inset 0 -4px 6px -3px rgb(0 0 0 / .35), 0 1px 3px rgb(0 0 0 / .2); }
+.button-metal:hover:not(:disabled) { background: linear-gradient(to bottom, var(--c-metal-top-hover), var(--c-metal-bottom-hover)); filter: none; }
+.button-fat { font-size: 1.25em; padding: 1em 1.2em; }
+.button-empty { background: none; box-shadow: none; text-shadow: none; color: var(--c-primary); }
+.button-empty:hover:not(:disabled) { background: var(--c-bg-low); filter: none; }
+.button svg { width: 1.1em; height: 1.1em; }
+
+/* ---------- home ---------- */
+.home-grid { display: grid; gap: 1rem; }
+.actions { display: grid; grid-template-columns: 1fr; gap: .6rem; }
+.actions .button { width: 100%; }
+.actions .button-metal { font-size: 1.05em; padding: .8em 1em; }
+.lobby-side { display: none; }
+.slist { width: 100%; border-collapse: collapse; }
+.slist thead th { font-family: Roboto, sans-serif; font-weight: 400; text-align: left; font-size: .85em; color: var(--c-font-dim); padding: .5rem .8rem; border-bottom: 1px solid var(--c-border); background: linear-gradient(to bottom, var(--c-metal-top), var(--c-metal-bottom)); }
+.slist tbody tr:nth-child(even) { background: var(--c-bg-zebra); }
+.slist tbody tr { cursor: pointer; }
+.slist tbody tr:hover { background: var(--c-bg-low); }
+.slist td { padding: .7rem .8rem; vertical-align: middle; }
+.slist td:first-child, .slist th:first-child { padding-left: 1.2rem; }
+.slist td:last-child, .slist th:last-child { padding-right: 1.2rem; text-align: right; }
+.slist .rank { color: var(--c-font-dim); width: 2.6em; font-variant-numeric: tabular-nums; }
+.slist .rank.top { color: var(--c-brag); font-weight: 600; }
+.slist .name { font-weight: 400; color: var(--c-font-clear); max-width: 0; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slist .name .line { display: inline-block; width: .5em; height: .5em; border-radius: 50%; background: var(--c-good); margin-right: .45em; vertical-align: .05em; }
+.slist .record { text-align: right; white-space: nowrap; }
+.slist .rec-bar { display: inline-block; width: 44px; height: 4px; border-radius: 2px; background: var(--c-bad); overflow: hidden; vertical-align: middle; margin-left: .5em; }
+.slist .rec-bar i { display: block; height: 100%; background: var(--c-good); }
+.slist .rec-bar.empty { background: var(--c-border); }
+@media (max-width: 479px) { .slist .rec-bar { display: none; } .slist td, .slist th { padding-left: .5rem; padding-right: .5rem; } }
+.slist rating { font-size: 1.15em; }
+.gold-head { background: var(--c-brag); color: #fff; font-family: Roboto, sans-serif; font-weight: 500; letter-spacing: 1px; font-size: 1.15em; line-height: 2.5em; padding: 0 1.2rem; display: flex; align-items: center; gap: .6em; }
+.gold-head .shy { margin-left: auto; opacity: .85; font-weight: 400; letter-spacing: 0; }
+.gold-head svg { width: 1em; height: 1em; }
+.foot-links { display: flex; gap: 1.2rem; justify-content: center; padding: 1.4rem 0 0; font-size: .9em; color: var(--c-font-dim); flex-wrap: wrap; }
+.foot-links a { color: var(--c-font-dim); }
+.foot-links a:hover { color: var(--c-primary); }
+.flash { background: color-mix(in oklab, var(--c-good) 14%, var(--c-bg)); border: 1px solid color-mix(in oklab, var(--c-good) 40%, var(--c-bg)); color: var(--c-font-clear); border-radius: var(--radius); padding: .8rem 1rem; margin-bottom: 1rem; display: flex; gap: .8rem; align-items: center; }
+.flash strong { color: var(--c-good); font-weight: 600; }
+
+/* ---------- record match ---------- */
+.setup h2 { display: flex; align-items: center; gap: .6em; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.2rem; border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); background: var(--c-bg-zebra); }
+.cmn-toggle { position: relative; width: 44px; height: 24px; border-radius: 12px; background: var(--c-bg-low); border: 1px solid var(--c-border); transition: background .15s; flex: none; }
+.cmn-toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--c-font-dim); transition: left .15s, background .15s; }
+.cmn-toggle[aria-checked="true"] { background: var(--c-good); border-color: var(--c-good); }
+.cmn-toggle[aria-checked="true"]::after { left: 22px; background: #fff; }
+.quick { padding: .9rem 1.2rem 0; }
+.quick .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .4rem; }
+.chip { border: 1px solid var(--c-border); border-radius: 999px; padding: .3em .8em; font-size: .9em; color: var(--c-font-clear); background: var(--c-bg-mid); }
+.chip:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.sides { display: grid; grid-template-columns: 1fr; gap: .8rem; padding: 1rem 1.2rem; }
+.side { display: grid; gap: .5rem; }
+.side label { font-family: Roboto, sans-serif; text-transform: uppercase; letter-spacing: .05em; font-size: .8em; color: var(--c-font-dim); }
+.vs { text-align: center; font-family: Roboto, sans-serif; font-weight: 300; font-size: 1.3em; color: var(--c-font-dimmer); }
+.player-input { position: relative; }
+.player-input input { width: 100%; padding: .75em .9em .75em 2.4em; background: var(--c-bg-input); color: var(--c-font-clear); border: 1px solid var(--c-border); border-radius: var(--radius); outline: none; }
+.player-input input:focus { border-color: var(--c-primary); box-shadow: 0 0 0 2px color-mix(in oklab, var(--c-primary) 30%, transparent); }
+.player-input input.ok { border-color: var(--c-good); }
+.player-input > svg { position: absolute; left: .8em; top: 50%; transform: translateY(-50%); width: 1em; height: 1em; color: var(--c-font-dim); pointer-events: none; }
+.player-input .rt { position: absolute; right: .8em; top: 50%; transform: translateY(-50%); font-size: .9em; }
+.complete { position: absolute; z-index: 4; left: 0; right: 0; top: calc(100% + 4px); background: var(--c-bg-low); border: 1px solid var(--c-border); border-radius: var(--radius); box-shadow: var(--shadow); list-style: none; margin: 0; padding: .25rem 0; max-height: 220px; overflow: auto; }
+.complete li { padding: .55em .9em; display: flex; justify-content: space-between; cursor: pointer; }
+.complete li:hover, .complete li.hl { background: var(--c-primary); color: #fff; }
+.complete li:hover rating, .complete li.hl rating { color: #fff; }
+.complete li.create { color: var(--c-primary); font-style: italic; }
+.winner { padding: 0 1.2rem 1.2rem; }
+.winner h3 { margin-bottom: .6rem; }
+.pick-row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+.pick { min-height: 96px; border: 2px solid var(--c-border); border-radius: var(--radius); background: var(--c-bg-mid); display: grid; align-content: center; justify-items: center; gap: .3em; padding: .8em .5em; text-align: center; transition: border-color .15s, background .15s; }
+.pick:hover { border-color: var(--c-font-dim); }
+.pick .who { font-family: Roboto, sans-serif; font-weight: 400; font-size: 1.05em; color: var(--c-font-clear); line-height: 1.25; }
+.pick .who.placeholder { color: var(--c-font-dimmer); font-weight: 300; }
+.pick .prev { font-size: .9em; }
+.pick.chosen { border-color: var(--c-good); background: color-mix(in oklab, var(--c-good) 12%, var(--c-bg)); }
+.pick.chosen .who::before { content: "✓ "; color: var(--c-good); font-weight: 600; }
+.pick.chosen .prev good { font-size: 1.15em; }
+.submit-row { padding: 0 1.2rem 1.2rem; display: grid; gap: .6rem; }
+.submit-row .button { width: 100%; }
+.submit-row .shy { text-align: center; }
+
+/* ---------- player ---------- */
+.user-show__header { background: var(--c-bg-zebra); padding: 1.6rem 1.2rem 1.3rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .3em 1em; }
+.user-show__header h1 { font-size: 1.9em; display: inline-flex; align-items: center; gap: .4em; }
+.user-show__header h1 .line { width: .38em; height: .38em; border-radius: 50%; background: var(--c-good); display: inline-block; }
+.user-show__header .meta { color: var(--c-font-dim); font-size: .9em; width: 100%; }
+.sub-rating { display: flex; align-items: center; gap: .9rem; padding: 1rem 1.2rem; border-bottom: 1px solid var(--c-border); }
+.sub-rating .paddle { width: 2.6em; height: 2.6em; color: var(--c-accent); opacity: .75; flex: none; }
+.sub-rating .lbl { font-family: Roboto, sans-serif; text-transform: uppercase; letter-spacing: .05em; font-size: .8em; color: var(--c-font-dim); }
+.sub-rating .big { display: flex; align-items: baseline; gap: .5em; }
+.sub-rating .big rating { font-size: 2.2em; line-height: 1.1; }
+.sub-rating .rank-pill { margin-left: auto; text-align: right; }
+.sub-rating .rank-pill strong { display: block; font-family: Roboto, sans-serif; font-weight: 300; font-size: 2em; line-height: 1.1; color: var(--c-brag); }
+.chart-wrap { padding: .8rem 1rem .4rem; }
+.chart-head { display: flex; align-items: center; justify-content: space-between; padding: 0 .2rem .3rem; }
+.range { display: inline-flex; }
+.range button { font-family: Roboto, sans-serif; font-weight: 400; text-transform: uppercase; font-size: .8em; padding: .3em .7em; border: 1px solid var(--c-border); border-right: 0; color: var(--c-font-dim); }
+.range button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.range button:last-child { border-right: 1px solid var(--c-border); border-radius: 0 var(--radius) var(--radius) 0; }
+.range button.active { background: var(--c-bg-low); color: var(--c-font-clear); }
+#chart { width: 100%; height: 210px; display: block; overflow: visible; }
+#chart .grid { stroke: var(--c-border); stroke-width: 1; }
+#chart .base { stroke: var(--c-brag); stroke-dasharray: 3 4; stroke-width: 1; opacity: .7; }
+#chart .area { fill: var(--c-primary); opacity: .14; }
+#chart .line { fill: none; stroke: var(--c-primary); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+#chart .pt { fill: var(--c-bg); stroke: var(--c-primary); stroke-width: 2; }
+#chart .pt.last { fill: var(--c-primary); }
+#chart text { fill: var(--c-font-dim); font-size: 10px; font-family: 'Noto Sans', sans-serif; }
+#chart text.val { fill: var(--c-font-clear); font-weight: 600; font-size: 11px; }
+#chart .hit { fill: transparent; }
+#chart .hover-line { stroke: var(--c-font-dim); stroke-width: 1; opacity: 0; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--c-border); }
+.stat { padding: .9rem .6rem; text-align: center; border-right: 1px solid var(--c-border); }
+.stat:last-child { border-right: 0; }
+.stat strong { display: block; font-family: Roboto, sans-serif; font-weight: 300; font-size: 1.6em; color: var(--c-font-clear); line-height: 1.1; }
+.stat .shy { display: block; margin-top: .15em; }
+.wl-bar { height: 6px; display: flex; margin: 0 1.2rem 1.2rem; border-radius: 3px; overflow: hidden; }
+.wl-bar i { display: block; height: 100%; }
+.wl-bar .w { background: var(--c-good); }
+.wl-bar .l { background: var(--c-bad); }
+.wl-legend { display: flex; justify-content: space-between; margin: 0 1.2rem .5rem; font-size: .85em; }
+.games { list-style: none; margin: 0; padding: 0; }
+.game-row { display: grid; grid-template-columns: 4.2em 1fr auto; gap: .8rem; align-items: center; padding: .75rem 1.2rem; }
+.game-row:nth-child(even) { background: var(--c-bg-zebra); }
+.game-row .res { font-family: Roboto, sans-serif; font-weight: 500; text-transform: uppercase; font-size: .85em; letter-spacing: .04em; }
+.game-row .res.win { color: var(--c-good); }
+.game-row .res.loss { color: var(--c-bad); }
+.game-row .opp { color: var(--c-font-clear); }
+.game-row .opp .shy { display: block; }
+.game-row .delta { font-size: 1.1em; }
+
+/* ---------- desktop ---------- */
+@media (min-width: 760px) {
+  main { padding: 1.5rem 1rem 3rem; }
+  .home-grid { grid-template-columns: 300px 1fr; align-items: start; }
+  .home-grid > div:first-child { position: sticky; top: 66px; }
+  .site-title { font-size: 1.55em; }
+  .lobby-side { display: block; margin-top: 1rem; }
+  .sides { grid-template-columns: 1fr auto 1fr; align-items: end; }
+  .vs { padding-bottom: .7em; }
+  .player-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .player-grid > .chart-col { border-right: 1px solid var(--c-border); }
+  #chart { height: 260px; }
+  .site-nav a { font-size: 1em; }
+  .site-header { padding: 0 1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="site-title" href="#home">
+    <svg class="paddle" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2.5a7 7 0 0 0-6.9 8.1c.1.7-.1 1.4-.6 1.9l-4.3 4.3a1.6 1.6 0 0 0 0 2.2l.9.9a1.6 1.6 0 0 0 2.2 0l4.3-4.3c.5-.5 1.2-.7 1.9-.6A7 7 0 1 0 14.5 2.5z" fill="currentColor"/><circle cx="19.6" cy="18.8" r="2.3" fill="var(--c-accent)"/></svg>
+    ashdown<b>.win</b>
+  </a>
+  <nav class="site-nav">
+    <a href="#home" data-nav="home">Board</a>
+    <a href="#record" data-nav="record">Record</a>
+    <a href="#player" data-nav="player">Player</a>
+  </nav>
+  <button class="theme-toggle" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  </button>
+</header>
+
+<main>
+
+<!-- ============ HOME ============ -->
+<section id="home" class="screen">
+  <div id="flash" class="flash hidden"></div>
+  <div class="home-grid">
+    <div>
+      <div class="actions">
+        <a class="button button-green button-fat" href="#record">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Record match
+        </a>
+        <a class="button button-metal button-fat" href="#create" id="createBtn">Create player</a>
+      </div>
+      <div class="box lobby-side">
+        <div class="box__pad">
+          <h3>How the rating moves</h3>
+          <p class="shy" style="margin:.5em 0 0">Elo, the chess formula. Winner takes <code>K·(1−E)</code> from the loser. K&nbsp;=&nbsp;32 for singles, 16 for doubles, everyone starts at 1000. Ratings are recomputed from the full match log every time. <a href="#algorithm">Algorithm →</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="gold-head">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14v2h3v4a5 5 0 0 1-4.3 4.9A6 6 0 0 1 13 17.9V20h4v2H7v-2h4v-2.1a6 6 0 0 1-4.7-4A5 5 0 0 1 2 9V5h3V3zm0 4H4v2a3 3 0 0 0 1.4 2.5A8 8 0 0 1 5 9V7zm14 0v2c0 .9-.1 1.7-.4 2.5A3 3 0 0 0 20 9V7h-1z"/></svg>
+        Leaderboard
+        <span class="shy" id="lbCount"></span>
+      </div>
+      <table class="slist">
+        <thead><tr><th>#</th><th>Player</th><th style="text-align:right">Rating</th><th>W – L</th></tr></thead>
+        <tbody id="lb"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="foot-links">
+    <a href="#algorithm">Algorithm</a>
+    <a href="#log">Match log</a>
+    <a href="https://github.com/andersbekkevard/ashdown-win">Source code</a>
+    <span>Ashdown House · MIT</span>
+  </div>
+</section>
+
+<!-- ============ RECORD ============ -->
+<section id="record" class="screen">
+  <div class="box setup">
+    <div class="box__top">
+      <h2>Record a match</h2>
+      <span class="shy">no login needed</span>
+    </div>
+    <div class="quick">
+      <span class="shy">Recently at the table</span>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="sides">
+      <div class="side" data-side="a">
+        <label>Side A</label>
+        <div class="player-input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.5-4.5"/></svg>
+          <input type="text" placeholder="Search a name…" data-slot="a1" autocomplete="off" spellcheck="false">
+          <span class="rt shy"></span>
+          <ul class="complete hidden"></ul>
+        </div>
+        <div class="player-input partner hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.5-4.5"/></svg>
+          <input type="text" placeholder="Partner…" data-slot="a2" autocomplete="off" spellcheck="false">
+          <span class="rt shy"></span>
+          <ul class="complete hidden"></ul>
+        </div>
+      </div>
+      <div class="vs">vs</div>
+      <div class="side" data-side="b">
+        <label>Side B</label>
+        <div class="player-input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.5-4.5"/></svg>
+          <input type="text" placeholder="Search a name…" data-slot="b1" autocomplete="off" spellcheck="false">
+          <span class="rt shy"></span>
+          <ul class="complete hidden"></ul>
+        </div>
+        <div class="player-input partner hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.5-4.5"/></svg>
+          <input type="text" placeholder="Partner…" data-slot="b2" autocomplete="off" spellcheck="false">
+          <span class="rt shy"></span>
+          <ul class="complete hidden"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <span>Doubles <span class="shy">· two per side, K = 16</span></span>
+      <button class="cmn-toggle" id="doublesToggle" role="switch" aria-checked="false" aria-label="Doubles"></button>
+    </div>
+    <div class="winner">
+      <h3 style="margin-top:1rem">Who won?</h3>
+      <div class="pick-row">
+        <button class="pick" data-win="a"><span class="who placeholder">Side A</span><span class="prev shy">—</span></button>
+        <button class="pick" data-win="b"><span class="who placeholder">Side B</span><span class="prev shy">—</span></button>
+      </div>
+    </div>
+    <div class="submit-row">
+      <button class="button button-green button-fat" id="submitBtn" disabled>Record match</button>
+      <span class="shy">Everything recorded is public and can be deleted from the log.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLAYER ============ -->
+<section id="player" class="screen">
+  <div class="box">
+    <div class="user-show__header">
+      <h1><span class="line" title="Played today"></span><span id="pName"></span></h1>
+      <span class="meta">Member since 12 Feb 2026 · last match today</span>
+    </div>
+    <div class="sub-rating">
+      <svg class="paddle" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2.5a7 7 0 0 0-6.9 8.1c.1.7-.1 1.4-.6 1.9l-4.3 4.3a1.6 1.6 0 0 0 0 2.2l.9.9a1.6 1.6 0 0 0 2.2 0l4.3-4.3c.5-.5 1.2-.7 1.9-.6A7 7 0 1 0 14.5 2.5z" fill="currentColor"/></svg>
+      <div>
+        <div class="lbl">Table tennis</div>
+        <div class="big"><rating id="pRating"></rating><span id="pProg"></span></div>
+        <span class="shy" id="pGames"></span>
+      </div>
+      <div class="rank-pill"><span class="lbl">Rank</span><strong id="pRank"></strong></div>
+    </div>
+    <div class="player-grid">
+      <div class="chart-col">
+        <div class="chart-wrap">
+          <div class="chart-head">
+            <h3>Rating history</h3>
+            <div class="range" id="range">
+              <button data-n="5">5</button><button data-n="10">10</button><button data-n="0" class="active">All</button>
+            </div>
+          </div>
+          <svg id="chart" aria-label="Rating over the last matches"></svg>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong id="sPeak"></strong><span class="shy">peak</span></div>
+          <div class="stat"><strong id="sWins"></strong><span class="shy">wins</span></div>
+          <div class="stat"><strong id="sLoss"></strong><span class="shy">losses</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="wl-legend"><good id="wlW"></good><bad id="wlL"></bad></div>
+        <div class="wl-bar" id="wlBar"></div>
+        <h3 style="padding:0 1.2rem .5rem">Recent matches</h3>
+        <ol class="games" id="games"></ol>
+        <div class="box__pad" style="padding-top:.6rem"><a href="#log" class="shy">All 14 matches →</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ---------- data (inlined from design/explorations/data.json) ---------- */
+const DATA = {
+  "site": { "name": "ashdown.win", "url": "ashdown.win", "repo": "github.com/andersbekkevard/ashdown-win" },
+  "constants": { "kSingles": 32, "kDoubles": 16, "start": 1000 },
+  "leaderboard": [
+    { "rank": 1, "name": "Priya Raman", "rating": 1142, "matches": 21, "wins": 16 },
+    { "rank": 2, "name": "Tomás Ferreira", "rating": 1108, "matches": 17, "wins": 12 },
+    { "rank": 3, "name": "Anders Bekkevard", "rating": 1071, "matches": 14, "wins": 9 },
+    { "rank": 4, "name": "jchen26", "rating": 1054, "matches": 9, "wins": 6 },
+    { "rank": 5, "name": "Mei Nakamura", "rating": 1033, "matches": 11, "wins": 6 },
+    { "rank": 6, "name": "Daniel Okafor", "rating": 1012, "matches": 6, "wins": 3 },
+    { "rank": 7, "name": "Sofia Almeida", "rating": 1000, "matches": 0, "wins": 0 },
+    { "rank": 8, "name": "Lukas Weber", "rating": 987, "matches": 5, "wins": 2 },
+    { "rank": 9, "name": "The Ghost of 4th Floor", "rating": 971, "matches": 8, "wins": 3 },
+    { "rank": 10, "name": "Hannah Cohen", "rating": 958, "matches": 12, "wins": 4 },
+    { "rank": 11, "name": "Ravi Menon", "rating": 934, "matches": 7, "wins": 1 },
+    { "rank": 12, "name": "Emma Lindqvist", "rating": 913, "matches": 10, "wins": 2 }
+  ],
+  "player": {
+    "name": "Anders Bekkevard", "rating": 1071, "rank": 3, "matches": 14, "wins": 9,
+    "history": [1000, 1016, 1031, 1017, 1035, 1050, 1038, 1055, 1069, 1058, 1074, 1088, 1077, 1061, 1071],
+    "recent": [
+      { "date": "2026-09-06", "type": "singles", "opponent": "Priya Raman", "result": "loss", "delta": -10 },
+      { "date": "2026-09-06", "type": "singles", "opponent": "jchen26", "result": "win", "delta": 15 },
+      { "date": "2026-09-05", "type": "doubles", "partner": "Mei Nakamura", "opponent": "Tomás Ferreira & Daniel Okafor", "result": "loss", "delta": -8 },
+      { "date": "2026-09-04", "type": "singles", "opponent": "Lukas Weber", "result": "win", "delta": 14 },
+      { "date": "2026-09-03", "type": "singles", "opponent": "Hannah Cohen", "result": "win", "delta": 13 },
+      { "date": "2026-09-02", "type": "singles", "opponent": "Tomás Ferreira", "result": "loss", "delta": -12 }
+    ]
+  }
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const byName = n => DATA.leaderboard.find(p => p.name === n);
+
+/* ---------- theme ---------- */
+$('#themeToggle').addEventListener('click', () => document.documentElement.classList.toggle('light'));
+
+/* ---------- routing ---------- */
+function route() {
+  let h = (location.hash || '#home').slice(1);
+  if (!['home', 'record', 'player'].includes(h)) {
+    if (h === 'create') { alert('Create player: a full name by default; MIT username or any unique name as alternatives. (Mockup)'); }
+    else if (h === 'algorithm') { alert('The algorithm page: the Elo derivation as a short paper. (Mockup)'); }
+    else if (h === 'log') { alert('The full public match log, deletions included. (Mockup)'); }
+    h = 'home';
+    history.replaceState(null, '', '#' + h);
+  }
+  $$('.screen').forEach(s => s.classList.toggle('active', s.id === h));
+  $$('.site-nav a').forEach(a => a.classList.toggle('active', a.dataset.nav === h));
+  window.scrollTo(0, 0);
+  if (h === 'player') drawChart();
+}
+window.addEventListener('hashchange', route);
+
+/* ---------- leaderboard ---------- */
+(function renderBoard() {
+  const tb = $('#lb');
+  tb.innerHTML = DATA.leaderboard.map(p => {
+    const losses = p.matches - p.wins;
+    const pct = p.matches ? (p.wins / p.matches * 100) : 0;
+    const prov = p.matches === 0 ? ' prov' : '';
+    const line = p.name === DATA.player.name ? '<span class="line"></span>' : '';
+    return `<tr data-name="${esc(p.name)}">
+      <td class="rank${p.rank <= 3 ? ' top' : ''}">${p.rank}</td>
+      <td class="name">${line}${esc(p.name)}</td>
+      <td style="text-align:right"><rating class="${prov.trim()}">${p.rating}</rating></td>
+      <td class="record"><span class="shy">${p.matches ? p.wins + ' – ' + losses : 'no matches'}</span><span class="rec-bar${p.matches ? '' : ' empty'}"><i style="width:${pct}%"></i></span></td>
+    </tr>`;
+  }).join('');
+  $('#lbCount').textContent = DATA.leaderboard.length + ' players';
+  tb.addEventListener('click', e => {
+    const tr = e.target.closest('tr'); if (!tr) return;
+    if (tr.dataset.name === DATA.player.name) location.hash = '#player';
+    else alert(tr.dataset.name + ' — player page (only ' + DATA.player.name + ' is mocked up).');
+  });
+})();
+
+/* ---------- record match ---------- */
+const slots = { a1: null, a2: null, b1: null, b2: null };
+let doubles = false, winner = null;
+const K = () => doubles ? DATA.constants.kDoubles : DATA.constants.kSingles;
+const expected = (r, o) => 1 / (1 + Math.pow(10, (o - r) / 400));
+
+function sideRating(s) {
+  const ps = [slots[s + '1'], doubles ? slots[s + '2'] : null].filter(Boolean);
+  if (!ps.length || (doubles && ps.length < 2)) return null;
+  return ps.reduce((a, p) => a + p.rating, 0) / ps.length;
+}
+function sideLabel(s) {
+  const ps = [slots[s + '1'], doubles ? slots[s + '2'] : null].filter(Boolean).map(p => p.name);
+  return ps.length ? ps.join(' & ') : null;
+}
+function complete() {
+  const need = doubles ? ['a1', 'a2', 'b1', 'b2'] : ['a1', 'b1'];
+  return need.every(k => slots[k]);
+}
+function refreshPicks() {
+  const ra = sideRating('a'), rb = sideRating('b');
+  ['a', 'b'].forEach(s => {
+    const btn = $(`.pick[data-win="${s}"]`);
+    const lbl = sideLabel(s);
+    const who = $('.who', btn);
+    who.textContent = lbl || (s === 'a' ? 'Side A' : 'Side B');
+    who.classList.toggle('placeholder', !lbl);
+    const prev = $('.prev', btn);
+    if (ra != null && rb != null) {
+      const me = s === 'a' ? ra : rb, op = s === 'a' ? rb : ra;
+      const win = Math.round(K() * (1 - expected(me, op)));
+      const lose = Math.round(K() * (0 - expected(me, op)));
+      prev.innerHTML = `<good class="rp">${win}</good> <span class="shy">/</span> <bad class="rp">${Math.abs(lose)}</bad>`;
+      prev.classList.remove('shy');
+    } else { prev.textContent = ra != null || rb != null ? 'pick the other side' : 'tap the winner'; prev.classList.add('shy'); }
+    btn.classList.toggle('chosen', winner === s);
+  });
+  $('#submitBtn').disabled = !(complete() && winner);
+}
+function setSlot(key, player) {
+  slots[key] = player;
+  const inp = $(`input[data-slot="${key}"]`);
+  inp.value = player ? player.name : inp.value;
+  inp.classList.toggle('ok', !!player);
+  const rt = inp.parentElement.querySelector('.rt');
+  rt.innerHTML = player ? `<rating>${player.rating}</rating>` : '';
+  refreshPicks();
+}
+function chosenNames() { return Object.values(slots).filter(Boolean).map(p => p.name); }
+function firstEmptySlot() {
+  const order = doubles ? ['a1', 'a2', 'b1', 'b2'] : ['a1', 'b1'];
+  return order.find(k => !slots[k]);
+}
+
+$$('input[data-slot]').forEach(inp => {
+  const list = inp.parentElement.querySelector('.complete');
+  const key = inp.dataset.slot;
+  const render = () => {
+    const q = inp.value.trim().toLowerCase();
+    if (slots[key] && slots[key].name.toLowerCase() === q) { list.classList.add('hidden'); return; }
+    if (slots[key]) setSlot(key, null);
+    const taken = chosenNames();
+    const hits = DATA.leaderboard.filter(p => !taken.includes(p.name) && (!q || p.name.toLowerCase().includes(q))).slice(0, 6);
+    let html = hits.map(p => `<li data-name="${esc(p.name)}"><span>${esc(p.name)}</span><rating>${p.rating}</rating></li>`).join('');
+    if (q && !DATA.leaderboard.some(p => p.name.toLowerCase() === q)) html += `<li class="create" data-create="${esc(inp.value.trim())}">Create “${esc(inp.value.trim())}”</li>`;
+    list.innerHTML = html;
+    list.classList.toggle('hidden', !html);
+  };
+  inp.addEventListener('focus', render);
+  inp.addEventListener('input', render);
+  inp.addEventListener('blur', () => setTimeout(() => list.classList.add('hidden'), 150));
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { const li = list.querySelector('li'); if (li) { li.dispatchEvent(new Event('mousedown')); e.preventDefault(); } }
+  });
+  list.addEventListener('mousedown', e => {
+    const li = e.target.closest('li'); if (!li) return;
+    if (li.dataset.create != null) {
+      const p = { name: li.dataset.create, rating: DATA.constants.start, matches: 0, wins: 0, rank: DATA.leaderboard.length + 1 };
+      DATA.leaderboard.push(p); setSlot(key, p);
+    } else setSlot(key, byName(li.dataset.name));
+    list.classList.add('hidden');
+    const next = firstEmptySlot(); if (next) $(`input[data-slot="${next}"]`).focus(); else inp.blur();
+  });
+});
+
+$('#doublesToggle').addEventListener('click', e => {
+  doubles = !doubles;
+  e.currentTarget.setAttribute('aria-checked', doubles);
+  $$('.partner').forEach(el => el.classList.toggle('hidden', !doubles));
+  if (!doubles) { ['a2', 'b2'].forEach(k => { slots[k] = null; const i = $(`input[data-slot="${k}"]`); i.value = ''; i.classList.remove('ok'); i.parentElement.querySelector('.rt').textContent = ''; }); }
+  refreshPicks();
+});
+$$('.pick').forEach(b => b.addEventListener('click', () => { winner = winner === b.dataset.win ? null : b.dataset.win; refreshPicks(); }));
+
+(function chips() {
+  const names = [...new Set(DATA.player.recent.flatMap(m => [m.opponent.split(' & ')[0], m.partner].filter(Boolean)).concat(DATA.player.name))];
+  $('#chips').innerHTML = names.slice(0, 6).map(n => `<button class="chip" data-name="${esc(n)}">${esc(n)}</button>`).join('');
+  $('#chips').addEventListener('click', e => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    if (chosenNames().includes(c.dataset.name)) return;
+    const k = firstEmptySlot(); if (!k) return;
+    setSlot(k, byName(c.dataset.name));
+  });
+})();
+
+$('#submitBtn').addEventListener('click', () => {
+  const ra = sideRating('a'), rb = sideRating('b');
+  const w = winner, l = winner === 'a' ? 'b' : 'a';
+  const rw = w === 'a' ? ra : rb, rl = w === 'a' ? rb : ra;
+  const d = Math.round(K() * (1 - expected(rw, rl)));
+  const f = $('#flash');
+  f.innerHTML = `<good class="rp">${d}</good><span>Recorded: <strong>${esc(sideLabel(w))}</strong> beat ${esc(sideLabel(l))} <span class="shy">(${doubles ? 'doubles' : 'singles'}, K = ${K()})</span>. The board below reflects it once the log replays; a wrong entry can be deleted from the log.</span>`;
+  f.classList.remove('hidden');
+  Object.keys(slots).forEach(k => { slots[k] = null; const i = $(`input[data-slot="${k}"]`); i.value = ''; i.classList.remove('ok'); i.parentElement.querySelector('.rt').textContent = ''; });
+  winner = null; refreshPicks();
+  location.hash = '#home';
+  setTimeout(() => f.classList.add('hidden'), 9000);
+});
+refreshPicks();
+
+/* ---------- player page ---------- */
+(function renderPlayer() {
+  const p = DATA.player, h = p.history;
+  $('#pName').textContent = p.name;
+  $('#pRating').textContent = p.rating;
+  const span = Math.min(12, h.length - 1); // lichess progress: change over the last 12 rated games
+  const prog = h[h.length - 1] - h[h.length - 1 - span];
+  $('#pProg').innerHTML = prog >= 0 ? `<good class="rp">${prog}</good>` : `<bad class="rp">${-prog}</bad>`;
+  $('#pProg').title = 'Change over the last ' + span + ' matches';
+  $('#pGames').textContent = p.matches + ' matches';
+  $('#pRank').textContent = '#' + p.rank;
+  $('#sPeak').textContent = Math.max(...h);
+  $('#sWins').textContent = p.wins;
+  $('#sLoss').textContent = p.matches - p.wins;
+  const wp = p.wins / p.matches * 100;
+  $('#wlBar').innerHTML = `<i class="w" style="width:${wp}%"></i><i class="l" style="width:${100 - wp}%"></i>`;
+  $('#wlW').textContent = p.wins + ' wins';
+  $('#wlL').textContent = (p.matches - p.wins) + ' losses';
+  const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  $('#games').innerHTML = p.recent.map(m => `<li class="game-row">
+    <span class="res ${m.result}">${m.result === 'win' ? 'Win' : 'Loss'}</span>
+    <span class="opp">vs ${esc(m.opponent)}<span class="shy">${m.type}${m.partner ? ' with ' + esc(m.partner) : ''} · ${fmt(m.date)}</span></span>
+    <span class="delta">${m.delta >= 0 ? `<good class="rp">${m.delta}</good>` : `<bad class="rp">${-m.delta}</bad>`}</span>
+  </li>`).join('');
+})();
+
+/* ---------- chart ---------- */
+let rangeN = 0;
+$('#range').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  rangeN = +b.dataset.n;
+  $$('#range button').forEach(x => x.classList.toggle('active', x === b));
+  drawChart();
+});
+window.addEventListener('resize', () => { if ($('#player').classList.contains('active')) drawChart(); });
+
+function drawChart() {
+  const svg = $('#chart');
+  const full = DATA.player.history;
+  const pts = rangeN ? full.slice(-(rangeN + 1)) : full;
+  const offset = full.length - pts.length;
+  const W = svg.clientWidth || 340, H = svg.clientHeight || 210;
+  const padL = 34, padR = 14, padT = 14, padB = 22;
+  const iw = W - padL - padR, ih = H - padT - padB;
+  let lo = Math.min(...pts, DATA.constants.start), hi = Math.max(...pts, DATA.constants.start);
+  const step = 25;
+  lo = Math.floor((lo - 5) / step) * step; hi = Math.ceil((hi + 5) / step) * step;
+  const x = i => padL + (pts.length === 1 ? iw / 2 : i / (pts.length - 1) * iw);
+  const y = v => padT + (hi - v) / (hi - lo) * ih;
+  let out = '';
+  for (let v = lo; v <= hi; v += step) {
+    out += `<line class="grid" x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}"/>`;
+    out += `<text x="${padL - 6}" y="${y(v) + 3.5}" text-anchor="end">${v}</text>`;
+  }
+  out += `<line class="base" x1="${padL}" x2="${W - padR}" y1="${y(DATA.constants.start)}" y2="${y(DATA.constants.start)}"/>`;
+  const ticks = pts.length <= 6 ? pts.map((_, i) => i) : [0, Math.round((pts.length - 1) / 2), pts.length - 1];
+  ticks.forEach(i => out += `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === pts.length - 1 ? 'end' : 'middle'}">${i + offset === 0 ? 'start' : 'match ' + (i + offset)}</text>`);
+  const path = pts.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  out += `<path class="area" d="${path} L${x(pts.length - 1).toFixed(1)},${(padT + ih).toFixed(1)} L${x(0).toFixed(1)},${(padT + ih).toFixed(1)} Z"/>`;
+  out += `<path class="line" d="${path}"/>`;
+  out += `<line class="hover-line" id="hl" y1="${padT}" y2="${padT + ih}" x1="0" x2="0"/>`;
+  pts.forEach((v, i) => { out += `<circle class="pt${i === pts.length - 1 ? ' last' : ''}" cx="${x(i)}" cy="${y(v)}" r="${i === pts.length - 1 ? 4 : 2.5}"><title>${i + offset === 0 ? 'Start' : 'After match ' + (i + offset)}: ${v}</title></circle>`; });
+  const last = pts[pts.length - 1];
+  out += `<text class="val" id="hv" x="${Math.min(x(pts.length - 1), W - padR - 4)}" y="${y(last) - 9}" text-anchor="end">${last}</text>`;
+  pts.forEach((v, i) => { const w = iw / Math.max(pts.length - 1, 1); out += `<rect class="hit" x="${x(i) - w / 2}" y="${padT}" width="${w}" height="${ih}" data-i="${i}"/>`; });
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = out;
+  const hl = $('#hl'), hv = $('#hv');
+  svg.onmousemove = e => {
+    const r = e.target.closest('.hit'); if (!r) return;
+    const i = +r.dataset.i; hl.setAttribute('x1', x(i)); hl.setAttribute('x2', x(i)); hl.style.opacity = .6;
+    hv.textContent = pts[i]; hv.setAttribute('x', Math.min(Math.max(x(i), padL + 14), W - padR - 4)); hv.setAttribute('y', y(pts[i]) - 9);
+    hv.setAttribute('text-anchor', i > pts.length / 2 ? 'end' : 'start');
+  };
+  svg.onmouseleave = () => { hl.style.opacity = 0; hv.textContent = last; hv.setAttribute('x', Math.min(x(pts.length - 1), W - padR - 4)); hv.setAttribute('y', y(last) - 9); hv.setAttribute('text-anchor', 'end'); };
+}
+route();
+</script>
+</body>
+</html>

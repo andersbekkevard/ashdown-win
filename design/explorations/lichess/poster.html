@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashdown.win — poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+@page { size: A4 portrait; margin: 0; }
+:root {
+  ---site-hue: 37deg;
+  --c-bg-page: hsl(var(---site-hue) 10% 8%);
+  --c-bg: hsl(var(---site-hue) 7% 14%);
+  --c-bg-mid: hsl(var(---site-hue) 7% 16%);
+  --c-bg-low: hsl(var(---site-hue) 7% 22%);
+  --c-bg-zebra: hsl(var(---site-hue) 5% 19%);
+  --c-metal-top: hsl(var(---site-hue) 7% 22%);
+  --c-metal-bottom: hsl(var(---site-hue) 5% 19%);
+  --c-font: hsl(0 0% 73%);
+  --c-font-dim: hsl(0 0% 58%);
+  --c-font-dimmer: hsl(0 0% 42%);
+  --c-font-clear: hsl(0 0% 82%);
+  --c-font-clearer: hsl(0 0% 92%);
+  --c-border: hsl(0 0% 25%);
+  --c-primary: hsl(209 79% 56%);
+  --c-good: hsl(88 62% 37%);
+  --c-bad: hsl(0 60% 50%);
+  --c-brag: hsl(var(---site-hue) 74% 43%);
+  --c-accent: hsl(22 100% 42%);
+  --radius: 2.2mm;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: hsl(0 0% 12%);
+  font-family: 'Noto Sans', sans-serif;
+  color: var(--c-font);
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  display: flex; justify-content: center; align-items: flex-start; padding: 12mm 0;
+}
+.sheet {
+  width: 210mm; height: 297mm; flex: none; overflow: hidden;
+  background: var(--c-bg-page);
+  box-shadow: 0 10px 40px rgb(0 0 0 / .6);
+  display: flex; flex-direction: column;
+  padding: 10mm 12mm 9mm;
+  font-size: 11pt; line-height: 1.4;
+}
+@media print { body { background: none; padding: 0; display: block; } .sheet { box-shadow: none; margin: 0; } }
+
+h1, h2, h3 { font-family: Roboto, sans-serif; font-weight: 300; margin: 0; }
+good { color: var(--c-good); font-weight: 600; }
+bad { color: var(--c-bad); font-weight: 600; }
+rating { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--c-font-clearer); }
+rating.prov::after { content: "?"; color: var(--c-font-dim); font-weight: 400; }
+.arrow { display: inline-block; width: .75em; height: .75em; margin-right: .1em; vertical-align: -.04em; }
+
+/* header bar like the site header */
+.bar {
+  height: 13mm; display: flex; align-items: center; gap: 3mm;
+  background: var(--c-bg); border-radius: var(--radius); padding: 0 5mm;
+  box-shadow: 0 1px 3px rgb(0 0 0 / .4);
+}
+.wordmark { font-family: Roboto, sans-serif; font-weight: 300; font-size: 19pt; color: var(--c-font-clearer); display: inline-flex; align-items: center; gap: 2mm; }
+.wordmark b { font-weight: 300; color: var(--c-font-dim); }
+.wordmark svg { width: 7mm; height: 7mm; color: var(--c-font-dim); }
+.bar .right { margin-left: auto; color: var(--c-font-dim); font-size: 9.5pt; display: flex; gap: 4mm; }
+.bar .right span { padding: 1mm 0; }
+
+/* hero */
+.hero { padding: 9mm 2mm 6mm; }
+.hero h1 { font-size: 34pt; line-height: 1.08; color: var(--c-font-clearer); letter-spacing: -.005em; }
+.hero h1 em { font-style: normal; color: var(--c-primary); }
+.hero p { margin: 4mm 0 0; font-size: 12.5pt; color: var(--c-font); max-width: 165mm; }
+
+/* two columns: steps + board */
+.cols { display: grid; grid-template-columns: 1fr 66mm; gap: 5mm; }
+.box { background: var(--c-bg); border-radius: var(--radius); box-shadow: 0 1px 3px rgb(0 0 0 / .4); overflow: hidden; }
+.steps { padding: 1mm 0; }
+.step { display: grid; grid-template-columns: 12mm 1fr; gap: 3mm; padding: 4.2mm 5mm; align-items: start; }
+.step + .step { border-top: 1px solid var(--c-border); }
+.step .n { font-family: Roboto, sans-serif; font-weight: 300; font-size: 24pt; line-height: 1; color: var(--c-brag); }
+.step h2 { font-size: 14pt; font-weight: 400; color: var(--c-font-clearer); margin-bottom: 1mm; }
+.step p { margin: 0; font-size: 10.2pt; color: var(--c-font); }
+.step code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 9.2pt; color: var(--c-font-clear); background: var(--c-bg-low); padding: 0 1mm; border-radius: 1mm; }
+
+.gold-head { background: var(--c-brag); color: #fff; font-family: Roboto, sans-serif; font-weight: 500; letter-spacing: 1px; font-size: 11pt; line-height: 9mm; padding: 0 4mm; display: flex; align-items: center; gap: 2mm; }
+.gold-head span { margin-left: auto; font-weight: 400; letter-spacing: 0; font-size: 8.5pt; opacity: .9; }
+.gold-head svg { width: 4mm; height: 4mm; }
+table.slist { width: 100%; border-collapse: collapse; font-size: 9.6pt; table-layout: fixed; }
+.slist th { text-align: left; font-family: Roboto, sans-serif; font-weight: 400; font-size: 8pt; color: var(--c-font-dim); padding: 1.6mm 2.2mm; background: linear-gradient(to bottom, var(--c-metal-top), var(--c-metal-bottom)); border-bottom: 1px solid var(--c-border); white-space: nowrap; }
+.slist td { padding: 1.9mm 2.2mm; }
+.slist tr:nth-child(even) td { background: var(--c-bg-zebra); }
+.slist th:first-child, .slist td:first-child { padding-left: 3.5mm; }
+.slist th:last-child, .slist td:last-child { padding-right: 3.5mm; }
+.slist col.c-rank { width: 9mm; } .slist col.c-rating { width: 14mm; } .slist col.c-d { width: 14mm; }
+.slist td.rank { color: var(--c-font-dim); }
+.slist td.rank.top { color: var(--c-brag); font-weight: 600; }
+.slist td.name { color: var(--c-font-clear); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slist td.r { text-align: right; }
+.slist td.d { text-align: right; white-space: nowrap; color: var(--c-font-dim); }
+.slist th.r, .slist th.d { text-align: right; }
+.board-foot { padding: 2.5mm 4mm; font-size: 8.5pt; color: var(--c-font-dim); border-top: 1px solid var(--c-border); }
+
+/* elo line */
+.elo { margin-top: 5mm; display: grid; grid-template-columns: auto 1fr; gap: 5mm; align-items: center; padding: 4mm 5mm; }
+.elo .lbl { font-family: Roboto, sans-serif; text-transform: uppercase; letter-spacing: .08em; font-size: 8.5pt; color: var(--c-font-dim); }
+.elo .f { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5pt; color: var(--c-font-clearer); white-space: nowrap; }
+.elo .f i { font-style: normal; color: var(--c-primary); }
+.elo .f sup, .elo .f sub { font-size: 70%; }
+.elo .k { font-size: 9.6pt; color: var(--c-font); margin-top: 1mm; }
+.elo .k b { color: var(--c-font-clearer); font-weight: 600; }
+
+/* url + qr */
+.cta { margin-top: auto; display: grid; grid-template-columns: 1fr 46mm; gap: 6mm; align-items: end; padding: 0 2mm; }
+.url { font-family: Roboto, sans-serif; font-weight: 300; font-size: 62pt; line-height: 1; color: var(--c-font-clearer); letter-spacing: -.01em; }
+.url b { font-weight: 300; color: var(--c-primary); }
+.cta .sub { font-size: 11pt; color: var(--c-font-dim); margin-top: 3mm; }
+.cta .sub good, .cta .sub bad { font-weight: 600; }
+.qr { width: 46mm; height: 46mm; border-radius: var(--radius); background: var(--c-bg); border: 1px solid var(--c-border); display: grid; place-items: center; position: relative; }
+.qr .grid { position: absolute; inset: 3mm; background-image: linear-gradient(var(--c-border) 1px, transparent 1px), linear-gradient(90deg, var(--c-border) 1px, transparent 1px); background-size: 4mm 4mm; opacity: .35; }
+.qr .eye { position: absolute; width: 9mm; height: 9mm; border: 1.6mm solid var(--c-font-dim); border-radius: 1mm; }
+.qr .eye::after { content: ""; position: absolute; inset: 1.4mm; background: var(--c-font-dim); border-radius: .5mm; }
+.qr .eye.tl { top: 3mm; left: 3mm; } .qr .eye.tr { top: 3mm; right: 3mm; } .qr .eye.bl { bottom: 3mm; left: 3mm; }
+.qr .lbl { position: relative; font-family: Roboto, sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: .1em; font-size: 8pt; color: var(--c-font-dim); background: var(--c-bg); padding: 1mm 2mm; border-radius: 1mm; }
+
+/* footer */
+.foot { margin-top: 6mm; padding-top: 3mm; border-top: 1px solid var(--c-border); display: flex; align-items: center; gap: 2.5mm; font-size: 9.5pt; color: var(--c-font-dim); white-space: nowrap; }
+.foot svg { width: 4.5mm; height: 4.5mm; flex: none; color: var(--c-font-dim); }
+.foot .repo { color: var(--c-font-clear); }
+.foot .right { margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="bar">
+    <span class="wordmark">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2.5a7 7 0 0 0-6.9 8.1c.1.7-.1 1.4-.6 1.9l-4.3 4.3a1.6 1.6 0 0 0 0 2.2l.9.9a1.6 1.6 0 0 0 2.2 0l4.3-4.3c.5-.5 1.2-.7 1.9-.6A7 7 0 1 0 14.5 2.5z" fill="currentColor"/><circle cx="19.6" cy="18.8" r="2.3" fill="var(--c-accent)"/></svg>
+      ashdown<b>.win</b>
+    </span>
+    <div class="right"><span>Table tennis ladder</span><span>Ashdown House · MIT</span></div>
+  </div>
+
+  <div class="hero">
+    <h1>Every match at this table<br>moves the <em>board</em>.</h1>
+    <p>ashdown.win is the public Elo ladder for the Ashdown table. No accounts, no app to install: one rating per player, recomputed from every match ever recorded, and every match is visible to everyone.</p>
+  </div>
+
+  <div class="cols">
+    <div class="box steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div><h2>Create your name</h2><p>Once, on your phone. Full name by default, or your MIT username if you'd rather. You appear on the board at <rating>1000</rating> straight away.</p></div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div><h2>Record a match</h2><p>Type both names, tap the winner, done. Flip the doubles switch for two per side. Anyone can record for anyone; nothing is hidden.</p></div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div><h2>Watch the board</h2><p>The winner takes points from the loser the moment it's saved. Your page shows your rating <good><svg class="arrow" viewBox="0 0 16 16"><path d="M3 13 13 3M6 3h7v7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>climbing</good> or <bad><svg class="arrow" viewBox="0 0 16 16"><path d="M3 3l10 10M6 13h7V6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>sliding</bad>, and the games that did it.</p></div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="gold-head">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14v2h3v4a5 5 0 0 1-4.3 4.9A6 6 0 0 1 13 17.9V20h4v2H7v-2h4v-2.1a6 6 0 0 1-4.7-4A5 5 0 0 1 2 9V5h3V3zm0 4H4v2a3 3 0 0 0 1.4 2.5A8 8 0 0 1 5 9V7zm14 0v2c0 .9-.1 1.7-.4 2.5A3 3 0 0 0 20 9V7h-1z"/></svg>
+        Leaderboard <span>12 players</span>
+      </div>
+      <table class="slist">
+        <colgroup><col class="c-rank"><col><col class="c-rating"><col class="c-d"></colgroup>
+        <thead><tr><th>#</th><th>Player</th><th class="r">Rating</th><th class="d">Played</th></tr></thead>
+        <tbody>
+          <tr><td class="rank top">1</td><td class="name">Priya Raman</td><td class="r"><rating>1142</rating></td><td class="d">21</td></tr>
+          <tr><td class="rank top">2</td><td class="name">Tomás Ferreira</td><td class="r"><rating>1108</rating></td><td class="d">17</td></tr>
+          <tr><td class="rank top">3</td><td class="name">Anders Bekkevard</td><td class="r"><rating>1071</rating></td><td class="d">14</td></tr>
+          <tr><td class="rank">4</td><td class="name">jchen26</td><td class="r"><rating>1054</rating></td><td class="d">9</td></tr>
+          <tr><td class="rank">5</td><td class="name">Mei Nakamura</td><td class="r"><rating>1033</rating></td><td class="d">11</td></tr>
+          <tr><td class="rank">6</td><td class="name">Daniel Okafor</td><td class="r"><rating>1012</rating></td><td class="d">6</td></tr>
+          <tr><td class="rank">7</td><td class="name">Sofia Almeida</td><td class="r"><rating class="prov">1000</rating></td><td class="d">0</td></tr>
+          <tr><td class="rank">8</td><td class="name">Lukas Weber</td><td class="r"><rating>987</rating></td><td class="d">5</td></tr>
+          <tr><td class="rank">9</td><td class="name">The Ghost of 4th Floor</td><td class="r"><rating>971</rating></td><td class="d">8</td></tr>
+        </tbody>
+      </table>
+      <div class="board-foot">…and 3 more. A <rating class="prov">1000</rating> is a player with no matches yet.</div>
+    </div>
+  </div>
+
+  <div class="box elo">
+    <div class="lbl">The rule</div>
+    <div>
+      <div class="f">R′ = R + <i>K</i>·(S − E)&nbsp;&nbsp;&nbsp;where&nbsp;&nbsp;E = 1 / (1 + 10<sup>(R<sub>opp</sub> − R)/400</sup>)</div>
+      <div class="k"><b>K = 32</b> singles · <b>K = 16</b> doubles · S = 1 win, 0 loss · everyone starts at <b>1000</b> · a doubles team plays as the average of its two ratings. Same Elo as chess, nothing tuned.</div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <div>
+      <div class="url">ashdown<b>.win</b></div>
+      <div class="sub">Open it on your phone. Filed a match wrong? Delete it; the deletion is public too.</div>
+    </div>
+    <div class="qr" aria-label="QR code placeholder">
+      <div class="grid"></div>
+      <div class="eye tl"></div><div class="eye tr"></div><div class="eye bl"></div>
+      <div class="lbl">QR</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="4" r="2"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="8" r="2"/><path d="M6 6v12M18 10a6 6 0 0 1-6 6H6"/></svg>
+    open source: <span class="repo">github.com/andersbekkevard/ashdown-win</span>
+    <span class="right">MIT licence · ratings replayed from the public log</span>
+  </div>
+
+</div>
+</body>
+</html>

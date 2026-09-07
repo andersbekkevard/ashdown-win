@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashdown.win — poster (LED scoreboard)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  :root{
+    --page:#050505; --cab:#0c0c0c; --edge:#1c1c1c;
+    --amb:#ffb000; --glow:rgba(255,176,0,.55); --off:rgba(255,176,0,.09);
+    --cap:#e8e4d8; --dimcap:#8f8a7c;
+    --grn:#3dff5c; --red:#ff3b2f;
+    --mono:'Share Tech Mono', ui-monospace, Menlo, Consolas, monospace;
+    --pix:'Silkscreen', 'Share Tech Mono', ui-monospace, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#161616;color:var(--cap);font-family:var(--mono);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{display:flex;justify-content:center;padding:24px 0}
+  .sheet{
+    position:relative;width:210mm;height:297mm;background:var(--page);
+    padding:9mm 12mm 8mm;display:flex;flex-direction:column;gap:3.4mm;overflow:hidden;
+    box-shadow:0 0 0 1px #000,0 30px 80px rgba(0,0,0,.8);
+  }
+  /* LED dot mask + scanlines over the whole panel */
+  .sheet::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 55%, rgba(0,0,0,.42) 62%) 0 0/2.2px 2.2px,
+      repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px);
+  }
+  .sheet>*{position:relative;z-index:1}
+
+  /* captions: white vinyl labels on the cabinet */
+  .cap{font-family:var(--pix);font-size:8pt;letter-spacing:.14em;text-transform:uppercase;color:var(--cap);font-weight:700}
+  .cap.dim{color:var(--dimcap);font-weight:400}
+  .strip{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);padding:2.2mm 0}
+  .live{display:inline-flex;align-items:center;gap:1.8mm;color:var(--amb)}
+  .live::before{content:"";width:2.4mm;height:2.4mm;border-radius:50%;background:var(--amb);box-shadow:0 0 3mm var(--glow);animation:blink 1.4s steps(1) infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  /* dot-matrix svg text */
+  .dm{display:block;width:100%;height:auto}
+  .dm .on{fill:var(--amb)}
+  .dm .off{fill:var(--off)}
+
+  #headline{width:82%;margin-top:0;filter:drop-shadow(0 0 2.2mm var(--glow))}
+  .lead{margin:0;font-size:10.6pt;line-height:1.4;color:var(--cap);max-width:170mm}
+  .lead b{color:var(--amb);font-weight:400}
+
+  /* seven-segment digits */
+  .ss{display:inline-flex;gap:.16em;transform:skewX(-7deg);line-height:1;vertical-align:-.04em;filter:drop-shadow(0 0 .14em var(--glow))}
+  .ss i{position:relative;display:block;width:.58em;height:1em}
+  .ss b{position:absolute;background:var(--off)}
+  .ss b.on{background:var(--amb)}
+  .ss.grn b.on{background:var(--grn)} .ss.red b.on{background:var(--red)}
+  .ss.grn{filter:drop-shadow(0 0 .14em rgba(61,255,92,.5))} .ss.red{filter:drop-shadow(0 0 .14em rgba(255,59,47,.5))}
+  .ss .a,.ss .g,.ss .d{left:11%;width:78%;height:11.5%;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%)}
+  .ss .a{top:0}.ss .g{top:44.25%}.ss .d{bottom:0}
+  .ss .b,.ss .c,.ss .e,.ss .f{width:14%;height:45%;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}
+  .ss .b{right:0;top:4%}.ss .c{right:0;bottom:4%}.ss .e{left:0;bottom:4%}.ss .f{left:0;top:4%}
+
+  /* the live board */
+  .board{border:1px solid var(--edge);background:var(--cab);padding:2.4mm 4mm 2.2mm}
+  .board .hdr,.board .row{display:grid;grid-template-columns:14mm 1fr 30mm 20mm;align-items:center;column-gap:3mm}
+  .board .hdr{padding-bottom:1.3mm;border-bottom:1px solid var(--edge);margin-bottom:1mm}
+  .board .row{padding:1.05mm 0;border-bottom:1px dotted #1a1a1a}
+  .board .row:last-of-type{border-bottom:0}
+  .board .row .name{font-size:11.5pt;letter-spacing:.02em;text-transform:uppercase;color:var(--cap);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .board .row .rk{font-size:12pt}
+  .board .row .rt{font-size:14pt;text-align:right;justify-self:end}
+  .board .row .wl{font-size:9.5pt;color:var(--dimcap);text-align:right}
+  .board .hdr .r{text-align:right}
+  .board .more{margin-top:1.4mm;padding-top:1.4mm;border-top:1px solid var(--edge);font-size:9.6pt;color:var(--dimcap)}
+  .board .more b{color:var(--amb);font-weight:400}
+
+  /* three steps as PERIOD boxes */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}
+  .step{border:1px solid var(--edge);background:var(--cab);padding:2.6mm 3.2mm 2.6mm;display:flex;flex-direction:column;gap:1.4mm}
+  .step .num{font-size:19pt;display:flex;align-items:center;gap:2.5mm}
+  .step .num .cap{font-size:7pt}
+  .step h3{margin:0;font-family:var(--pix);font-size:8.5pt;letter-spacing:.1em;color:var(--amb);text-transform:uppercase;font-weight:700;text-shadow:0 0 2mm var(--glow)}
+  .step p{margin:0;font-size:9.2pt;line-height:1.36;color:var(--cap)}
+
+  .rule{border:1px solid var(--edge);background:var(--cab);padding:2.2mm 4mm;display:grid;grid-template-columns:22mm 1fr;gap:3mm;align-items:center}
+  .rule .f{font-size:11pt;color:var(--amb);text-shadow:0 0 2mm var(--glow);letter-spacing:.02em;line-height:1.35}
+  .rule .k{font-size:9.6pt;color:var(--dimcap);margin-top:.6mm}
+  .rule .k b{color:var(--cap);font-weight:400}
+
+  /* the URL, very large, and the QR square */
+  .urlrow{display:grid;grid-template-columns:1fr 34mm;gap:5mm;align-items:end;margin-top:auto}
+  .url{display:flex;flex-direction:column;gap:2mm;padding-bottom:1mm}
+  #url{filter:drop-shadow(0 0 2.5mm var(--glow))}
+  .qr{border:1px solid var(--edge);background:var(--cab);padding:2mm;display:flex;flex-direction:column;gap:1.2mm;align-items:center}
+  .qr svg{width:100%;height:auto;display:block}
+  .qr .on{fill:var(--amb)} .qr .off{fill:var(--off)}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--edge);padding-top:2mm;font-size:8.4pt;color:var(--dimcap);letter-spacing:.04em}
+  .foot b{color:var(--cap);font-weight:400}
+
+  @media print{
+    html,body{background:var(--page);padding:0}
+    .sheet{box-shadow:none;margin:0}
+    .live::before{animation:none}
+  }
+  @media screen and (max-width:820px){ body{padding:0} .sheet{transform-origin:top left;transform:scale(calc(100vw / 794px));margin-bottom:calc(1123px * (100vw / 794px) - 1123px)} }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="strip">
+    <span class="cap">Ashdown House · MIT</span>
+    <span class="cap dim">Table tennis · Elo ladder · no accounts</span>
+    <span class="cap live">Live</span>
+  </header>
+
+  <div id="headline"></div>
+
+  <p class="lead">
+    <b>ashdown.win</b> is the rating ladder for the table downstairs. No accounts, no app, nothing to install.
+    Record a match from your phone and the board moves before you have put the paddle down.
+  </p>
+
+  <section class="board" id="board">
+    <div class="hdr">
+      <span class="cap dim">Rank</span><span class="cap dim">Player</span><span class="cap dim r">Rating</span><span class="cap dim r">W–L</span>
+    </div>
+    <div id="rows"></div>
+    <div class="more" id="more"></div>
+  </section>
+
+  <section class="steps">
+    <div class="step">
+      <div class="num"><span id="n1"></span><span class="cap dim">Once</span></div>
+      <h3>Create your name</h3>
+      <p>Full name by default, or your MIT username if you would rather. No password, no email. That is the whole sign-up.</p>
+    </div>
+    <div class="step">
+      <div class="num"><span id="n2"></span><span class="cap dim">Every game</span></div>
+      <h3>Record a match</h3>
+      <p>Type two names, tap the winner. Playing doubles? Flip the switch and add the partners. Three taps, done.</p>
+    </div>
+    <div class="step">
+      <div class="num"><span id="n3"></span><span class="cap dim">Always</span></div>
+      <h3>Watch the board</h3>
+      <p>Ratings update instantly. Every match ever played is public, so every number on the board can be checked.</p>
+    </div>
+  </section>
+
+  <section class="rule">
+    <span class="cap">The rule</span>
+    <div>
+      <div class="f">R′ = R + K · (S − E) &nbsp;&nbsp; where &nbsp; E = 1 / (1 + 10<sup>(R<sub>opp</sub> − R) / 400</sup>)</div>
+      <div class="k">S is <b>1</b> for a win, <b>0</b> for a loss. K = <b>32</b> singles, <b>16</b> doubles. Everyone starts at <b>1000</b>. Standard Elo, same as chess.</div>
+    </div>
+  </section>
+
+  <section class="urlrow">
+    <div class="url">
+      <span class="cap dim">Open on your phone</span>
+      <div id="url"></div>
+    </div>
+    <div class="qr">
+      <div id="qr"></div>
+      <span class="cap dim">Scan</span>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>open source: <b>github.com/andersbekkevard/ashdown-win</b></span>
+    <span>MIT licence · built by residents, for the house</span>
+  </footer>
+</div>
+
+<script>
+// Shared fake data (design/explorations/data.json), inlined so the file is self-contained.
+const DATA = {"site":{"name":"ashdown.win","url":"ashdown.win","repo":"github.com/andersbekkevard/ashdown-win"},"constants":{"kSingles":32,"kDoubles":16,"start":1000},"leaderboard":[{"rank":1,"name":"Priya Raman","rating":1142,"matches":21,"wins":16},{"rank":2,"name":"Tomás Ferreira","rating":1108,"matches":17,"wins":12},{"rank":3,"name":"Anders Bekkevard","rating":1071,"matches":14,"wins":9},{"rank":4,"name":"jchen26","rating":1054,"matches":9,"wins":6},{"rank":5,"name":"Mei Nakamura","rating":1033,"matches":11,"wins":6},{"rank":6,"name":"Daniel Okafor","rating":1012,"matches":6,"wins":3},{"rank":7,"name":"Sofia Almeida","rating":1000,"matches":0,"wins":0},{"rank":8,"name":"Lukas Weber","rating":987,"matches":5,"wins":2},{"rank":9,"name":"The Ghost of 4th Floor","rating":971,"matches":8,"wins":3},{"rank":10,"name":"Hannah Cohen","rating":958,"matches":12,"wins":4},{"rank":11,"name":"Ravi Menon","rating":934,"matches":7,"wins":1},{"rank":12,"name":"Emma Lindqvist","rating":913,"matches":10,"wins":2}]};
+
+// ---- seven-segment digits, pure CSS ----
+const SEG={'0':'abcdef','1':'bc','2':'abged','3':'abgcd','4':'fgbc','5':'afgcd','6':'afgedc','7':'abc','8':'abcdefg','9':'abcdfg','-':'g',' ':''};
+function ss(str,cls){
+  return '<span class="ss'+(cls?' '+cls:'')+'">'+[...String(str)].map(ch=>'<i>'+[...'abcdefg'].map(s=>'<b class="'+s+((SEG[ch]||'').includes(s)?' on':'')+'"></b>').join('')+'</i>').join('')+'</span>';
+}
+
+// ---- 5x7 dot-matrix type rendered as SVG circles ----
+const F={
+A:['.###.','#...#','#...#','#####','#...#','#...#','#...#'],B:['####.','#...#','#...#','####.','#...#','#...#','####.'],
+C:['.###.','#...#','#....','#....','#....','#...#','.###.'],D:['####.','#...#','#...#','#...#','#...#','#...#','####.'],
+E:['#####','#....','#....','####.','#....','#....','#####'],F:['#####','#....','#....','####.','#....','#....','#....'],
+G:['.###.','#...#','#....','#.###','#...#','#...#','.####'],H:['#...#','#...#','#...#','#####','#...#','#...#','#...#'],
+I:['.###.','..#..','..#..','..#..','..#..','..#..','.###.'],J:['..###','...#.','...#.','...#.','...#.','#..#.','.##..'],
+K:['#...#','#..#.','#.#..','##...','#.#..','#..#.','#...#'],L:['#....','#....','#....','#....','#....','#....','#####'],
+M:['#...#','##.##','#.#.#','#.#.#','#...#','#...#','#...#'],N:['#...#','##..#','#.#.#','#..##','#...#','#...#','#...#'],
+O:['.###.','#...#','#...#','#...#','#...#','#...#','.###.'],P:['####.','#...#','#...#','####.','#....','#....','#....'],
+Q:['.###.','#...#','#...#','#...#','#.#.#','#..#.','.##.#'],R:['####.','#...#','#...#','####.','#.#..','#..#.','#...#'],
+S:['.####','#....','#....','.###.','....#','....#','####.'],T:['#####','..#..','..#..','..#..','..#..','..#..','..#..'],
+U:['#...#','#...#','#...#','#...#','#...#','#...#','.###.'],V:['#...#','#...#','#...#','#...#','.#.#.','.#.#.','..#..'],
+W:['#...#','#...#','#...#','#.#.#','#.#.#','##.##','#...#'],X:['#...#','#...#','.#.#.','..#..','.#.#.','#...#','#...#'],
+Y:['#...#','#...#','.#.#.','..#..','..#..','..#..','..#..'],Z:['#####','....#','...#.','..#..','.#...','#....','#####'],
+'.':['.....','.....','.....','.....','.....','.##..','.##..'],'?':['.###.','#...#','....#','...#.','..#..','.....','..#..'],
+' ':['.....','.....','.....','.....','.....','.....','.....'],'!':['..#..','..#..','..#..','..#..','..#..','.....','..#..'],
+'-':['.....','.....','.....','#####','.....','.....','.....'],':':['.....','.##..','.##..','.....','.##..','.##..','.....'],
+'0':['.###.','#...#','#..##','#.#.#','##..#','#...#','.###.'],'1':['..#..','.##..','..#..','..#..','..#..','..#..','.###.'],
+'2':['.###.','#...#','....#','...#.','..#..','.#...','#####'],'3':['#####','...#.','..#..','...#.','....#','#...#','.###.'],
+'4':['...#.','..##.','.#.#.','#..#.','#####','...#.','...#.'],'5':['#####','#....','####.','....#','....#','#...#','.###.'],
+'6':['..##.','.#...','#....','####.','#...#','#...#','.###.'],'7':['#####','....#','...#.','..#..','.#...','.#...','.#...'],
+'8':['.###.','#...#','#...#','.###.','#...#','#...#','.###.'],'9':['.###.','#...#','#...#','.####','....#','...#.','.##..']
+};
+function dm(text,opts={}){
+  const pitch=10, r=opts.r||3.7, lines=text.toUpperCase().split('\n');
+  const cols=Math.max(...lines.map(l=>l.length))*6-1, rows=lines.length*8-1;
+  let out='';
+  lines.forEach((line,li)=>{
+    for(let row=0;row<7;row++){
+      for(let c=0;c<cols;c++){
+        const ci=Math.floor(c/6), cc=c%6; const g=F[line[ci]]||F[' '];
+        const on = cc<5 && line[ci]!==undefined && g[row][cc]==='#';
+        if(cc===5 && ci>=line.length-1 && line.length*6-1<=c) continue;
+        out+='<circle class="'+(on?'on':'off')+'" cx="'+(c*pitch+pitch/2)+'" cy="'+((li*8+row)*pitch+pitch/2)+'" r="'+(on?r:r*.8)+'"/>';
+      }
+    }
+    if(li<lines.length-1){ for(let c=0;c<cols;c++) out+='<circle class="off" cx="'+(c*pitch+pitch/2)+'" cy="'+((li*8+7)*pitch+pitch/2)+'" r="'+(r*.8)+'"/>'; }
+  });
+  return '<svg class="dm" viewBox="0 0 '+(cols*pitch)+' '+(rows*pitch)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+text.replace(/\n/g,' ')+'">'+out+'</svg>';
+}
+
+// ---- QR placeholder: finder patterns plus a deterministic pseudo-random field ----
+function qr(n=25){
+  let seed=20260907; const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff;};
+  const finder=(x,y,i,j)=>{ if(i<0||j<0||i>6||j>6) return null; const b=(i===0||i===6||j===0||j===6), c=(i>=2&&i<=4&&j>=2&&j<=4); return b||c; };
+  let out='';
+  for(let y=0;y<n;y++) for(let x=0;x<n;x++){
+    let v=null;
+    for(const [fx,fy] of [[0,0],[n-7,0],[0,n-7]]){ const f=finder(x,y,x-fx,y-fy); if(f!==null){v=f;} if(x-fx===7||y-fy===7){ if(x>=fx-1&&x<=fx+7&&y>=fy-1&&y<=fy+7) v=false; } }
+    if(v===null) v = rnd()>.52;
+    out+='<rect class="'+(v?'on':'off')+'" x="'+x+'" y="'+y+'" width="0.92" height="0.92"/>';
+  }
+  return '<svg viewBox="-1 -1 '+(n+2)+' '+(n+2)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR code placeholder">'+out+'</svg>';
+}
+
+// ---- fill the sheet ----
+document.getElementById('headline').innerHTML = dm('WHO RUNS\nTHE TABLE?');
+document.getElementById('url').innerHTML = dm('ASHDOWN.WIN',{r:4});
+document.getElementById('qr').innerHTML = qr();
+['n1','n2','n3'].forEach((id,i)=>document.getElementById(id).innerHTML=ss(String(i+1)));
+
+const topRows = DATA.leaderboard.slice(0,6);
+document.getElementById('rows').innerHTML = topRows.map(p=>
+  '<div class="row"><span class="rk">'+ss(String(p.rank).padStart(2,' '))+'</span>'+
+  '<span class="name">'+p.name+'</span>'+
+  '<span class="rt">'+ss(String(p.rating).padStart(4,' '))+'</span>'+
+  '<span class="wl">'+p.wins+'–'+(p.matches-p.wins)+'</span></div>').join('');
+const rest = DATA.leaderboard.slice(6);
+const fresh = rest.find(p=>p.matches===0);
+document.getElementById('more').innerHTML =
+  '+ '+rest.length+' more on the board. '+(fresh? '<b>'+fresh.name+'</b> is on <b>'+fresh.rating+'</b> with no matches yet: that is where you start.':'');
+</script>
+</body>
+</html>

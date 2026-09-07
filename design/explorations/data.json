@@ -1,0 +1,34 @@
+{
+  "site": { "name": "ashdown.win", "url": "ashdown.win", "repo": "github.com/andersbekkevard/ashdown-win" },
+  "constants": { "kSingles": 32, "kDoubles": 16, "start": 1000 },
+  "leaderboard": [
+    { "rank": 1, "name": "Priya Raman", "rating": 1142, "matches": 21, "wins": 16 },
+    { "rank": 2, "name": "Tomás Ferreira", "rating": 1108, "matches": 17, "wins": 12 },
+    { "rank": 3, "name": "Anders Bekkevard", "rating": 1071, "matches": 14, "wins": 9 },
+    { "rank": 4, "name": "jchen26", "rating": 1054, "matches": 9, "wins": 6 },
+    { "rank": 5, "name": "Mei Nakamura", "rating": 1033, "matches": 11, "wins": 6 },
+    { "rank": 6, "name": "Daniel Okafor", "rating": 1012, "matches": 6, "wins": 3 },
+    { "rank": 7, "name": "Sofia Almeida", "rating": 1000, "matches": 0, "wins": 0 },
+    { "rank": 8, "name": "Lukas Weber", "rating": 987, "matches": 5, "wins": 2 },
+    { "rank": 9, "name": "The Ghost of 4th Floor", "rating": 971, "matches": 8, "wins": 3 },
+    { "rank": 10, "name": "Hannah Cohen", "rating": 958, "matches": 12, "wins": 4 },
+    { "rank": 11, "name": "Ravi Menon", "rating": 934, "matches": 7, "wins": 1 },
+    { "rank": 12, "name": "Emma Lindqvist", "rating": 913, "matches": 10, "wins": 2 }
+  ],
+  "player": {
+    "name": "Anders Bekkevard",
+    "rating": 1071,
+    "rank": 3,
+    "matches": 14,
+    "wins": 9,
+    "history": [1000, 1016, 1031, 1017, 1035, 1050, 1038, 1055, 1069, 1058, 1074, 1088, 1077, 1061, 1071],
+    "recent": [
+      { "date": "2026-09-06", "type": "singles", "opponent": "Priya Raman", "result": "loss", "delta": -10 },
+      { "date": "2026-09-06", "type": "singles", "opponent": "jchen26", "result": "win", "delta": 15 },
+      { "date": "2026-09-05", "type": "doubles", "partner": "Mei Nakamura", "opponent": "Tomás Ferreira & Daniel Okafor", "result": "loss", "delta": -8 },
+      { "date": "2026-09-04", "type": "singles", "opponent": "Lukas Weber", "result": "win", "delta": 14 },
+      { "date": "2026-09-03", "type": "singles", "opponent": "Hannah Cohen", "result": "win", "delta": 13 },
+      { "date": "2026-09-02", "type": "singles", "opponent": "Tomás Ferreira", "result": "loss", "delta": -12 }
+    ]
+  }
+}

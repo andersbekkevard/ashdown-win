@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashdown.win</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2d4f3e;
+    --green-deep: #1b3126;
+    --green-lit: #3b6a51;
+    --cream: #f1e9d4;
+    --paint: #f6f2e6;
+    --paint-dim: #cfc8b6;
+    --yellow: #efc340;
+    --red: #d9382c;
+    --lamp-green: #4fbf5a;
+    --steel: #7a7f76;
+    --plate-font: "Alfa Slab One", "Rockwell", "Roboto Slab", serif;
+    --caps-font: "Oswald", "Impact", "Arial Narrow", sans-serif;
+    --prose-font: Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #14201a;
+    color: var(--paint);
+    font-family: var(--prose-font);
+    min-height: 100vh;
+    display: flex; justify-content: center;
+  }
+  .wall {
+    width: 100%; max-width: 480px; min-height: 100vh; position: relative;
+    background-color: var(--green);
+    background-image:
+      radial-gradient(ellipse at 30% 10%, rgba(255,255,255,.06), transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,0,0,.25), transparent 60%),
+      repeating-linear-gradient(97deg, rgba(255,255,255,.018) 0 2px, transparent 2px 7px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 4px);
+    padding: 14px 14px 40px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  @media (min-width: 560px) {
+    body { padding: 24px 0; }
+    .wall { min-height: calc(100vh - 48px); border: 6px solid #5c615a; border-radius: 3px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.7), inset 0 0 0 1px rgba(0,0,0,.5); }
+  }
+  .bolt { position: absolute; width: 12px; height: 12px; border-radius: 50%; z-index: 2;
+    background: radial-gradient(circle at 35% 35%, #c9ccc4, #7a7f76 55%, #3c3f3a 100%);
+    box-shadow: 0 1px 3px rgba(0,0,0,.7), inset 0 0 0 1px rgba(0,0,0,.35); }
+  .bolt::after { content: ""; position: absolute; left: 50%; top: 20%; width: 1.5px; height: 60%;
+    background: #2c2e2a; transform: translateX(-50%) rotate(35deg); border-radius: 2px; }
+  .bolt.tl { left: 6px; top: 6px; } .bolt.tr { right: 6px; top: 6px; }
+
+  .painted { font-family: var(--caps-font); text-transform: uppercase; letter-spacing: .1em; color: var(--paint); }
+  .rule { height: 2px; background: var(--paint); opacity: .9; border-radius: 1px; }
+
+  /* masthead */
+  .mast { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
+  .mast .kicker { display: flex; justify-content: space-between; font-family: var(--caps-font); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .8; }
+  .mast h1 { margin: 0; font-family: var(--caps-font); font-weight: 700; text-transform: uppercase; font-size: 34px; line-height: 1;
+    letter-spacing: .02em; text-shadow: 2px 3px 0 rgba(0,0,0,.45); cursor: pointer; }
+
+  /* tabs */
+  nav { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px solid var(--paint); border-bottom: 2px solid var(--paint); }
+  nav button { appearance: none; background: none; border: 0; color: var(--paint); padding: 10px 4px 9px;
+    font-family: var(--caps-font); font-weight: 500; font-size: 14px; letter-spacing: .18em; text-transform: uppercase;
+    display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; opacity: .75; }
+  nav button + button { border-left: 2px solid rgba(246,242,230,.35); }
+  nav button.active { opacity: 1; background: rgba(0,0,0,.18); }
+  nav button.active .lamp { background: radial-gradient(circle at 40% 35%, #b6f3b7, var(--lamp-green) 55%, #1f6e2c 100%); }
+
+  /* lamps */
+  .lamp { width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto; display: inline-block;
+    background: radial-gradient(circle at 40% 35%, #4a4f48, #1d201c 70%);
+    box-shadow: inset 0 0 0 1.5px #0d120f, 0 1px 2px rgba(0,0,0,.6); }
+  .lamp.red { background: radial-gradient(circle at 40% 35%, #ff8f7f, var(--red) 55%, #8b1d14 100%); }
+  .lamp.green { background: radial-gradient(circle at 40% 35%, #b6f3b7, var(--lamp-green) 55%, #1f6e2c 100%); }
+  .lamp.big { width: 22px; height: 22px; box-shadow: inset 0 0 0 2px #0d120f, 0 1px 3px rgba(0,0,0,.6); }
+
+  /* slots and plates */
+  .slot { background: var(--green-deep); padding: 3px; display: inline-flex; align-items: stretch;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.08); }
+  .plate { display: flex; align-items: center; justify-content: center; font-family: var(--plate-font); line-height: 1;
+    color: var(--green-deep); background: linear-gradient(180deg, #f7f0dd 0%, var(--cream) 60%, #e6dcc2 100%);
+    box-shadow: inset 4px 5px 8px rgba(0,0,0,.42), inset -1px -1px 0 rgba(255,255,255,.7); width: 100%; }
+  .plate.yellow { background: linear-gradient(180deg, #f6d05a 0%, var(--yellow) 60%, #d9ad2c 100%); }
+
+  /* action plates (buttons) */
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .action { appearance: none; border: 0; padding: 0; background: var(--green-deep); cursor: pointer; text-align: left;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.08); padding: 4px; }
+  .action .plate { flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 12px 11px; min-height: 74px; }
+  .action .plate .big { font-family: var(--caps-font); font-weight: 700; font-size: 20px; letter-spacing: .04em; text-transform: uppercase; line-height: 1; }
+  .action .plate .sub { font-family: var(--caps-font); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .7; }
+  .action:active .plate { box-shadow: inset 6px 7px 10px rgba(0,0,0,.5); transform: translate(1px,1px); }
+
+  /* leaderboard */
+  .section-title { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--caps-font); text-transform: uppercase; letter-spacing: .2em; font-size: 12px; opacity: .85; padding: 0 2px; }
+  .rows { display: flex; flex-direction: column; gap: 6px; }
+  .row { display: grid; grid-template-columns: 38px 1fr 52px 72px; gap: 8px; align-items: center; min-height: 44px; text-decoration: none; color: inherit; }
+  .row .slot .plate { height: 34px; font-size: 18px; }
+  .row .name { font-family: var(--caps-font); font-weight: 700; font-size: 17px; letter-spacing: .05em; text-transform: uppercase; color: var(--paint);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 2px; }
+  .row .name small { display: block; font-weight: 500; font-size: 10px; letter-spacing: .18em; opacity: .65; }
+  .row .rec { font-family: var(--caps-font); font-size: 14px; letter-spacing: .1em; text-align: center; opacity: .8; }
+  .row.link { cursor: pointer; }
+  .row.link .name { text-decoration: underline; text-decoration-color: rgba(246,242,230,.45); text-underline-offset: 4px; }
+  .hdr { display: grid; grid-template-columns: 38px 1fr 52px 72px; gap: 8px; padding: 0 2px; font-family: var(--caps-font); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .hdr span:nth-child(3), .hdr span:nth-child(4) { text-align: center; }
+  .note { font-size: 13px; line-height: 1.4; color: var(--paint-dim); margin: 0; }
+  .note a { color: var(--paint); }
+
+  /* screens */
+  .screen { display: none; flex-direction: column; gap: 14px; }
+  .screen.active { display: flex; }
+
+  /* record match */
+  .side { border: 2px solid rgba(246,242,230,.55); padding: 12px 12px 14px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .side .lbl { display: flex; justify-content: space-between; align-items: center; font-family: var(--caps-font); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; opacity: .85; }
+  .search { position: relative; }
+  .search .slot { width: 100%; }
+  .search input { width: 100%; border: 0; outline: 0; font-family: var(--plate-font); font-size: 20px; color: var(--green-deep); padding: 12px 12px;
+    background: linear-gradient(180deg, #f7f0dd 0%, var(--cream) 60%, #e6dcc2 100%);
+    box-shadow: inset 4px 5px 8px rgba(0,0,0,.42), inset -1px -1px 0 rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: .02em; }
+  .search input::placeholder { color: rgba(27,49,38,.45); font-family: var(--caps-font); font-weight: 500; letter-spacing: .12em; font-size: 15px; text-transform: uppercase; }
+  .search.picked input { background: linear-gradient(180deg, #f7f0dd 0%, var(--cream) 60%, #e6dcc2 100%); }
+  .sugg { position: absolute; left: 0; right: 0; top: 100%; z-index: 5; background: var(--green-deep); border: 2px solid var(--paint); margin-top: 4px; display: none; max-height: 220px; overflow: auto; }
+  .sugg.open { display: block; }
+  .sugg button { display: block; width: 100%; text-align: left; appearance: none; background: none; border: 0; color: var(--paint); cursor: pointer;
+    font-family: var(--caps-font); font-weight: 700; font-size: 16px; letter-spacing: .06em; text-transform: uppercase; padding: 11px 12px; border-bottom: 1px solid rgba(246,242,230,.2); }
+  .sugg button:last-child { border-bottom: 0; }
+  .sugg button:hover, .sugg button:focus { background: rgba(255,255,255,.08); }
+  .sugg button.create { font-weight: 500; color: var(--yellow); }
+  .sugg button.create::before { content: "+ "; }
+
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 2px; }
+  .toggle .lbl { font-family: var(--caps-font); font-size: 13px; letter-spacing: .2em; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+  .switch { appearance: none; border: 0; cursor: pointer; width: 62px; height: 30px; background: var(--green-deep); position: relative; padding: 0;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.6), inset 0 2px 4px rgba(0,0,0,.6); }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 28px; height: 24px;
+    background: linear-gradient(180deg, #c9ccc4, #7a7f76); box-shadow: 1px 2px 3px rgba(0,0,0,.6); transition: left .12s; }
+  .switch[aria-checked="true"]::after { left: 31px; background: linear-gradient(180deg, #f7f0dd, #e6dcc2); }
+  .switch span { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--caps-font); font-size: 10px; letter-spacing: .1em; color: var(--paint); opacity: .8; }
+  .switch span:first-child { left: 0; } .switch span:last-child { right: 0; }
+
+  .winner { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .winbtn { appearance: none; border: 0; padding: 4px; background: var(--green-deep); cursor: pointer; box-shadow: inset 0 0 0 1px rgba(0,0,0,.6); }
+  .winbtn .plate { flex-direction: column; gap: 8px; padding: 16px 10px 14px; min-height: 108px; }
+  .winbtn .who { font-family: var(--caps-font); font-weight: 700; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15; text-align: center; min-height: 34px; display: flex; align-items: center; }
+  .winbtn .who.empty { opacity: .45; font-weight: 500; }
+  .winbtn .tag { font-family: var(--caps-font); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; opacity: .7; }
+  .winbtn.on .plate { background: linear-gradient(180deg, #f6d05a 0%, var(--yellow) 60%, #d9ad2c 100%); }
+  .winbtn.on .tag { opacity: 1; }
+  .winbtn:active .plate { box-shadow: inset 6px 7px 10px rgba(0,0,0,.5); }
+
+  .submit { appearance: none; border: 0; padding: 4px; background: var(--green-deep); cursor: pointer; width: 100%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.6); }
+  .submit .plate { padding: 16px; font-family: var(--caps-font); font-weight: 700; font-size: 22px; letter-spacing: .12em; text-transform: uppercase; }
+  .submit[disabled] { cursor: not-allowed; }
+  .submit[disabled] .plate { opacity: .55; }
+  .preview { font-family: var(--caps-font); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; text-align: center; opacity: .8; min-height: 16px; }
+  .filed { border: 2px solid var(--paint); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  [hidden] { display: none !important; }
+  .filed h3 { margin: 0; font-family: var(--caps-font); font-weight: 700; font-size: 18px; letter-spacing: .1em; text-transform: uppercase; }
+  .filed .line { display: flex; justify-content: space-between; align-items: center; font-family: var(--caps-font); font-size: 15px; letter-spacing: .05em; text-transform: uppercase; gap: 10px; }
+  .filed .line .slot { width: 70px; } .filed .line .plate { height: 32px; font-size: 17px; }
+  .filed .line .nm { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .linkbtn { appearance: none; background: none; border: 0; color: var(--paint); font-family: var(--caps-font); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; padding: 6px 0; align-self: flex-start; }
+
+  /* player page */
+  .pname { font-family: var(--caps-font); font-weight: 700; font-size: 30px; letter-spacing: .03em; text-transform: uppercase; line-height: 1; text-shadow: 2px 3px 0 rgba(0,0,0,.45); }
+  .stats { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 10px; }
+  .stat { display: flex; flex-direction: column; gap: 6px; }
+  .stat .cap { font-family: var(--caps-font); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; opacity: .8; text-align: center; }
+  .stat .plate { height: 64px; font-size: 34px; }
+  .stat.small .plate { font-size: 26px; }
+  .lamps-row { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; }
+  .lamps-row .lbl { font-family: var(--caps-font); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; opacity: .8; }
+  .lamps-row .set { display: flex; gap: 8px; }
+  .graph { border: 2px solid rgba(246,242,230,.55); padding: 10px 8px 6px; background: rgba(0,0,0,.14); }
+  .graph svg { width: 100%; height: auto; display: block; }
+  .matches { display: flex; flex-direction: column; gap: 6px; }
+  .m { display: grid; grid-template-columns: 22px 1fr 64px; gap: 10px; align-items: center; min-height: 48px; padding: 4px 2px; border-bottom: 1px solid rgba(246,242,230,.18); }
+  .m:last-child { border-bottom: 0; }
+  .m .opp { font-family: var(--caps-font); font-weight: 700; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15; }
+  .m .opp small { display: block; font-weight: 500; font-size: 10.5px; letter-spacing: .16em; opacity: .65; margin-top: 2px; }
+  .m .plate { height: 32px; font-size: 17px; }
+  .m.loss .plate { color: #7a1d15; }
+
+  /* create player sheet */
+  .sheet { position: fixed; inset: 0; background: rgba(10,18,14,.75); display: none; align-items: flex-end; justify-content: center; z-index: 20; }
+  .sheet.open { display: flex; }
+  .sheet .panel { width: 100%; max-width: 480px; background: var(--green); border-top: 6px solid #5c615a; padding: 18px 16px 28px; display: flex; flex-direction: column; gap: 12px; }
+  .sheet h3 { margin: 0; font-family: var(--caps-font); font-weight: 700; font-size: 20px; letter-spacing: .1em; text-transform: uppercase; }
+  .sheet .note { font-size: 13px; }
+  .foot { margin-top: auto; display: flex; justify-content: space-between; font-family: var(--caps-font); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; opacity: .7; padding-top: 10px; }
+  .foot a { color: inherit; text-decoration: none; }
+  .foot a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wall">
+  <i class="bolt tl"></i><i class="bolt tr"></i>
+
+  <header class="mast">
+    <div class="kicker"><span>Ashdown House</span><span>Table tennis</span></div>
+    <h1 onclick="show('home')">ashdown.win</h1>
+  </header>
+
+  <nav>
+    <button data-tab="home" class="active" onclick="show('home')"><i class="lamp"></i>Board</button>
+    <button data-tab="record" onclick="show('record')"><i class="lamp"></i>Record</button>
+    <button data-tab="player" onclick="show('player')"><i class="lamp"></i>Player</button>
+  </nav>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen active" id="screen-home">
+    <div class="actions">
+      <button class="action" onclick="openCreate()"><span class="plate"><span class="big">Create player</span><span class="sub">Once, under your name</span></span></button>
+      <button class="action" onclick="show('record')"><span class="plate"><span class="big">Record match</span><span class="sub">Two names, tap the winner</span></span></button>
+    </div>
+    <div class="section-title"><span>The board</span><span id="board-count"></span></div>
+    <div class="hdr"><span>Rk</span><span>Player</span><span>W&ndash;L</span><span>Rating</span></div>
+    <div class="rows" id="board"></div>
+    <p class="note">A yellow plate is a player with no match yet. Everyone starts at 1000. Ratings are replayed from every match ever filed, so nothing hides. <a href="#" onclick="return false;">How the rating works</a>.</p>
+  </section>
+
+  <!-- ============ RECORD ============ -->
+  <section class="screen" id="screen-record">
+    <div id="form">
+      <div class="side" id="sideA" style="margin-bottom:10px">
+        <div class="lbl"><span>Side A</span><i class="lamp" id="lampA"></i></div>
+        <div class="search"><span class="slot"><input type="text" placeholder="Search a name" autocomplete="off" data-side="A" data-n="0" oninput="onSearch(this)" onfocus="onSearch(this)"></span><div class="sugg"></div></div>
+        <div class="search partner" hidden><span class="slot"><input type="text" placeholder="Partner" autocomplete="off" data-side="A" data-n="1" oninput="onSearch(this)" onfocus="onSearch(this)"></span><div class="sugg"></div></div>
+      </div>
+      <div class="side" id="sideB">
+        <div class="lbl"><span>Side B</span><i class="lamp" id="lampB"></i></div>
+        <div class="search"><span class="slot"><input type="text" placeholder="Search a name" autocomplete="off" data-side="B" data-n="0" oninput="onSearch(this)" onfocus="onSearch(this)"></span><div class="sugg"></div></div>
+        <div class="search partner" hidden><span class="slot"><input type="text" placeholder="Partner" autocomplete="off" data-side="B" data-n="1" oninput="onSearch(this)" onfocus="onSearch(this)"></span><div class="sugg"></div></div>
+      </div>
+
+      <div class="toggle" style="margin-top:8px">
+        <span class="lbl"><i class="lamp" id="lampD"></i>Doubles</span>
+        <button class="switch" role="switch" aria-checked="false" id="dbl" onclick="toggleDoubles()"><span>1v1</span><span>2v2</span></button>
+      </div>
+
+      <div class="section-title" style="margin:6px 0 8px"><span>Who won? Tap the side</span><span id="kLabel">K = 32</span></div>
+      <div class="winner">
+        <button class="winbtn" id="winA" onclick="pickWinner('A')"><span class="plate"><span class="who empty">Side A</span><i class="lamp big"></i><span class="tag">wins</span></span></button>
+        <button class="winbtn" id="winB" onclick="pickWinner('B')"><span class="plate"><span class="who empty">Side B</span><i class="lamp big"></i><span class="tag">wins</span></span></button>
+      </div>
+      <div class="preview" id="preview" style="margin:12px 0 8px"></div>
+      <button class="submit" id="submit" disabled onclick="fileMatch()"><span class="plate">File it</span></button>
+    </div>
+
+    <div class="filed" id="filed" hidden>
+      <h3>Filed. Plates moved.</h3>
+      <div id="filedLines"></div>
+      <p class="note">Filed it wrong? Delete it from the log. The deletion is as public as the match.</p>
+      <button class="linkbtn" onclick="resetForm(); show('home')">Back to the board</button>
+      <button class="linkbtn" onclick="resetForm()">Record another</button>
+    </div>
+  </section>
+
+  <!-- ============ PLAYER ============ -->
+  <section class="screen" id="screen-player">
+    <div class="pname" id="pname"></div>
+    <div class="stats">
+      <div class="stat"><span class="cap">Rating</span><span class="slot"><span class="plate" id="prating"></span></span></div>
+      <div class="stat small"><span class="cap">Rank</span><span class="slot"><span class="plate" id="prank"></span></span></div>
+      <div class="stat small"><span class="cap">W&ndash;L</span><span class="slot"><span class="plate" id="precord"></span></span></div>
+    </div>
+    <div class="lamps-row"><span class="lbl">Last six, oldest first</span><span class="set" id="plamps"></span></div>
+    <div class="section-title"><span>Rating over time</span><span id="gspan"></span></div>
+    <div class="graph" id="graph"></div>
+    <div class="section-title"><span>Recent matches</span><span>Delta</span></div>
+    <div class="matches" id="matches"></div>
+    <p class="note">Every match here is public and can be traced by hand from the log.</p>
+  </section>
+
+  <footer class="foot">
+    <span>Numbers changed by hand</span>
+    <a href="https://github.com/andersbekkevard/ashdown-win">open source</a>
+  </footer>
+</div>
+
+<!-- create player sheet -->
+<div class="sheet" id="createSheet" onclick="if(event.target===this) closeCreate()">
+  <div class="panel">
+    <h3>Create player</h3>
+    <div class="search"><span class="slot"><input type="text" id="newName" placeholder="Full name" autocomplete="off"></span></div>
+    <p class="note">Your full name, once. Others need to find you when they record a match.<br><a href="#" onclick="altName(); return false;">I'd rather not use my full name</a></p>
+    <p class="note" id="altNote" hidden>Then your MIT username, the part before the @, which is unique. Failing that, any name you know nobody else in the house uses.</p>
+    <button class="submit" onclick="createPlayer()"><span class="plate">Put me on the board</span></button>
+    <button class="linkbtn" onclick="closeCreate()">Cancel</button>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  "site": { "name": "ashdown.win", "url": "ashdown.win", "repo": "github.com/andersbekkevard/ashdown-win" },
+  "constants": { "kSingles": 32, "kDoubles": 16, "start": 1000 },
+  "leaderboard": [
+    { "rank": 1, "name": "Priya Raman", "rating": 1142, "matches": 21, "wins": 16 },
+    { "rank": 2, "name": "Tomás Ferreira", "rating": 1108, "matches": 17, "wins": 12 },
+    { "rank": 3, "name": "Anders Bekkevard", "rating": 1071, "matches": 14, "wins": 9 },
+    { "rank": 4, "name": "jchen26", "rating": 1054, "matches": 9, "wins": 6 },
+    { "rank": 5, "name": "Mei Nakamura", "rating": 1033, "matches": 11, "wins": 6 },
+    { "rank": 6, "name": "Daniel Okafor", "rating": 1012, "matches": 6, "wins": 3 },
+    { "rank": 7, "name": "Sofia Almeida", "rating": 1000, "matches": 0, "wins": 0 },
+    { "rank": 8, "name": "Lukas Weber", "rating": 987, "matches": 5, "wins": 2 },
+    { "rank": 9, "name": "The Ghost of 4th Floor", "rating": 971, "matches": 8, "wins": 3 },
+    { "rank": 10, "name": "Hannah Cohen", "rating": 958, "matches": 12, "wins": 4 },
+    { "rank": 11, "name": "Ravi Menon", "rating": 934, "matches": 7, "wins": 1 },
+    { "rank": 12, "name": "Emma Lindqvist", "rating": 913, "matches": 10, "wins": 2 }
+  ],
+  "player": {
+    "name": "Anders Bekkevard", "rating": 1071, "rank": 3, "matches": 14, "wins": 9,
+    "history": [1000, 1016, 1031, 1017, 1035, 1050, 1038, 1055, 1069, 1058, 1074, 1088, 1077, 1061, 1071],
+    "recent": [
+      { "date": "2026-09-06", "type": "singles", "opponent": "Priya Raman", "result": "loss", "delta": -10 },
+      { "date": "2026-09-06", "type": "singles", "opponent": "jchen26", "result": "win", "delta": 15 },
+      { "date": "2026-09-05", "type": "doubles", "partner": "Mei Nakamura", "opponent": "Tomás Ferreira & Daniel Okafor", "result": "loss", "delta": -8 },
+      { "date": "2026-09-04", "type": "singles", "opponent": "Lukas Weber", "result": "win", "delta": 14 },
+      { "date": "2026-09-03", "type": "singles", "opponent": "Hannah Cohen", "result": "win", "delta": 13 },
+      { "date": "2026-09-02", "type": "singles", "opponent": "Tomás Ferreira", "result": "loss", "delta": -12 }
+    ]
+  }
+};
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ---------- tabs ---------- */
+function show(id) {
+  $$(".screen").forEach(s => s.classList.toggle("active", s.id === "screen-" + id));
+  $$("nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
+  window.scrollTo(0, 0);
+}
+
+/* ---------- home ---------- */
+function renderBoard() {
+  const b = $("#board");
+  b.innerHTML = DATA.leaderboard.map(p => {
+    const link = p.name === DATA.player.name;
+    return `<div class="row${link ? " link" : ""}" ${link ? 'onclick="show(\'player\')" role="link" tabindex="0"' : ""}>
+      <span class="slot"><span class="plate">${p.rank}</span></span>
+      <span class="name">${esc(p.name)}</span>
+      <span class="rec">${p.wins}&ndash;${p.matches - p.wins}</span>
+      <span class="slot"><span class="plate${p.matches === 0 ? " yellow" : ""}">${p.rating}</span></span>
+    </div>`;
+  }).join("");
+  $("#board-count").textContent = DATA.leaderboard.length + " players";
+}
+
+/* ---------- create player ---------- */
+function openCreate() { $("#createSheet").classList.add("open"); setTimeout(() => $("#newName").focus(), 50); }
+function closeCreate() { $("#createSheet").classList.remove("open"); $("#altNote").hidden = true; }
+function altName() { $("#altNote").hidden = false; $("#newName").placeholder = "MIT username"; $("#newName").focus(); }
+function createPlayer() {
+  const name = $("#newName").value.trim();
+  if (!name) { $("#newName").focus(); return; }
+  if (DATA.leaderboard.some(p => p.name.toLowerCase() === name.toLowerCase())) { alert("That name is already on the board."); return; }
+  DATA.leaderboard.push({ rank: 0, name, rating: DATA.constants.start, matches: 0, wins: 0 });
+  rerank(); renderBoard(); closeCreate(); $("#newName").value = ""; show("home");
+}
+function rerank() {
+  DATA.leaderboard.sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
+  DATA.leaderboard.forEach((p, i) => p.rank = i + 1);
+}
+
+/* ---------- record match ---------- */
+const state = { A: [null, null], B: [null, null], doubles: false, winner: null };
+
+function onSearch(input) {
+  const q = input.value.trim().toLowerCase();
+  const box = input.closest(".search");
+  const sugg = $(".sugg", box);
+  const side = input.dataset.side, n = +input.dataset.n;
+  state[side][n] = null; box.classList.remove("picked");
+  const taken = [...state.A, ...state.B].filter(Boolean);
+  if (!q) { sugg.classList.remove("open"); updateForm(); return; }
+  const hits = DATA.leaderboard.filter(p => p.name.toLowerCase().includes(q) && !taken.includes(p.name)).slice(0, 6);
+  let html = hits.map(p => `<button type="button" onclick="pick('${side}',${n},${JSON.stringify(p.name).replace(/"/g, "&quot;")})">${esc(p.name)}</button>`).join("");
+  if (!hits.some(p => p.name.toLowerCase() === q))
+    html += `<button type="button" class="create" onclick="createInline('${side}',${n},${JSON.stringify(input.value.trim()).replace(/"/g, "&quot;")})">Create "${esc(input.value.trim())}"</button>`;
+  sugg.innerHTML = html; sugg.classList.add("open"); updateForm();
+}
+function pick(side, n, name) {
+  state[side][n] = name;
+  const input = $(`input[data-side="${side}"][data-n="${n}"]`);
+  input.value = name; input.closest(".search").classList.add("picked");
+  $(".sugg", input.closest(".search")).classList.remove("open");
+  updateForm();
+  // advance focus: next empty input, or leave for the winner tap
+  const next = $$("#form input").find(i => !i.closest(".search").hidden && !i.value);
+  if (next) next.focus();
+}
+function createInline(side, n, name) {
+  DATA.leaderboard.push({ rank: 0, name, rating: DATA.constants.start, matches: 0, wins: 0 });
+  rerank(); renderBoard(); pick(side, n, name);
+}
+function toggleDoubles() {
+  state.doubles = !state.doubles;
+  $("#dbl").setAttribute("aria-checked", state.doubles);
+  $("#lampD").classList.toggle("green", state.doubles);
+  $$(".partner").forEach(p => { p.hidden = !state.doubles; if (!state.doubles) { $("input", p).value = ""; } });
+  if (!state.doubles) { state.A[1] = null; state.B[1] = null; }
+  $("#kLabel").textContent = "K = " + (state.doubles ? DATA.constants.kDoubles : DATA.constants.kSingles);
+  updateForm();
+}
+function pickWinner(side) { state.winner = side; updateForm(); }
+function sideNames(side) { return state[side].filter(Boolean); }
+function sideRating(side) {
+  const rs = sideNames(side).map(n => DATA.leaderboard.find(p => p.name === n).rating);
+  return rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : null;
+}
+function complete() {
+  const need = state.doubles ? 2 : 1;
+  return sideNames("A").length === need && sideNames("B").length === need;
+}
+function expected(r, opp) { return 1 / (1 + Math.pow(10, (opp - r) / 400)); }
+function updateForm() {
+  ["A", "B"].forEach(s => {
+    const who = $(`#win${s} .who`);
+    const names = sideNames(s);
+    who.textContent = names.length ? names.join(" & ") : "Side " + s;
+    who.classList.toggle("empty", !names.length);
+    $(`#win${s}`).classList.toggle("on", state.winner === s);
+    $(`#win${s} .lamp`).className = "lamp big" + (state.winner ? (state.winner === s ? " green" : " red") : "");
+    $(`#lamp${s}`).className = "lamp" + (names.length === (state.doubles ? 2 : 1) ? " green" : "");
+  });
+  const ok = complete() && state.winner;
+  $("#submit").disabled = !ok;
+  const pv = $("#preview");
+  if (complete()) {
+    const K = state.doubles ? DATA.constants.kDoubles : DATA.constants.kSingles;
+    const ra = sideRating("A"), rb = sideRating("B");
+    const dA = Math.round(K * (1 - expected(ra, rb)));
+    const dB = Math.round(K * (1 - expected(rb, ra)));
+    pv.textContent = state.winner
+      ? `Side ${state.winner} wins: +${state.winner === "A" ? dA : dB} / −${state.winner === "A" ? dA : dB} per player`
+      : `If A wins: +${dA}. If B wins: +${dB}.`;
+  } else pv.textContent = state.winner ? "Fill both sides" : "";
+}
+function fileMatch() {
+  if (!(complete() && state.winner)) return;
+  const K = state.doubles ? DATA.constants.kDoubles : DATA.constants.kSingles;
+  const ra = sideRating("A"), rb = sideRating("B");
+  const W = state.winner, L = W === "A" ? "B" : "A";
+  const rw = W === "A" ? ra : rb, rl = W === "A" ? rb : ra;
+  const d = Math.round(K * (1 - expected(rw, rl)));
+  const lines = [];
+  sideNames(W).forEach(n => { const p = DATA.leaderboard.find(x => x.name === n); p.rating += d; p.matches++; p.wins++; lines.push({ n, d: +d, w: true, r: p.rating }); });
+  sideNames(L).forEach(n => { const p = DATA.leaderboard.find(x => x.name === n); p.rating -= d; p.matches++; lines.push({ n, d: -d, w: false, r: p.rating }); });
+  rerank(); renderBoard();
+  $("#filedLines").innerHTML = lines.map(l => `<div class="line"><span class="nm"><i class="lamp ${l.w ? "green" : "red"}"></i>${esc(l.n)}</span><span>${l.d > 0 ? "+" : "−"}${Math.abs(l.d)}</span><span class="slot"><span class="plate">${l.r}</span></span></div>`).join("");
+  $("#form").hidden = true; $("#filed").hidden = false; window.scrollTo(0, 0);
+}
+function resetForm() {
+  state.A = [null, null]; state.B = [null, null]; state.winner = null;
+  $$("#form input").forEach(i => { i.value = ""; i.closest(".search").classList.remove("picked"); });
+  $$(".sugg").forEach(s => s.classList.remove("open"));
+  if (state.doubles) toggleDoubles();
+  $("#form").hidden = false; $("#filed").hidden = true; updateForm();
+}
+document.addEventListener("click", e => { if (!e.target.closest(".search")) $$(".sugg").forEach(s => s.classList.remove("open")); });
+
+/* ---------- player page ---------- */
+function renderPlayer() {
+  const p = DATA.player;
+  $("#pname").textContent = p.name;
+  $("#prating").textContent = p.rating;
+  $("#prank").textContent = "#" + p.rank;
+  $("#precord").textContent = p.wins + "–" + (p.matches - p.wins);
+  $("#plamps").innerHTML = p.recent.slice().reverse().map(m => `<i class="lamp ${m.result === "win" ? "green" : "red"}"></i>`).join("");
+  $("#gspan").textContent = p.history.length + " points, from " + DATA.constants.start;
+  $("#graph").innerHTML = graphSVG(p.history);
+  $("#matches").innerHTML = p.recent.map(m => `<div class="m ${m.result}">
+    <i class="lamp ${m.result === "win" ? "green" : "red"}"></i>
+    <span class="opp">${m.type === "doubles" ? "vs " : "vs "}${esc(m.opponent)}<small>${m.date.slice(5).replace("-", "/")} &middot; ${m.type}${m.partner ? " with " + esc(m.partner) : ""}</small></span>
+    <span class="slot"><span class="plate">${m.delta > 0 ? "+" : "−"}${Math.abs(m.delta)}</span></span>
+  </div>`).join("");
+}
+function graphSVG(h) {
+  const W = 360, H = 170, padL = 38, padR = 14, padT = 12, padB = 24;
+  const lo = Math.floor((Math.min(...h) - 10) / 20) * 20, hi = Math.ceil((Math.max(...h) + 10) / 20) * 20;
+  const x = i => padL + (i / (h.length - 1)) * (W - padL - padR);
+  const y = v => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
+  const pts = h.map((v, i) => [x(i), y(v)]);
+  const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+  const ticks = [];
+  for (let v = lo; v <= hi; v += 20) ticks.push(v);
+  const paint = "#f6f2e6";
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Rating history">`;
+  ticks.forEach(v => {
+    s += `<line x1="${padL}" x2="${W - padR}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="${paint}" stroke-opacity="${v === 1000 ? .7 : .18}" stroke-width="${v === 1000 ? 1.5 : 1}" ${v === 1000 ? 'stroke-dasharray="4 4"' : ""}/>`;
+    s += `<text x="${padL - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" font-family="Oswald, Impact, Arial Narrow, sans-serif" font-size="11" letter-spacing="1" fill="${paint}" fill-opacity=".8">${v}</text>`;
+  });
+  s += `<text x="${padL}" y="${H - 6}" font-family="Oswald, Impact, Arial Narrow, sans-serif" font-size="10" letter-spacing="2" fill="${paint}" fill-opacity=".7">CREATED</text>`;
+  s += `<text x="${W - padR}" y="${H - 6}" text-anchor="end" font-family="Oswald, Impact, Arial Narrow, sans-serif" font-size="10" letter-spacing="2" fill="${paint}" fill-opacity=".7">MATCH ${h.length - 1}</text>`;
+  s += `<path d="${d}" fill="none" stroke="#0e1a14" stroke-opacity=".5" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" transform="translate(1.5,2)"/>`;
+  s += `<path d="${d}" fill="none" stroke="${paint}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+  pts.forEach((p, i) => {
+    const up = i === 0 ? null : h[i] > h[i - 1];
+    s += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${i === h.length - 1 ? 5 : 3.2}" fill="${i === 0 ? paint : up ? "#4fbf5a" : "#d9382c"}" stroke="#0e1a14" stroke-width="1.2"/>`;
+  });
+  // final value plate
+  const last = pts[pts.length - 1];
+  const bx = Math.min(last[0] - 22, W - padR - 44), by = last[1] - 30 < padT ? last[1] + 12 : last[1] - 30;
+  s += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="44" height="20" fill="#1b3126"/>`;
+  s += `<rect x="${(bx + 2).toFixed(1)}" y="${(by + 2).toFixed(1)}" width="40" height="16" fill="#f1e9d4"/>`;
+  s += `<text x="${(bx + 22).toFixed(1)}" y="${(by + 14.5).toFixed(1)}" text-anchor="middle" font-family="Alfa Slab One, Rockwell, serif" font-size="12" fill="#1b3126">${h[h.length - 1]}</text>`;
+  s += `</svg>`;
+  return s;
+}
+
+renderBoard(); renderPlayer(); updateForm();
+if (location.hash === "#demo") {            // mockup review hook: a filled-in doubles match
+  show("record"); toggleDoubles();
+  pick("A", 0, "Anders Bekkevard"); pick("A", 1, "Mei Nakamura");
+  pick("B", 0, "Tomás Ferreira"); pick("B", 1, "Daniel Okafor");
+  pickWinner("A"); document.activeElement && document.activeElement.blur();
+} else if (location.hash === "#demo-filed") {
+  show("record"); pick("A", 0, "Anders Bekkevard"); pick("B", 0, "Priya Raman"); pickWinner("A"); fileMatch();
+} else if (location.hash) show(location.hash.slice(1));
+</script>
+</body>
+</html>

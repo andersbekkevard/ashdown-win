@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashdown.win poster (whiteboard)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board:#fbfbf8; --ink:#22262b; --blue:#1d5fb4; --red:#c9302c; --green:#2b8a3e;
+    --ghost:#dfe2e5; --tray:#b6bbc1;
+    --marker:"Permanent Marker","Marker Felt","Chalkboard SE","Segoe Print",cursive;
+    --hand:"Patrick Hand","Comic Sans MS","Chalkboard","Segoe Print",cursive;
+    --note:"Caveat","Patrick Hand","Comic Sans MS","Segoe Print",cursive;
+  }
+  @page{ size:A4 portrait; margin:0; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    background:#8f949a;
+    font-family:var(--hand); color:var(--ink);
+    display:flex; justify-content:center; align-items:flex-start;
+    padding:12mm 0; min-height:100vh;
+  }
+  .sheet{
+    width:210mm; height:297mm; background:var(--board); position:relative; overflow:hidden;
+    box-shadow:0 6mm 18mm rgba(0,0,0,.35);
+    padding:11mm 12mm 0;
+    display:grid; grid-template-rows:auto 1fr auto auto auto; row-gap:4mm;
+  }
+  @media print{
+    body{ background:#fff; padding:0; display:block; }
+    .sheet{ box-shadow:none; margin:0; page-break-after:always; }
+  }
+  /* faint half-erased residue in the board corner */
+  .residue{ position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; }
+
+  .rough{ position:relative; }
+  .rough > svg.rough-border{ position:absolute; inset:-4px; width:calc(100% + 8px); height:calc(100% + 8px); pointer-events:none; overflow:visible; }
+  .rough > svg.rough-border path{ fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+  .rough > svg.rough-border path.hatch{ stroke-width:1.2; opacity:.35; }
+
+  /* ---- header ---- */
+  .tag{
+    display:inline-block; font-family:var(--hand); font-size:13pt; color:var(--blue);
+    transform:rotate(-2deg); transform-origin:left; padding:1mm 3mm; margin-left:1mm;
+  }
+  h1{
+    font-family:var(--marker); font-weight:400; font-size:31pt; line-height:1.05; margin:3mm 0 0; letter-spacing:.3px;
+  }
+  h1 .u{ position:relative; white-space:nowrap; }
+  h1 .u svg{ position:absolute; left:-1mm; right:-1mm; bottom:-2.5mm; width:calc(100% + 2mm); height:4mm; overflow:visible; }
+  h1 .u svg path{ fill:none; stroke:var(--blue); stroke-width:3; stroke-linecap:round; }
+  .lede{ font-size:14.5pt; line-height:1.3; margin:4mm 0 0; max-width:170mm; }
+  .lede b{ font-family:var(--marker); font-weight:400; color:var(--red); }
+
+  /* ---- middle: table + steps ---- */
+  .mid{ display:grid; grid-template-columns:78mm 1fr; column-gap:6mm; align-items:start; align-content:start; }
+  .table-wrap{ position:relative; padding-top:10mm; }
+  .table-wrap svg{ width:100%; height:auto; display:block; overflow:visible; }
+  .note{ font-family:var(--note); font-size:14pt; color:var(--ink); line-height:1.1; position:absolute; }
+  .note.n1{ left:2mm; bottom:-8mm; transform:rotate(-4deg); width:72mm; }
+  .note svg{ position:absolute; overflow:visible; }
+
+  .steps{ display:flex; flex-direction:column; gap:6mm; padding-top:2mm; }
+  .steps h2{ font-family:var(--marker); font-weight:400; font-size:15pt; margin:0 0 1mm 2mm; }
+  .step{ display:flex; gap:4mm; align-items:flex-start; padding:3.5mm 4mm 3mm 3mm; color:var(--ink); }
+  .step:nth-child(2){ transform:rotate(-.7deg); }
+  .step:nth-child(3){ transform:rotate(.5deg) translateX(2mm); }
+  .step:nth-child(4){ transform:rotate(-.4deg); }
+  .num{
+    flex:0 0 11mm; height:11mm; display:grid; place-items:center; font-family:var(--marker); font-size:15pt; color:var(--blue); position:relative;
+  }
+  .num svg{ position:absolute; inset:-1.5mm; width:calc(100% + 3mm); height:calc(100% + 3mm); overflow:visible; }
+  .num svg path{ fill:none; stroke:var(--blue); stroke-width:2; stroke-linecap:round; }
+  .step .t{ font-size:13pt; line-height:1.25; }
+  .step .t strong{ font-family:var(--marker); font-weight:400; font-size:13.5pt; display:block; margin-bottom:.5mm; }
+
+  /* ---- Elo line ---- */
+  .elo{ position:relative; padding:4mm 5mm 3mm 6mm; margin:1mm 0 0 0; color:var(--ink); }
+  .elo .f{ font-family:var(--marker); font-size:19pt; line-height:1.15; white-space:nowrap; }
+  .elo .f small{ font-family:var(--hand); font-size:12pt; }
+  .elo sup{ font-size:.62em; vertical-align:.55em; margin-left:.5px; }
+  .elo sub{ font-size:.6em; vertical-align:-.25em; }
+  .elo .k{ font-size:13pt; margin-top:1.5mm; line-height:1.3; }
+  .elo .k b{ font-family:var(--marker); font-weight:400; color:var(--blue); }
+  .elo .note.n2{ right:6mm; top:-6mm; transform:rotate(2deg); color:var(--red); white-space:nowrap; background:var(--board); padding:0 2mm; }
+  .elo .note.n2 svg path{ fill:none; stroke:var(--red); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .elo .f{ position:relative; display:inline-block; }
+  .elo .under{ position:absolute; left:0; width:66mm; height:4mm; overflow:visible; bottom:-3mm; }
+  .elo .under path{ fill:none; stroke:var(--red); stroke-width:2.4; stroke-linecap:round; }
+
+  /* ---- URL + QR ---- */
+  .cta{ display:grid; grid-template-columns:1fr 42mm; column-gap:6mm; align-items:center; margin-top:1mm; }
+  .url{ font-family:var(--marker); font-weight:400; color:var(--red); font-size:62pt; line-height:.95; letter-spacing:-1px; margin:0; transform:rotate(-1.2deg); transform-origin:left center; }
+  .url small{ display:block; font-family:var(--hand); font-size:14pt; color:var(--ink); letter-spacing:0; transform:none; margin-top:3mm; margin-left:2mm; }
+  .qr{ width:42mm; height:42mm; color:var(--ink); display:grid; place-items:center; transform:rotate(1.5deg); }
+  .qr .inner{ font-family:var(--note); font-size:14pt; text-align:center; line-height:1.05; }
+  .qr svg.scribble{ width:26mm; height:26mm; display:block; margin:0 auto 1mm; }
+  .qr svg.scribble path{ fill:none; stroke:var(--ink); stroke-width:1.6; stroke-linecap:round; }
+
+  /* ---- footer tray ---- */
+  .foot{ position:relative; margin:0 -12mm; padding:0 12mm; height:27mm; display:flex; align-items:flex-end; }
+  .foot .os{ font-size:12.5pt; color:var(--ink); margin-bottom:18mm; white-space:nowrap; }
+  .foot .os b{ font-weight:700; color:var(--blue); }
+  .foot svg.tray{ position:absolute; left:0; right:0; bottom:0; width:100%; height:15mm; display:block; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <svg class="residue" viewBox="0 0 210 297" preserveAspectRatio="none" aria-hidden="true">
+    <!-- ghost of a half-erased earlier scribble -->
+    <path d="M4 150 q10 -8 20 0 t20 0" fill="none" stroke="#e6e8eb" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M188 20 l-6 9 m8 -8 l-6 9 m8 -8 l-6 9" fill="none" stroke="#e6e8eb" stroke-width="1.1" stroke-linecap="round"/>
+  </svg>
+
+  <header>
+    <span class="tag rough" data-rough="tag" style="color:var(--blue)">Ashdown House · MIT</span>
+    <h1>Who is actually the best<br>at <span class="u">ping pong<svg viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M2 6 Q40 2 90 6 T198 5"/></svg></span> in this house?</h1>
+    <p class="lede">Now there is a board that answers it. <b>ashdown.win</b> is a public Elo ladder for the Ashdown table. No account, no app, no login: write your name once, and any match you play moves your number.</p>
+  </header>
+
+  <section class="mid">
+    <div class="table-wrap">
+      <svg viewBox="0 0 300 250" aria-label="A sketch of a table tennis table seen from above">
+        <g fill="none" stroke="#2b8a3e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <!-- table top, drawn twice like a marker sketch -->
+          <path d="M48 62 L252 60 L254 190 L46 191 Z"/>
+          <path d="M50 64 L250 63 L251 188 L48 189 Z" stroke-width="1.4" opacity=".6"/>
+          <!-- centre line -->
+          <path d="M150 63 L149 189" stroke-width="1.6" stroke-dasharray="1 0"/>
+          <!-- net -->
+          <path d="M40 126 L262 125" stroke="#22262b" stroke-width="3"/>
+          <path d="M40 120 L40 132 M262 119 L262 131" stroke="#22262b" stroke-width="3"/>
+          <path d="M44 126 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4 m8 4 l0 -4" stroke="#22262b" stroke-width="1.2" opacity=".7"/>
+          <!-- legs -->
+          <path d="M60 191 L58 232 M240 190 L243 232 M62 226 L238 228" stroke-width="2"/>
+        </g>
+        <!-- ball trajectory -->
+        <path d="M78 98 C120 40 190 40 232 96" fill="none" stroke="#c9302c" stroke-width="2" stroke-dasharray="5 6" stroke-linecap="round"/>
+        <circle cx="232" cy="98" r="5.5" fill="none" stroke="#c9302c" stroke-width="2.4"/>
+        <circle cx="233" cy="99" r="4" fill="none" stroke="#c9302c" stroke-width="1" opacity=".5"/>
+        <!-- paddles -->
+        <g fill="none" stroke="#22262b" stroke-width="2.4" stroke-linecap="round">
+          <path d="M60 104 c-10 -9 -10 -22 0 -30 c10 -8 24 -6 30 4 c6 10 2 24 -8 30 c-8 5 -16 3 -22 -4z"/>
+          <path d="M66 108 l-12 22"/>
+          <path d="M254 108 c-10 -9 -12 -22 -2 -30 c10 -8 24 -6 30 4 c6 10 2 24 -8 30 c-8 5 -16 3 -20 -4z"/>
+          <path d="M256 112 l14 22"/>
+        </g>
+      </svg>
+      <div class="note n1">the winner takes points off the loser.<br>every match. every number is public.
+        <svg viewBox="0 0 60 40" style="width:18mm;height:12mm;right:-16mm;top:-11mm"><path d="M4 36 C20 30 34 22 52 6 M52 6 l-12 2 M52 6 l-2 12" fill="none" stroke="#22262b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <div class="steps">
+      <h2>How it works, in three steps</h2>
+      <div class="step rough" data-rough="s1">
+        <div class="num">1<svg viewBox="0 0 40 40" preserveAspectRatio="none"><path d="M20 3 C31 2 38 9 37 20 C36 31 29 38 19 37 C9 36 3 29 3 19 C3 9 10 3 21 3"/></svg></div>
+        <div class="t"><strong>Create your name.</strong> Once. Full name, or your MIT username. That is the whole sign-up.</div>
+      </div>
+      <div class="step rough" data-rough="s2">
+        <div class="num">2<svg viewBox="0 0 40 40" preserveAspectRatio="none"><path d="M18 4 C30 1 38 10 37 21 C36 32 27 38 18 36 C8 34 2 27 4 17 C6 8 12 5 20 4"/></svg></div>
+        <div class="t"><strong>Record a match.</strong> Two names, tap the winner, done. Doubles works too. Anyone at the table can file it.</div>
+      </div>
+      <div class="step rough" data-rough="s3">
+        <div class="num">3<svg viewBox="0 0 40 40" preserveAspectRatio="none"><path d="M21 3 C32 4 38 12 36 22 C34 32 26 38 17 36 C7 34 2 26 4 16 C6 7 13 2 22 3"/></svg></div>
+        <div class="t"><strong>Watch the board.</strong> Ratings update immediately. Your page shows a graph and every match you have played.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="elo rough" data-rough="elo">
+    <div class="note n2">this is the whole algorithm. really.
+      <svg viewBox="0 0 60 40" style="width:16mm;height:11mm;left:-15mm;top:5mm"><path d="M56 4 C40 10 26 20 8 34 M8 34 l12 -4 M8 34 l4 -11"/></svg>
+    </div>
+    <div class="f">R′ = R + K·(S − E)<small>&nbsp;&nbsp; with &nbsp;</small>E = 1 / (1 + 10<sup>(R<sub>opp</sub> − R) / 400</sup>)<svg class="under" viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M2 5 Q50 1 100 6 T198 4"/></svg></div>
+    <div class="k">S is 1 for a win, 0 for a loss. <b>K = 32</b> singles, <b>K = 16</b> doubles. Everyone starts at <b>1000</b>. Same Elo that chess uses, nothing hidden.</div>
+  </section>
+
+  <section class="cta">
+    <div>
+      <p class="url">ashdown.win<small>type it, or scan. works on your phone at the table.</small></p>
+    </div>
+    <div class="qr rough" data-rough="qr">
+      <div class="inner">
+        <svg class="scribble" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M6 6 h26 v26 h-26z M12 12 h14 v14 h-14z M68 6 h26 v26 h-26z M74 12 h14 v14 h-14z M6 68 h26 v26 h-26z M12 74 h14 v14 h-14z"/>
+          <path d="M42 8 h6 m6 0 h6 M42 20 h12 M60 20 h4 M42 32 h6 m10 0 h6 M8 44 h8 m8 0 h4 m10 0 h8 m8 0 h6 m8 0 h10 M8 56 h4 m10 0 h12 m6 0 h8 m10 0 h6 m8 0 h4 M42 68 h8 m6 0 h4 m8 0 h12 M42 80 h4 m8 0 h10 m6 0 h8 m6 0 h6 M42 92 h12 m6 0 h4 m8 0 h14"/>
+        </svg>
+        QR goes here
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="os">open source: <b>github.com/andersbekkevard/ashdown-win</b> &nbsp;·&nbsp; check the maths, or add a feature.</div>
+    <svg class="tray" viewBox="0 0 210 15" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 9 L210 8.5 L210 15 L0 15 Z" fill="#b6bbc1"/>
+      <path d="M0 9 L210 8.5" stroke="#8f949a" stroke-width=".5"/>
+      <!-- three markers resting in the tray -->
+      <g stroke-linecap="round">
+        <path d="M22 5.5 h30" stroke="#1d5fb4" stroke-width="4"/><path d="M52 5.5 h4" stroke="#22262b" stroke-width="4"/>
+        <path d="M62 6 h30" stroke="#c9302c" stroke-width="4"/><path d="M92 6 h4" stroke="#22262b" stroke-width="4"/>
+        <path d="M104 5.5 h30" stroke="#2b8a3e" stroke-width="4"/><path d="M134 5.5 h4" stroke="#22262b" stroke-width="4"/>
+        <path d="M150 4 h22 v5 h-22z" fill="#22262b" stroke="none"/>
+        <path d="M150 9 h22 v2 h-22z" fill="#5a6066" stroke="none"/>
+      </g>
+    </svg>
+  </footer>
+</div>
+
+<script>
+/* Rough rectangle borders, in the manner of Rough.js: every edge is drawn twice
+   with small random offsets and a bowed midpoint, corners overshoot slightly. */
+(function(){
+  function prng(seed){ let s = seed % 2147483647; if (s <= 0) s += 2147483646;
+    return function(){ s = s * 16807 % 2147483647; return (s - 1) / 2147483646; }; }
+  function hash(str){ let h = 7; for (let i=0;i<str.length;i++) h = (h*31 + str.charCodeAt(i)) & 0xffffffff; return Math.abs(h)+1; }
+  function roughRect(w, h, opts){
+    const rnd = prng(opts.seed || 1), r = opts.roughness || 1.6;
+    const j = ()=> (rnd()-0.5) * 2 * r;
+    const pts = [[0,0],[w,0],[w,h],[0,h]];
+    let d = '';
+    for (let pass=0; pass<2; pass++){
+      const rr = pass ? r*0.7 : r;
+      for (let i=0;i<4;i++){
+        const a = pts[i], b = pts[(i+1)%4];
+        const dx = Math.sign(b[0]-a[0]), dy = Math.sign(b[1]-a[1]);
+        const over = 1.5 + rnd()*3;
+        const x1 = a[0] + j()*rr - dx*over*0.4, y1 = a[1] + j()*rr - dy*over*0.4;
+        const x2 = b[0] + j()*rr + dx*over,     y2 = b[1] + j()*rr + dy*over;
+        const mx = (x1+x2)/2 + j()*1.4, my = (y1+y2)/2 + j()*1.4;
+        d += `M${x1.toFixed(1)} ${y1.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)} `;
+      }
+    }
+    return d;
+  }
+  function hatch(w, h, seed){
+    const rnd = prng(seed+99); let d=''; const gap = 7;
+    for (let x = -h; x < w; x += gap){
+      const x1 = x + (rnd()-0.5)*2, x2 = x + h + (rnd()-0.5)*2;
+      d += `M${x1.toFixed(1)} ${h} L${x2.toFixed(1)} 0 `;
+    }
+    return d;
+  }
+  const NS='http://www.w3.org/2000/svg';
+  function draw(el){
+    let svg = el.querySelector(':scope > svg.rough-border');
+    if (!svg){ svg = document.createElementNS(NS,'svg'); svg.setAttribute('class','rough-border'); svg.setAttribute('aria-hidden','true'); el.insertBefore(svg, el.firstChild); }
+    const w = el.offsetWidth, h = el.offsetHeight, pad = 4;
+    svg.setAttribute('viewBox', `${-pad} ${-pad} ${w+2*pad} ${h+2*pad}`);
+    const seed = hash(el.dataset.rough || 'x') + Math.round(w) ;
+    let inner = '';
+    if (el.dataset.hatch !== undefined) inner += `<path class="hatch" d="${hatch(w,h,seed)}"/>`;
+    inner += `<path d="${roughRect(w,h,{seed, roughness: parseFloat(el.dataset.roughness||'1.6')})}"/>`;
+    svg.innerHTML = inner;
+  }
+  function all(){ document.querySelectorAll('.rough').forEach(draw); }
+  all();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(all);
+  window.addEventListener('resize', all);
+})();
+</script>
+</body>
+</html>

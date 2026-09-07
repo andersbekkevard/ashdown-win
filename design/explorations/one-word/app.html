@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ashdown.win</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #000;
+    --paper: #fff;
+    --mute: #8a8a8a;
+    --ph: #bbb;
+    --pad: 20px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.3;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; border-radius: 0; cursor: pointer; }
+  .app {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 0 var(--pad) 96px;
+    min-height: 100vh;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 20px 0 12px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .mark {
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.035em;
+    text-decoration: none;
+  }
+  nav a {
+    text-decoration: none;
+    margin-left: 18px;
+    font-size: 15px;
+  }
+  nav a.on { text-decoration: underline; text-underline-offset: 4px; }
+
+  section { display: none; }
+  section.on { display: block; }
+
+  .label {
+    font-size: 13px;
+    color: var(--mute);
+    margin: 0;
+  }
+  .giant {
+    font-size: clamp(96px, 34vw, 168px);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    line-height: 0.85;
+    font-variant-numeric: tabular-nums;
+    margin: 24px 0 6px -0.04em;
+  }
+  .lead-name {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0 0 32px;
+  }
+  .lead-name .link { text-decoration: none; }
+
+  .actions a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 18px 0;
+    border-top: 1px solid var(--ink);
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    text-decoration: none;
+  }
+  .actions a:last-child { border-bottom: 1px solid var(--ink); }
+  .actions .arrow { font-weight: 400; }
+
+  .board { margin-top: 40px; }
+  .board .head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--mute);
+    margin-bottom: 6px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 2.4em 1fr auto;
+    align-items: baseline;
+    padding: 12px 0;
+    border-top: 1px solid var(--ink);
+    text-decoration: none;
+  }
+  .row:last-child { border-bottom: 1px solid var(--ink); }
+  .rank { color: var(--mute); font-variant-numeric: tabular-nums; }
+  .name { font-weight: 500; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 12px; }
+  .name small { display: block; font-weight: 400; color: var(--mute); font-size: 13px; }
+  .rating {
+    font-variant-numeric: tabular-nums;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .foot-link { margin-top: 28px; font-size: 13px; color: var(--mute); }
+  .foot-link a { color: var(--mute); }
+
+  h2 {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    margin: 28px 0 20px;
+  }
+
+  .field { margin-bottom: 24px; position: relative; }
+  .field .label { margin-bottom: 2px; }
+  input[type=text] {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    border-radius: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    padding: 6px 0 8px;
+    outline: none;
+    color: var(--ink);
+    -webkit-appearance: none;
+  }
+  input::placeholder { color: var(--ph); font-weight: 500; }
+  .sugg {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 0; right: 0;
+    background: var(--paper);
+    z-index: 2;
+  }
+  .sugg li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--ink);
+    font-size: 17px;
+    cursor: pointer;
+  }
+  .sugg li.new { color: var(--mute); }
+  .sugg li.new b { color: var(--ink); font-weight: 500; }
+
+  .seg { display: flex; gap: 20px; margin: -8px 0 28px; font-size: 15px; }
+  .seg button { background: none; border: 0; padding: 0; color: var(--mute); }
+  .seg button.on { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+
+  .partner { display: none; }
+  .doubles .partner { display: block; }
+
+  .winner { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 8px 0 24px; }
+  .winner button {
+    min-height: 128px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    text-align: left;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+  .winner button .side { color: var(--ph); }
+  .winner button.named .side { color: inherit; }
+  .winner button small { font-size: 13px; font-weight: 400; color: var(--mute); }
+  .winner button.on { background: var(--ink); color: var(--paper); }
+  .winner button.on .side { color: var(--paper); }
+  .winner button.on small { color: var(--paper); opacity: .7; }
+
+  .submit {
+    width: 100%;
+    height: 64px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .submit:disabled { background: var(--paper); color: var(--ph); border-color: var(--ph); cursor: default; }
+
+  .linkish { background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 4px; font-size: 15px; }
+  .note { font-size: 15px; color: var(--mute); margin: 0 0 24px; }
+  .note b { color: var(--ink); font-weight: 500; }
+
+  .result .line {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 0;
+    border-top: 1px solid var(--ink);
+  }
+  .result .line:last-of-type { border-bottom: 1px solid var(--ink); }
+  .result .num {
+    font-variant-numeric: tabular-nums;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 1;
+  }
+  .result .num small { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; margin-left: 8px; }
+  .result .after { display: flex; gap: 20px; margin-top: 24px; font-size: 15px; }
+
+  .player-name {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    margin: 28px 0 0;
+  }
+  .meta-line { color: var(--mute); font-size: 15px; margin: 0 0 32px; font-variant-numeric: tabular-nums; }
+
+  .graph { border-top: 1px solid var(--ink); padding-top: 8px; margin-bottom: 32px; }
+  .graph .head { display: flex; justify-content: space-between; font-size: 13px; color: var(--mute); margin-bottom: 8px; }
+  .graph svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+  .matches .head { font-size: 13px; color: var(--mute); margin-bottom: 6px; }
+  .match {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--ink);
+  }
+  .match:last-child { border-bottom: 1px solid var(--ink); }
+  .match .opp { font-weight: 500; letter-spacing: -0.01em; }
+  .match .opp small { display: block; color: var(--mute); font-weight: 400; font-size: 13px; }
+  .match .delta {
+    font-variant-numeric: tabular-nums;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  @media (min-width: 720px) {
+    .app { max-width: 640px; padding-bottom: 120px; }
+    .giant { font-size: 200px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="mark" href="#home">ashdown.win</a>
+    <nav>
+      <a href="#home" data-nav="home">Board</a>
+      <a href="#record" data-nav="record">Record</a>
+    </nav>
+  </header>
+
+  <!-- HOME -->
+  <section id="home">
+    <p class="label" style="margin-top:28px">Leader</p>
+    <div class="giant" id="leadRating">1142</div>
+    <p class="lead-name"><a class="link" id="leadName" href="#player">Priya Raman</a></p>
+
+    <div class="actions">
+      <a href="#create">Create player <span class="arrow">&rarr;</span></a>
+      <a href="#record">Record match <span class="arrow">&rarr;</span></a>
+    </div>
+
+    <div class="board">
+      <div class="head"><span id="boardCount">12 players</span><span>Rating</span></div>
+      <div id="board"></div>
+    </div>
+    <p class="foot-link">Standard Elo, K 32 singles, 16 doubles, start 1000. <a href="#home">How the rating works</a> &middot; <a href="#home">Source</a></p>
+  </section>
+
+  <!-- CREATE -->
+  <section id="create">
+    <h2>Create player</h2>
+    <div class="field">
+      <p class="label">Full name</p>
+      <input type="text" id="newName" placeholder="Your name" autocomplete="off" autocapitalize="words">
+    </div>
+    <p class="note" id="altNote" hidden>Use your MIT username (the part before the @), or any name you know to be unique. <b>Others must be able to find it when recording a match.</b></p>
+    <p style="margin:0 0 28px"><button class="linkish" id="altToggle">I&rsquo;d rather not use my full name</button></p>
+    <button class="submit" id="createBtn" disabled>Create</button>
+    <p class="note" style="margin-top:16px">You start at 1000. Your name appears on the board immediately.</p>
+  </section>
+
+  <!-- RECORD -->
+  <section id="record">
+    <div id="recordForm">
+      <h2>Record match</h2>
+      <div class="seg">
+        <button id="segS" class="on">Singles</button>
+        <button id="segD">Doubles</button>
+      </div>
+
+      <div class="field">
+        <p class="label">Side A</p>
+        <input type="text" class="who" data-side="a" data-slot="0" placeholder="Name" autocomplete="off">
+        <ul class="sugg"></ul>
+      </div>
+      <div class="field partner">
+        <p class="label">Partner</p>
+        <input type="text" class="who" data-side="a" data-slot="1" placeholder="Name" autocomplete="off">
+        <ul class="sugg"></ul>
+      </div>
+
+      <div class="field">
+        <p class="label">Side B</p>
+        <input type="text" class="who" data-side="b" data-slot="0" placeholder="Name" autocomplete="off">
+        <ul class="sugg"></ul>
+      </div>
+      <div class="field partner">
+        <p class="label">Partner</p>
+        <input type="text" class="who" data-side="b" data-slot="1" placeholder="Name" autocomplete="off">
+        <ul class="sugg"></ul>
+      </div>
+
+      <p class="label">Who won</p>
+      <div class="winner">
+        <button id="winA" data-w="a"><span class="side">Side A</span><small>won</small></button>
+        <button id="winB" data-w="b"><span class="side">Side B</span><small>won</small></button>
+      </div>
+
+      <button class="submit" id="recordBtn" disabled>Record</button>
+      <p class="note" style="margin-top:16px">Anyone can record. Every match is public and can be deleted, publicly.</p>
+    </div>
+
+    <div id="recordResult" class="result" hidden>
+      <h2>Recorded</h2>
+      <div id="resultLines"></div>
+      <div class="after">
+        <a href="#record" id="again">Record another</a>
+        <a href="#home">Back to the board</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAYER -->
+  <section id="player">
+    <h1 class="player-name" id="pName">Anders Bekkevard</h1>
+    <div class="giant" id="pRating">1071</div>
+    <p class="meta-line" id="pMeta">3rd of 12 &middot; 14 matches &middot; 9 wins</p>
+
+    <div class="graph">
+      <div class="head"><span>Rating over 14 matches</span><span id="gRange">1000 – 1088</span></div>
+      <svg id="graph" viewBox="0 0 350 140" preserveAspectRatio="none" role="img" aria-label="Rating history"></svg>
+    </div>
+
+    <div class="matches">
+      <div class="head">Recent matches</div>
+      <div id="recent"></div>
+    </div>
+    <p class="foot-link"><a href="#player">All 14 matches</a></p>
+  </section>
+</div>
+
+<script>
+// Shared fake data (design/explorations/data.json), inlined so the file is self-contained.
+const DATA = {
+  "site": { "name": "ashdown.win", "url": "ashdown.win", "repo": "github.com/andersbekkevard/ashdown-win" },
+  "constants": { "kSingles": 32, "kDoubles": 16, "start": 1000 },
+  "leaderboard": [
+    { "rank": 1, "name": "Priya Raman", "rating": 1142, "matches": 21, "wins": 16 },
+    { "rank": 2, "name": "Tomás Ferreira", "rating": 1108, "matches": 17, "wins": 12 },
+    { "rank": 3, "name": "Anders Bekkevard", "rating": 1071, "matches": 14, "wins": 9 },
+    { "rank": 4, "name": "jchen26", "rating": 1054, "matches": 9, "wins": 6 },
+    { "rank": 5, "name": "Mei Nakamura", "rating": 1033, "matches": 11, "wins": 6 },
+    { "rank": 6, "name": "Daniel Okafor", "rating": 1012, "matches": 6, "wins": 3 },
+    { "rank": 7, "name": "Sofia Almeida", "rating": 1000, "matches": 0, "wins": 0 },
+    { "rank": 8, "name": "Lukas Weber", "rating": 987, "matches": 5, "wins": 2 },
+    { "rank": 9, "name": "The Ghost of 4th Floor", "rating": 971, "matches": 8, "wins": 3 },
+    { "rank": 10, "name": "Hannah Cohen", "rating": 958, "matches": 12, "wins": 4 },
+    { "rank": 11, "name": "Ravi Menon", "rating": 934, "matches": 7, "wins": 1 },
+    { "rank": 12, "name": "Emma Lindqvist", "rating": 913, "matches": 10, "wins": 2 }
+  ],
+  "player": {
+    "name": "Anders Bekkevard",
+    "rating": 1071,
+    "rank": 3,
+    "matches": 14,
+    "wins": 9,
+    "history": [1000, 1016, 1031, 1017, 1035, 1050, 1038, 1055, 1069, 1058, 1074, 1088, 1077, 1061, 1071],
+    "recent": [
+      { "date": "2026-09-06", "type": "singles", "opponent": "Priya Raman", "result": "loss", "delta": -10 },
+      { "date": "2026-09-06", "type": "singles", "opponent": "jchen26", "result": "win", "delta": 15 },
+      { "date": "2026-09-05", "type": "doubles", "partner": "Mei Nakamura", "opponent": "Tomás Ferreira & Daniel Okafor", "result": "loss", "delta": -8 },
+      { "date": "2026-09-04", "type": "singles", "opponent": "Lukas Weber", "result": "win", "delta": 14 },
+      { "date": "2026-09-03", "type": "singles", "opponent": "Hannah Cohen", "result": "win", "delta": 13 },
+      { "date": "2026-09-02", "type": "singles", "opponent": "Tomás Ferreira", "result": "loss", "delta": -12 }
+    ]
+  }
+};
+
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const players = DATA.leaderboard.map(p => ({ ...p }));
+const MINUS = '−';
+
+function fmtDelta(d) { return (d < 0 ? MINUS : '+') + Math.abs(d); }
+function ordinal(n) {
+  const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+// Rolling number: the only motion in the interface, used only when a rating changes.
+function roll(el, from, to, ms = 700) {
+  const t0 = performance.now();
+  const step = now => {
+    const p = Math.min(1, (now - t0) / ms);
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(from + (to - from) * e);
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// ---------- Board ----------
+function renderBoard() {
+  players.sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
+  players.forEach((p, i) => p.rank = i + 1);
+  $('#board').innerHTML = players.map(p => `
+    <a class="row" href="#player">
+      <span class="rank">${p.rank}</span>
+      <span class="name">${p.name}${p.matches === 0 ? '<small>no matches yet</small>' : ''}</span>
+      <span class="rating">${p.rating}</span>
+    </a>`).join('');
+  $('#boardCount').textContent = players.length + ' players';
+  const lead = players[0];
+  $('#leadRating').textContent = lead.rating;
+  $('#leadName').textContent = lead.name;
+}
+
+// ---------- Create ----------
+$('#newName').addEventListener('input', e => { $('#createBtn').disabled = !e.target.value.trim(); });
+$('#altToggle').addEventListener('click', () => {
+  const n = $('#altNote'); n.hidden = !n.hidden;
+  $('#newName').placeholder = n.hidden ? 'Your name' : 'Username or unique name';
+  $('#newName').focus();
+});
+$('#createBtn').addEventListener('click', () => {
+  const name = $('#newName').value.trim();
+  if (!name) return;
+  if (!players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+    players.push({ name, rating: DATA.constants.start, matches: 0, wins: 0 });
+  }
+  $('#newName').value = ''; $('#createBtn').disabled = true;
+  renderBoard();
+  location.hash = '#home';
+});
+
+// ---------- Record ----------
+const rec = { doubles: false, winner: null };
+const inputs = $$('.who');
+
+function sideNames(side) {
+  return inputs.filter(i => i.dataset.side === side && (rec.doubles || i.dataset.slot === '0'))
+               .map(i => i.value.trim()).filter(Boolean);
+}
+function needed() { return rec.doubles ? 2 : 1; }
+function ready() {
+  return sideNames('a').length === needed() && sideNames('b').length === needed() && rec.winner;
+}
+function refreshWinner() {
+  ['a', 'b'].forEach(s => {
+    const btn = s === 'a' ? $('#winA') : $('#winB');
+    const names = sideNames(s);
+    btn.classList.toggle('named', names.length > 0);
+    $('.side', btn).textContent = names.length ? names.join(' & ') : (s === 'a' ? 'Side A' : 'Side B');
+    btn.classList.toggle('on', rec.winner === s);
+  });
+  $('#recordBtn').disabled = !ready();
+}
+function suggest(input) {
+  const ul = input.nextElementSibling;
+  const q = input.value.trim().toLowerCase();
+  if (!q) { ul.innerHTML = ''; return; }
+  const taken = inputs.filter(i => i !== input).map(i => i.value.trim().toLowerCase());
+  const hits = players.filter(p => p.name.toLowerCase().includes(q) && !taken.includes(p.name.toLowerCase())).slice(0, 4);
+  const exact = hits.some(p => p.name.toLowerCase() === q);
+  ul.innerHTML = hits.map(p => `<li data-name="${p.name}">${p.name} <span style="color:var(--mute)">${p.rating}</span></li>`).join('')
+    + (exact ? '' : `<li class="new" data-new="${input.value.trim()}">Create <b>${input.value.trim()}</b></li>`);
+}
+inputs.forEach(i => {
+  i.addEventListener('input', () => { suggest(i); refreshWinner(); });
+  i.addEventListener('focus', () => suggest(i));
+  i.addEventListener('blur', () => setTimeout(() => { i.nextElementSibling.innerHTML = ''; }, 150));
+  i.nextElementSibling.addEventListener('mousedown', e => {
+    const li = e.target.closest('li'); if (!li) return;
+    e.preventDefault();
+    if (li.dataset.new) {
+      players.push({ name: li.dataset.new, rating: DATA.constants.start, matches: 0, wins: 0 });
+      i.value = li.dataset.new;
+    } else i.value = li.dataset.name;
+    i.nextElementSibling.innerHTML = '';
+    refreshWinner();
+    // Move on to the next empty box so the journey stays short.
+    const next = inputs.find(x => x.offsetParent && !x.value.trim());
+    if (next) next.focus(); else i.blur();
+  });
+});
+function setDoubles(on) {
+  rec.doubles = on;
+  $('#recordForm').classList.toggle('doubles', on);
+  $('#segS').classList.toggle('on', !on);
+  $('#segD').classList.toggle('on', on);
+  refreshWinner();
+}
+$('#segS').addEventListener('click', () => setDoubles(false));
+$('#segD').addEventListener('click', () => setDoubles(true));
+$$('.winner button').forEach(b => b.addEventListener('click', () => { rec.winner = b.dataset.w; refreshWinner(); }));
+
+function find(name) { return players.find(p => p.name.toLowerCase() === name.toLowerCase()); }
+function ensure(name) {
+  let p = find(name);
+  if (!p) { p = { name, rating: DATA.constants.start, matches: 0, wins: 0 }; players.push(p); }
+  return p;
+}
+$('#recordBtn').addEventListener('click', () => {
+  if (!ready()) return;
+  const A = sideNames('a').map(ensure), B = sideNames('b').map(ensure);
+  const K = rec.doubles ? DATA.constants.kDoubles : DATA.constants.kSingles;
+  const avg = xs => xs.reduce((s, p) => s + p.rating, 0) / xs.length;
+  const ra = avg(A), rb = avg(B);
+  const ea = 1 / (1 + Math.pow(10, (rb - ra) / 400));
+  const sa = rec.winner === 'a' ? 1 : 0;
+  const dA = Math.round(K * (sa - ea));
+  const lines = [];
+  A.forEach(p => { lines.push({ p, from: p.rating, d: dA }); p.rating += dA; p.matches++; if (sa) p.wins++; });
+  B.forEach(p => { lines.push({ p, from: p.rating, d: -dA }); p.rating -= dA; p.matches++; if (!sa) p.wins++; });
+  renderBoard();
+
+  $('#resultLines').innerHTML = lines.map((l, i) => `
+    <div class="line">
+      <span class="name">${l.p.name}<small>${l.d >= 0 ? 'won' : 'lost'} ${rec.doubles ? 'doubles' : 'singles'} &middot; now ${ordinal(l.p.rank)}</small></span>
+      <span class="num"><span data-roll="${i}">${l.from}</span><small>${fmtDelta(l.d)}</small></span>
+    </div>`).join('');
+  $('#recordForm').hidden = true;
+  $('#recordResult').hidden = false;
+  window.scrollTo(0, 0);
+  lines.forEach((l, i) => roll($(`[data-roll="${i}"]`), l.from, l.p.rating));
+});
+function resetRecord() {
+  inputs.forEach(i => { i.value = ''; i.nextElementSibling.innerHTML = ''; });
+  rec.winner = null;
+  setDoubles(false);
+  $('#recordForm').hidden = false;
+  $('#recordResult').hidden = true;
+}
+$('#again').addEventListener('click', e => { e.preventDefault(); resetRecord(); window.scrollTo(0, 0); });
+
+// ---------- Player ----------
+function renderPlayer() {
+  const P = DATA.player;
+  const live = find(P.name) || P;
+  $('#pName').textContent = P.name;
+  $('#pMeta').innerHTML = `${ordinal(live.rank || P.rank)} of ${players.length} &middot; ${live.matches} matches &middot; ${live.wins} wins`;
+
+  // Graph: hand-drawn polyline in a 350 x 140 box, baseline at the start rating.
+  const h = P.history, W = 350, H = 140, padT = 10, padB = 18, padX = 4;
+  const min = Math.min(...h, DATA.constants.start), max = Math.max(...h);
+  const x = i => padX + i * (W - 2 * padX) / (h.length - 1);
+  const y = v => padT + (max - v) * (H - padT - padB) / (max - min || 1);
+  const pts = h.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const hi = h.indexOf(max);
+  const last = h.length - 1;
+  const base = DATA.constants.start;
+  $('#graph').innerHTML = `
+    <line x1="0" y1="${y(base).toFixed(1)}" x2="${W}" y2="${y(base).toFixed(1)}" stroke="#8a8a8a" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/>
+    <text x="0" y="${(y(base) + 14).toFixed(1)}" font-size="11" fill="#8a8a8a" font-family="inherit">${base}</text>
+    <polyline points="${pts}" fill="none" stroke="#000" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${x(hi).toFixed(1)}" cy="${y(max).toFixed(1)}" r="2.5" fill="#fff" stroke="#000" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+    <text x="${x(hi).toFixed(1)}" y="${(y(max) - 8).toFixed(1)}" font-size="11" fill="#000" text-anchor="${hi > h.length * 0.8 ? 'end' : 'middle'}" font-family="inherit">${max}</text>
+    <circle cx="${x(last).toFixed(1)}" cy="${y(h[last]).toFixed(1)}" r="4" fill="#000"/>
+  `;
+  $('#gRange').textContent = `${min} – ${max}`;
+
+  $('#recent').innerHTML = P.recent.map(m => `
+    <div class="match">
+      <span class="opp">${m.result === 'win' ? 'beat' : 'lost to'} ${m.opponent}<small>${m.date}${m.type === 'doubles' ? ' &middot; doubles with ' + m.partner : ''}</small></span>
+      <span class="delta">${fmtDelta(m.delta)}</span>
+    </div>`).join('');
+
+  // Rating rolls in from the previous point in the history: the one moment motion is earned.
+  const prev = h[h.length - 2] ?? live.rating;
+  roll($('#pRating'), prev, live.rating);
+}
+
+// ---------- Router ----------
+const screens = ['home', 'create', 'record', 'player'];
+function route() {
+  let h = (location.hash || '#home').slice(1);
+  if (!screens.includes(h)) h = 'home';
+  screens.forEach(s => document.getElementById(s).classList.toggle('on', s === h));
+  $$('nav a').forEach(a => a.classList.toggle('on', a.dataset.nav === h));
+  if (h === 'player') renderPlayer();
+  if (h === 'record' && $('#recordResult').hidden === false) resetRecord();
+  if (h === 'record') setTimeout(() => inputs[0].focus(), 0);
+  if (h === 'create') setTimeout(() => $('#newName').focus(), 0);
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+renderBoard();
+refreshWinner();
+route();
+</script>
+</body>
+</html>

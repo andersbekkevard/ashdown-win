@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080806">
+<title>ashdown.win</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --screen: #080806;
+    --amber: #ffb000;
+    --amber-dim: #8a6000;
+    --amber-faint: #3d2a00;
+    --amber-bright: #ffd27a;
+    --win: #00ff00;
+    --win-bulk: #00cd00;
+    --loss: #ff5555;
+    --loss-bulk: #cd0000;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, "DejaVu Sans Mono", monospace;
+    --fs: 15px;
+    --row: 48px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--screen); }
+  body {
+    font-family: var(--mono);
+    font-size: var(--fs);
+    line-height: 1.45;
+    color: var(--amber);
+    text-shadow: 0 0 5px rgba(255,176,0,.32);
+    min-height: 100vh;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0; z-index: 50;
+    background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,.14) 2px 3px);
+    pointer-events: none;
+  }
+  @media (min-width: 720px) {
+    :root { --fs: 16px; }
+    body::after { background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,.12) 3px 4px); }
+  }
+
+  /* layout */
+  .term {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 12px 14px calc(var(--row) + 24px + env(safe-area-inset-bottom));
+  }
+  @media (min-width: 720px) { .term { padding-top: 28px; } }
+  .screen { display: none; }
+  .screen.on { display: block; animation: glow-in .25s ease-out; }
+  @keyframes glow-in { from { opacity: .3; filter: brightness(1.8); } to { opacity: 1; filter: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .screen.on { animation: none; }
+    .cur { animation: none !important; }
+  }
+
+  /* text roles */
+  .prompt { color: var(--amber-bright); margin: 0 0 6px; }
+  .prompt b { font-weight: 400; color: var(--amber-dim); }
+  .prompt .cmd { color: var(--amber-bright); font-weight: 500; }
+  .dim { color: var(--amber-dim); }
+  .bright { color: var(--amber-bright); }
+  .win { color: var(--win); }
+  .loss { color: var(--loss); }
+  .out { margin: 0 0 18px; }
+  .cur {
+    display: inline-block; width: .6em; height: 1.05em;
+    background: var(--amber); vertical-align: -0.15em; margin-left: 2px;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  pre { margin: 0; font: inherit; white-space: pre; }
+  a { color: inherit; text-decoration: none; }
+
+  /* menu option = big tap target styled as text */
+  .menu { display: grid; gap: 6px; margin: 0 0 18px; }
+  .opt {
+    display: flex; align-items: center; gap: 10px;
+    min-height: var(--row);
+    padding: 0 12px;
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    cursor: pointer;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    width: 100%;
+    text-shadow: inherit;
+  }
+  .opt .k { color: var(--amber-bright); }
+  .opt .arrow { margin-left: auto; color: var(--amber-dim); }
+  .opt:hover, .opt:focus-visible { border-color: var(--amber); outline: none; }
+  .opt:active, .opt.sel { background: var(--amber); color: var(--screen); text-shadow: none; }
+  .opt:active .k, .opt.sel .k, .opt:active .arrow, .opt.sel .arrow { color: var(--screen); }
+
+  /* box-drawn table built from fixed-width spans so rows can be tall tap targets */
+  .box { margin: 0 0 18px; font-size: 14px; }
+  @media (min-width: 720px) { .box { font-size: 16px; } }
+  .box .ln { display: flex; white-space: pre; line-height: 1.25; }
+  .box .ln.hd { color: var(--amber-bright); }
+  .box .ln.rule { color: var(--amber-dim); }
+  .box a.ln { min-height: 42px; align-items: center; }
+  .box a.ln:hover, .box a.ln:focus-visible { background: var(--amber-faint); outline: none; }
+  .box a.ln.me { color: var(--amber-bright); }
+  .box .c { flex: none; }
+  .box .name { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .box .ln.rule .name { text-overflow: clip; }
+  .box .b { color: var(--amber-dim); flex: none; }
+  /* in tall tap rows the │ glyph would leave gaps, so draw the bar with CSS instead */
+  .box a.ln .b {
+    color: transparent;
+    background: linear-gradient(var(--amber-dim), var(--amber-dim)) 50% 0 / 1px 100% no-repeat;
+  }
+
+  /* prompt-styled inputs */
+  .field { display: flex; align-items: center; border: 1px solid var(--amber-dim); min-height: var(--row); margin: 0 0 6px; position: relative; }
+  .field:focus-within { border-color: var(--amber); }
+  .field label { padding: 0 0 0 12px; color: var(--amber-bright); white-space: pre; }
+  .field input {
+    flex: 1; min-width: 0; background: transparent; border: 0; outline: none;
+    color: var(--amber); font: inherit; padding: 0 12px 0 8px; height: var(--row);
+    caret-color: var(--amber); text-shadow: inherit;
+  }
+  .field input::placeholder { color: var(--amber-dim); }
+  .hits { border: 1px solid var(--amber-dim); border-top: 0; margin: -6px 0 6px; display: none; }
+  .hits.on { display: block; }
+  .hits button {
+    display: flex; width: 100%; min-height: 44px; align-items: center; gap: 8px;
+    background: transparent; border: 0; border-top: 1px dashed var(--amber-faint);
+    color: var(--amber); font: inherit; padding: 0 12px; text-align: left; cursor: pointer; text-shadow: inherit;
+  }
+  .hits button:first-child { border-top: 0; }
+  .hits button:hover, .hits button:focus-visible { background: var(--amber-faint); outline: none; }
+  .hits button.new { color: var(--amber-bright); }
+  .side { margin: 0 0 14px; }
+  .side h3 { margin: 0 0 6px; font-size: 1em; font-weight: 500; color: var(--amber-bright); }
+
+  .toggle {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px 0 0;
+    cursor: pointer; user-select: none;
+  }
+  .toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .toggle .bx { color: var(--amber-bright); }
+  .toggle input:focus-visible + .bx { outline: 1px solid var(--amber); }
+
+  .winner { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 0 14px; }
+  .winner .opt { min-height: 72px; justify-content: center; text-align: center; flex-direction: column; gap: 2px; }
+  .winner .opt .who { font-size: .85em; color: var(--amber-dim); }
+  .winner .opt.sel .who { color: var(--screen); }
+  .submit { border-color: var(--amber); min-height: 56px; justify-content: center; }
+  .submit[disabled] { opacity: .45; cursor: not-allowed; }
+  .submit:active:not([disabled]) { background: var(--amber); color: var(--screen); }
+  .receipt { display: none; margin: 0 0 18px; }
+  .receipt.on { display: block; }
+
+  /* player page */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 18px; }
+  .stat { border: 1px solid var(--amber-dim); padding: 8px 10px; }
+  .stat .v { font-size: 1.6em; line-height: 1.1; color: var(--amber-bright); font-weight: 700; }
+  .stat .l { color: var(--amber-dim); font-size: .85em; }
+  .chart { border: 1px solid var(--amber-dim); margin: 0 0 18px; padding: 8px 8px 4px; }
+  .chart svg { display: block; width: 100%; height: auto; }
+  .matches .ln { display: grid; grid-template-columns: 5.5em 1fr 3.5em; gap: 8px; min-height: 44px; align-items: center; border-bottom: 1px dashed var(--amber-faint); }
+  .matches .ln:last-child { border-bottom: 0; }
+  .matches .who { min-width: 0; padding: 8px 0; }
+  .matches .d { text-align: right; font-weight: 500; }
+  .matches .t { color: var(--amber-dim); font-size: .85em; }
+
+  /* bottom status bar as nav */
+  nav.status {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    background: var(--amber); color: var(--screen); text-shadow: none;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav.status .in { max-width: 640px; margin: 0 auto; display: flex; }
+  nav.status button {
+    flex: 1; min-height: var(--row); background: transparent; border: 0; color: var(--screen);
+    font: inherit; font-weight: 500; cursor: pointer;
+  }
+  nav.status button[aria-current="page"] { background: var(--screen); color: var(--amber); }
+  nav.status button:focus-visible { outline: 2px solid var(--screen); outline-offset: -3px; }
+  .topline { display: flex; justify-content: space-between; color: var(--amber-dim); font-size: .85em; margin: 0 0 12px; }
+</style>
+</head>
+<body>
+<div class="term">
+  <div class="topline"><span>ashdown.win</span><span>tty1 · Sat Sep 7 2026</span></div>
+
+  <!-- HOME -->
+  <section id="home" class="screen on" aria-labelledby="home-h">
+    <p class="prompt" id="home-h">athena% <span class="cmd">ladder</span></p>
+    <p class="out">Ashdown House table tennis ladder. No accounts. Every match is public.</p>
+
+    <div class="menu">
+      <button class="opt" type="button" data-go="create"><span class="k">[1]</span> create player <span class="arrow">→</span></button>
+      <button class="opt" type="button" data-go="record"><span class="k">[2]</span> record match <span class="arrow">→</span></button>
+    </div>
+
+    <p class="prompt">athena% <span class="cmd">ladder --all</span></p>
+    <div class="box" id="board" role="table" aria-label="Leaderboard"></div>
+    <p class="dim">Tap a name for the player page. <a href="#" class="bright">algorithm</a> · <a href="#" class="bright">lsdel</a><span class="cur" aria-hidden="true"></span></p>
+  </section>
+
+  <!-- CREATE (minimal, reachable from [1]) -->
+  <section id="create" class="screen" aria-labelledby="create-h">
+    <p class="prompt" id="create-h">athena% <span class="cmd">ladder add</span></p>
+    <p class="out">Your full name, as people know you at the table. You start at 1000.</p>
+    <div class="field"><label for="newname">name&gt; </label><input id="newname" type="text" autocomplete="off" placeholder="Firstname Lastname"></div>
+    <p class="dim" style="margin:0 0 14px">I'd rather not use my full name: use your MIT username (before the @), or any name others can find.</p>
+    <div class="menu">
+      <button class="opt submit" type="button" data-go="home"><span class="k">[enter]</span> create</button>
+      <button class="opt" type="button" data-go="home"><span class="k">[esc]</span> back</button>
+    </div>
+  </section>
+
+  <!-- RECORD -->
+  <section id="record" class="screen" aria-labelledby="record-h">
+    <p class="prompt" id="record-h">athena% <span class="cmd">ladder record</span></p>
+    <p class="out">Who played, then tap the side that won.</p>
+
+    <label class="toggle"><input type="checkbox" id="doubles"><span class="bx" id="doubles-bx">[ ]</span> doubles</label>
+
+    <div class="side">
+      <h3>side A</h3>
+      <div class="field"><label for="a1">A&gt; </label><input id="a1" type="search" autocomplete="off" placeholder="search name"></div>
+      <div class="hits" id="a1-hits"></div>
+      <div class="dbl" hidden>
+        <div class="field"><label for="a2">A&gt; </label><input id="a2" type="search" autocomplete="off" placeholder="partner"></div>
+        <div class="hits" id="a2-hits"></div>
+      </div>
+    </div>
+
+    <div class="side">
+      <h3>side B</h3>
+      <div class="field"><label for="b1">B&gt; </label><input id="b1" type="search" autocomplete="off" placeholder="search name"></div>
+      <div class="hits" id="b1-hits"></div>
+      <div class="dbl" hidden>
+        <div class="field"><label for="b2">B&gt; </label><input id="b2" type="search" autocomplete="off" placeholder="partner"></div>
+        <div class="hits" id="b2-hits"></div>
+      </div>
+    </div>
+
+    <p class="prompt">winner? <span class="dim">(tap)</span></p>
+    <div class="winner" role="radiogroup" aria-label="Winner">
+      <button class="opt" type="button" role="radio" aria-checked="false" data-win="A"><span class="k">◄ A wins</span><span class="who" id="who-a">side A</span></button>
+      <button class="opt" type="button" role="radio" aria-checked="false" data-win="B"><span class="k">B wins ►</span><span class="who" id="who-b">side B</span></button>
+    </div>
+
+    <div class="menu">
+      <button class="opt submit" type="button" id="submit" disabled><span class="k">[enter]</span> record match</button>
+    </div>
+    <pre class="receipt" id="receipt"></pre>
+  </section>
+
+  <!-- PLAYER -->
+  <section id="player" class="screen" aria-labelledby="player-h">
+    <p class="prompt" id="player-h">athena% <span class="cmd">ladder player "<span id="p-name"></span>"</span></p>
+    <div class="stats">
+      <div class="stat"><div class="v" id="p-rating"></div><div class="l">rating</div></div>
+      <div class="stat"><div class="v" id="p-rank"></div><div class="l">rank of <span id="p-n"></span></div></div>
+      <div class="stat"><div class="v" id="p-wl"></div><div class="l">win / loss</div></div>
+    </div>
+
+    <p class="prompt">athena% <span class="cmd">ladder graph</span></p>
+    <div class="chart" id="chart"></div>
+
+    <p class="prompt">athena% <span class="cmd">ladder log | head</span></p>
+    <div class="matches" id="recent"></div>
+    <p class="dim" style="margin-top:12px">Deleted matches stay in the log: <a href="#" class="bright">lsdel</a><span class="cur" aria-hidden="true"></span></p>
+  </section>
+</div>
+
+<nav class="status" aria-label="Screens">
+  <div class="in">
+    <button type="button" data-go="home" aria-current="page">[ladder]</button>
+    <button type="button" data-go="record">[record]</button>
+    <button type="button" data-go="player">[player]</button>
+  </div>
+</nav>
+
+<script>
+const DATA = {
+  "site": { "name": "ashdown.win", "url": "ashdown.win", "repo": "github.com/andersbekkevard/ashdown-win" },
+  "constants": { "kSingles": 32, "kDoubles": 16, "start": 1000 },
+  "leaderboard": [
+    { "rank": 1, "name": "Priya Raman", "rating": 1142, "matches": 21, "wins": 16 },
+    { "rank": 2, "name": "Tomás Ferreira", "rating": 1108, "matches": 17, "wins": 12 },
+    { "rank": 3, "name": "Anders Bekkevard", "rating": 1071, "matches": 14, "wins": 9 },
+    { "rank": 4, "name": "jchen26", "rating": 1054, "matches": 9, "wins": 6 },
+    { "rank": 5, "name": "Mei Nakamura", "rating": 1033, "matches": 11, "wins": 6 },
+    { "rank": 6, "name": "Daniel Okafor", "rating": 1012, "matches": 6, "wins": 3 },
+    { "rank": 7, "name": "Sofia Almeida", "rating": 1000, "matches": 0, "wins": 0 },
+    { "rank": 8, "name": "Lukas Weber", "rating": 987, "matches": 5, "wins": 2 },
+    { "rank": 9, "name": "The Ghost of 4th Floor", "rating": 971, "matches": 8, "wins": 3 },
+    { "rank": 10, "name": "Hannah Cohen", "rating": 958, "matches": 12, "wins": 4 },
+    { "rank": 11, "name": "Ravi Menon", "rating": 934, "matches": 7, "wins": 1 },
+    { "rank": 12, "name": "Emma Lindqvist", "rating": 913, "matches": 10, "wins": 2 }
+  ],
+  "player": {
+    "name": "Anders Bekkevard",
+    "rating": 1071,
+    "rank": 3,
+    "matches": 14,
+    "wins": 9,
+    "history": [1000, 1016, 1031, 1017, 1035, 1050, 1038, 1055, 1069, 1058, 1074, 1088, 1077, 1061, 1071],
+    "recent": [
+      { "date": "2026-09-06", "type": "singles", "opponent": "Priya Raman", "result": "loss", "delta": -10 },
+      { "date": "2026-09-06", "type": "singles", "opponent": "jchen26", "result": "win", "delta": 15 },
+      { "date": "2026-09-05", "type": "doubles", "partner": "Mei Nakamura", "opponent": "Tomás Ferreira & Daniel Okafor", "result": "loss", "delta": -8 },
+      { "date": "2026-09-04", "type": "singles", "opponent": "Lukas Weber", "result": "win", "delta": 14 },
+      { "date": "2026-09-03", "type": "singles", "opponent": "Hannah Cohen", "result": "win", "delta": 13 },
+      { "date": "2026-09-02", "type": "singles", "opponent": "Tomás Ferreira", "result": "loss", "delta": -12 }
+    ]
+  }
+};
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad = (s, n) => String(s).padStart(n, ' ');
+
+/* ---- navigation ---- */
+function go(id) {
+  $$('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+  $$('nav.status button').forEach(b => {
+    const cur = b.dataset.go === id || (id === 'create' && b.dataset.go === 'home');
+    if (cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
+  window.scrollTo({ top: 0 });
+  if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+  if (id === 'record') setTimeout(() => $('#a1').focus(), 50);
+  if (id === 'create') setTimeout(() => $('#newname').focus(), 50);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-go]');
+  if (b) { e.preventDefault(); go(b.dataset.go); }
+});
+const SCREENS = ['home', 'create', 'record', 'player'];
+const fromHash = () => { const h = location.hash.slice(1); if (SCREENS.includes(h)) go(h); };
+window.addEventListener('hashchange', fromHash);
+fromHash();
+
+/* ---- leaderboard as a box-drawn table ---- */
+function board() {
+  const L = DATA.leaderboard;
+  const me = DATA.player.name;
+  // columns: │ ## │ name (flexible) │ rating │ W/L │  — the name cell stretches, so the
+  // rule rows use an overflow-clipped run of ─ to stay the same width as the rows.
+  const fill = '─'.repeat(80);
+  const line = (l, m, r) => `<div class="ln rule"><span class="c">${l}${'─'.repeat(3)}${m}</span><span class="name">${fill}</span><span class="c">${m}${'─'.repeat(6)}${m}${'─'.repeat(6)}${r}</span></div>`;
+  let h = line('┌', '┬', '┐');
+  h += `<div class="ln hd"><span class="c b">│</span><span class="c"> # </span><span class="c b">│</span><span class="name"> player</span><span class="c b">│</span><span class="c">rating</span><span class="c b">│</span><span class="c"> W/L  </span><span class="c b">│</span></div>`;
+  h += line('├', '┼', '┤');
+  for (const p of L) {
+    const wl = `${p.wins}/${p.matches - p.wins}`;
+    h += `<a href="#player" class="ln${p.name === me ? ' me' : ''}" data-go="player" role="row">`
+      + `<span class="c b">│</span><span class="c">${pad(p.rank, 2)} </span>`
+      + `<span class="c b">│</span><span class="name"> ${esc(p.name)}</span>`
+      + `<span class="c b">│</span><span class="c">${pad(p.rating, 5)} </span>`
+      + `<span class="c b">│</span><span class="c">${pad(wl, 5)} </span><span class="c b">│</span></a>`;
+  }
+  h += line('└', '┴', '┘');
+  $('#board').innerHTML = h;
+}
+board();
+
+/* ---- record match ---- */
+const names = DATA.leaderboard.map(p => p.name);
+const picked = { a1: null, a2: null, b1: null, b2: null };
+let winner = null;
+
+function search(q) {
+  q = q.trim().toLowerCase();
+  if (!q) return [];
+  return names.filter(n => n.toLowerCase().includes(q)).slice(0, 5);
+}
+function hitsFor(id) {
+  const inp = $('#' + id), box = $('#' + id + '-hits');
+  const q = inp.value;
+  const hs = search(q);
+  if (!q.trim() || (hs.length === 1 && hs[0] === q)) { box.classList.remove('on'); box.innerHTML = ''; return; }
+  let h = hs.map(n => `<button type="button" data-pick="${esc(n)}">${esc(n)}</button>`).join('');
+  if (!hs.some(n => n.toLowerCase() === q.trim().toLowerCase())) {
+    h += `<button type="button" class="new" data-pick="${esc(q.trim())}" data-new="1">+ create "${esc(q.trim())}"</button>`;
+  }
+  box.innerHTML = h;
+  box.classList.add('on');
+  box.onclick = e => {
+    const b = e.target.closest('[data-pick]');
+    if (!b) return;
+    picked[id] = b.dataset.pick;
+    inp.value = b.dataset.pick;
+    box.classList.remove('on');
+    refresh();
+    const order = ['a1', 'a2', 'b1', 'b2'].filter(k => k.endsWith('1') || $('#doubles').checked);
+    const next = order[order.indexOf(id) + 1];
+    if (next) $('#' + next).focus();
+  };
+}
+['a1', 'a2', 'b1', 'b2'].forEach(id => {
+  const inp = $('#' + id);
+  inp.addEventListener('input', () => {
+    const exact = names.find(n => n.toLowerCase() === inp.value.trim().toLowerCase());
+    picked[id] = exact || null;
+    hitsFor(id); refresh();
+  });
+  inp.addEventListener('focus', () => hitsFor(id));
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { const f = $('#' + id + '-hits button'); if (f) f.click(); e.preventDefault(); }
+  });
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.field, .hits')) $$('.hits').forEach(b => b.classList.remove('on'));
+});
+
+$('#doubles').addEventListener('change', e => {
+  const on = e.target.checked;
+  $('#doubles-bx').textContent = on ? '[x]' : '[ ]';
+  $$('.dbl').forEach(d => d.hidden = !on);
+  refresh();
+});
+
+$$('[data-win]').forEach(b => b.addEventListener('click', () => {
+  winner = b.dataset.win;
+  $$('[data-win]').forEach(x => { const on = x.dataset.win === winner; x.classList.toggle('sel', on); x.setAttribute('aria-checked', on); });
+  refresh();
+}));
+
+function sideLabel(k) {
+  const d = $('#doubles').checked;
+  const a = picked[k + '1'], b = picked[k + '2'];
+  if (!a) return 'side ' + k.toUpperCase();
+  return d ? (b ? `${a} & ${b}` : `${a} & …`) : a;
+}
+function ready() {
+  const d = $('#doubles').checked;
+  return picked.a1 && picked.b1 && (!d || (picked.a2 && picked.b2)) && winner;
+}
+function refresh() {
+  $('#who-a').textContent = sideLabel('a');
+  $('#who-b').textContent = sideLabel('b');
+  $('#submit').disabled = !ready();
+}
+$('#submit').addEventListener('click', () => {
+  if (!ready()) return;
+  const d = $('#doubles').checked;
+  const K = d ? DATA.constants.kDoubles : DATA.constants.kSingles;
+  const rating = n => (DATA.leaderboard.find(p => p.name === n) || { rating: DATA.constants.start }).rating;
+  const side = k => d ? [picked[k + '1'], picked[k + '2']] : [picked[k + '1']];
+  const A = side('a'), B = side('b');
+  const rA = A.reduce((s, n) => s + rating(n), 0) / A.length;
+  const rB = B.reduce((s, n) => s + rating(n), 0) / B.length;
+  const eA = 1 / (1 + Math.pow(10, (rB - rA) / 400));
+  const sA = winner === 'A' ? 1 : 0;
+  const dA = Math.round(K * (sA - eA)), dB = -dA;
+  const fmt = (n, dd) => `${n.padEnd(22)} ${pad(rating(n), 4)} → ${pad(rating(n) + dd, 4)}  ${dd >= 0 ? '<span class="win">+' + dd + '</span>' : '<span class="loss">' + dd + '</span>'}`;
+  const r = $('#receipt');
+  r.innerHTML = `<span class="bright">match #62 recorded</span> (${d ? 'doubles, K=16' : 'singles, K=32'})\n`
+    + A.map(n => fmt(n, dA)).join('\n') + '\n' + B.map(n => fmt(n, dB)).join('\n')
+    + `\n<span class="dim">filed wrong? </span><a href="#" class="bright">delete #62</a>   <a href="#" class="bright" data-go="home">[ladder]</a><span class="cur" aria-hidden="true"></span>`;
+  r.classList.add('on');
+  r.scrollIntoView({ block: 'nearest' });
+});
+
+/* ---- player page ---- */
+function player() {
+  const P = DATA.player;
+  $('#p-name').textContent = P.name;
+  $('#p-rating').textContent = P.rating;
+  $('#p-rank').textContent = '#' + P.rank;
+  $('#p-n').textContent = DATA.leaderboard.length;
+  $('#p-wl').textContent = `${P.wins}/${P.matches - P.wins}`;
+
+  // hand-written SVG line graph
+  const H = P.history;
+  const W = 400, Hh = 210, px = 40, py = 20;
+  const lo = Math.floor((Math.min(...H) - 10) / 20) * 20, hi = Math.ceil((Math.max(...H) + 10) / 20) * 20;
+  const x = i => px + (i / (H.length - 1)) * (W - px - 10);
+  const y = v => py + (1 - (v - lo) / (hi - lo)) * (Hh - py - 26);
+  let s = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Rating over ${H.length} points, ${H[0]} to ${H[H.length - 1]}">`;
+  s += `<rect x="0" y="0" width="${W}" height="${Hh}" fill="none"/>`;
+  for (let v = lo; v <= hi; v += 20) {
+    const yy = y(v);
+    s += `<line x1="${px}" x2="${W - 10}" y1="${yy}" y2="${yy}" stroke="#3d2a00" stroke-dasharray="2 4"/>`;
+    s += `<text x="${px - 6}" y="${yy + 4}" fill="#8a6000" font-size="12" text-anchor="end" font-family="inherit">${v}</text>`;
+  }
+  // start line at 1000
+  const y0 = y(DATA.constants.start);
+  s += `<line x1="${px}" x2="${W - 10}" y1="${y0}" y2="${y0}" stroke="#8a6000" stroke-dasharray="4 3"/>`;
+  const pts = H.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+  s += `<path d="M${pts.join(' L')}" fill="none" stroke="#ffb000" stroke-width="2.5" stroke-linejoin="round" style="filter:drop-shadow(0 0 4px rgba(255,176,0,.6))"/>`;
+  H.forEach((v, i) => {
+    const up = i === 0 || v >= H[i - 1];
+    s += `<rect x="${(x(i) - 3).toFixed(1)}" y="${(y(v) - 3).toFixed(1)}" width="6" height="6" fill="${i === 0 ? '#ffb000' : up ? '#00ff00' : '#ff5555'}"/>`;
+  });
+  const last = H[H.length - 1];
+  s += `<text x="${x(H.length - 1) - 8}" y="${y(last) - 10}" fill="#ffd27a" font-size="15" text-anchor="end" font-family="inherit" font-weight="700">${last}</text>`;
+  s += `<text x="${px}" y="${Hh - 6}" fill="#8a6000" font-size="12" font-family="inherit">match 0</text>`;
+  s += `<text x="${W - 10}" y="${Hh - 6}" fill="#8a6000" font-size="12" text-anchor="end" font-family="inherit">match ${H.length - 1}</text>`;
+  s += `</svg>`;
+  $('#chart').innerHTML = s;
+
+  $('#recent').innerHTML = P.recent.map(m => {
+    const d = m.delta;
+    const who = m.type === 'doubles'
+      ? `w/ ${esc(m.partner)} <span class="dim">vs</span> ${esc(m.opponent)}`
+      : `<span class="dim">vs</span> ${esc(m.opponent)}`;
+    return `<div class="ln"><span class="t">${m.date.slice(5)} ${m.type === 'doubles' ? 'dbl' : 'sgl'}</span><span class="who">${who}</span><span class="d ${d >= 0 ? 'win' : 'loss'}">${d >= 0 ? '+' : ''}${d}</span></div>`;
+  }).join('');
+}
+player();
+</script>
+</body>
+</html>

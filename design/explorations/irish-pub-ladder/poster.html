@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ashdown House Table Tennis Ladder — poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Oswald:wght@500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #0E3A2C;
+    --green-deep: #082A1F;
+    --cream: #F4EAD3;
+    --cream-aged: #E9DCBB;
+    --brass: #C9A24B;
+    --brass-hi: #EBCB73;
+    --oxblood: #8A2E2A;
+    --ink: #1C1A16;
+    --slab: "Alfa Slab One", "Rockwell Extra Bold", Rockwell, "Georgia", serif;
+    --cond: "Oswald", "Arial Narrow", Impact, "Helvetica Neue", sans-serif;
+    --book: "Libre Baskerville", Georgia, "Times New Roman", serif;
+  }
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--green-deep);
+    background-image:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 38px),
+      linear-gradient(180deg, #0b3226, #072318);
+    font-family: var(--book);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16mm 0;
+  }
+  .sheet {
+    width: 210mm; height: 297mm;
+    background: var(--cream);
+    background-image:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.35), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(120,90,30,.035) 0 1px, transparent 1px 3px);
+    position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,.6), 0 2px 0 rgba(255,255,255,.2) inset;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  /* brass tacks in the corners */
+  .tack {
+    position: absolute; width: 7mm; height: 7mm; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass) 55%, #7a5d22);
+    box-shadow: 0 1.5mm 2mm rgba(0,0,0,.35);
+    z-index: 5;
+  }
+  .tack.tl { top: 6mm; left: 6mm; } .tack.tr { top: 6mm; right: 6mm; }
+  .tack.bl { bottom: 6mm; left: 6mm; } .tack.br { bottom: 6mm; right: 6mm; }
+
+  /* pub-sign header */
+  .sign {
+    margin: 12mm 12mm 0;
+    background: var(--green);
+    color: var(--cream);
+    border: 1.2mm solid var(--brass);
+    outline: 0.4mm solid var(--brass);
+    outline-offset: 1.4mm;
+    padding: 5.5mm 8mm 5mm;
+    position: relative;
+    text-align: center;
+  }
+  .sign .house {
+    font-family: var(--cond); font-weight: 500; text-transform: uppercase;
+    letter-spacing: .32em; font-size: 4.2mm; color: var(--brass-hi);
+    margin: 0 0 2mm;
+  }
+  .sign h1 {
+    font-family: var(--slab); font-weight: 400;
+    font-size: 16mm; line-height: .92; margin: 0;
+    letter-spacing: .01em;
+    text-shadow: 0 1.2mm 0 var(--green-deep), 0 1.2mm 0 var(--green-deep), 0.6mm 1.6mm 0 rgba(0,0,0,.35);
+  }
+  .sign h1 small { display: block; font-size: 9mm; color: var(--brass-hi); margin-top: 1mm; }
+  .sign .rule {
+    display: flex; align-items: center; gap: 3mm; margin: 3mm auto 0; width: 80%;
+    color: var(--brass);
+  }
+  .sign .rule::before, .sign .rule::after { content: ""; flex: 1; height: 0; border-top: 0.4mm double var(--brass); border-bottom: 0.4mm solid var(--brass); }
+  .sign .rule span { font-family: var(--cond); text-transform: uppercase; letter-spacing: .28em; font-size: 3.6mm; font-weight: 500; }
+  .sign svg.paddle { position: absolute; left: 7mm; top: 50%; transform: translateY(-52%) rotate(-18deg); width: 22mm; height: 30mm; }
+  .sign svg.paddle.right { left: auto; right: 7mm; transform: translateY(-52%) rotate(18deg) scaleX(-1); }
+
+  .lede {
+    margin: 5mm 15mm 0;
+    text-align: center;
+    font-size: 4.1mm; line-height: 1.42;
+  }
+  .lede b { font-family: var(--slab); font-weight: 400; color: var(--green); }
+
+  /* three steps */
+  .steps {
+    margin: 5mm 12mm 0;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm;
+  }
+  .step {
+    background: var(--cream-aged);
+    border: 0.5mm solid var(--green);
+    box-shadow: 0.8mm 0.8mm 0 var(--green);
+    padding: 4mm 3.5mm 3.8mm;
+    text-align: center;
+    position: relative;
+  }
+  .step .n {
+    width: 11mm; height: 11mm; border-radius: 50%;
+    margin: 0 auto 2.5mm;
+    background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass) 60%, #8a6a24);
+    color: var(--green-deep);
+    font-family: var(--slab); font-size: 6.5mm; line-height: 11mm;
+    box-shadow: 0 0.6mm 0 #6b5220, 0 0 0 0.6mm var(--cream-aged), 0 0 0 1mm var(--green);
+  }
+  .step h3 {
+    font-family: var(--cond); text-transform: uppercase; letter-spacing: .12em;
+    font-weight: 700; font-size: 5mm; margin: 0 0 1.8mm; color: var(--green);
+  }
+  .step p { margin: 0; font-size: 3.4mm; line-height: 1.4; }
+
+  /* elo rule strip */
+  .rule-strip {
+    margin: 5mm 12mm 0;
+    border-top: 0.4mm solid var(--green); border-bottom: 0.4mm solid var(--green);
+    padding: 2.6mm 2mm;
+    display: flex; align-items: baseline; justify-content: center; gap: 4mm; flex-wrap: wrap;
+  }
+  .rule-strip .lbl { font-family: var(--cond); text-transform: uppercase; letter-spacing: .2em; font-size: 3.5mm; font-weight: 700; color: var(--oxblood); }
+  .rule-strip .f { font-family: var(--book); font-style: italic; font-size: 4.3mm; }
+  .rule-strip .k { font-family: var(--cond); font-weight: 500; font-size: 3.7mm; letter-spacing: .04em; color: var(--green); }
+
+  /* the URL */
+  .url { margin: 5mm 12mm 0; text-align: center; }
+  .url .big {
+    font-family: var(--slab); font-weight: 400; color: var(--green);
+    font-size: 24.5mm; line-height: .9; letter-spacing: -.01em;
+    text-shadow: 1.2mm 1.2mm 0 var(--brass);
+    white-space: nowrap;
+  }
+  .url .sub { font-family: var(--cond); text-transform: uppercase; letter-spacing: .3em; font-size: 4mm; color: var(--oxblood); margin-top: 2.5mm; font-weight: 500; }
+
+  /* board snapshot + QR */
+  .bottom {
+    margin: 5mm 12mm 5mm;
+    display: grid; grid-template-columns: 1fr 40mm; gap: 8mm; align-items: center;
+  }
+  .board { position: relative; padding: 1.5mm 8mm; }
+  .board::before, .board::after { content: ""; position: absolute; top: 0; bottom: 0; width: 3.5mm; border-radius: 1mm; background: linear-gradient(90deg, #2a1a0d, #3a2716 40%, #4b3320 60%, #2a1a0d); }
+  .board::before { left: 0; } .board::after { right: 0; }
+  .board h4 { margin: 0 0 1.6mm; text-align: center; font-family: var(--cond); text-transform: uppercase; letter-spacing: .24em; font-size: 3.2mm; font-weight: 700; color: var(--green); }
+  .rung { position: relative; display: grid; grid-template-columns: 9mm 1fr auto; align-items: center; gap: 2.5mm; background: var(--cream-aged); border: 0.35mm solid var(--green); box-shadow: 0.6mm 0.6mm 0 var(--green); padding: 1.2mm 3mm 1.2mm 1.8mm; margin-bottom: 1.8mm; }
+  .rung::before { content: ""; position: absolute; left: -8mm; right: -8mm; top: 50%; height: 2mm; margin-top: -1mm; background: linear-gradient(180deg, #5a3d24, #3a2716); z-index: -1; }
+  .rung .r { width: 8mm; height: 8mm; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass) 60%, #8a6a24); color: var(--green-deep); font-family: var(--slab); font-size: 4.2mm; line-height: 8mm; text-align: center; box-shadow: 0 0.4mm 0 #6b5220, 0 0 0 0.4mm var(--cream-aged), 0 0 0 0.8mm var(--green); }
+  .rung .nm { font-family: var(--slab); font-size: 4mm; color: var(--ink); }
+  .rung .rt { font-family: var(--cond); font-weight: 700; font-size: 5.2mm; color: var(--green); }
+  .rung.you .nm { font-family: var(--book); font-style: italic; color: var(--oxblood); }
+  .rung.you .r { background: var(--cream); color: var(--oxblood); font-family: var(--cond); font-weight: 700; box-shadow: 0 0 0 0.4mm var(--cream-aged), 0 0 0 0.8mm var(--oxblood); }
+  .rung.you .rt { color: var(--oxblood); }
+  .qr {
+    width: 40mm; height: 40mm; background: var(--cream);
+    border: 0.6mm solid var(--ink); outline: 0.4mm solid var(--brass); outline-offset: 1.4mm;
+    display: grid; place-items: center; position: relative;
+  }
+  .qr svg { width: 31mm; height: 31mm; }
+  .qr .cap { position: absolute; bottom: -7mm; left: 0; right: 0; text-align: center; font-family: var(--cond); text-transform: uppercase; letter-spacing: .2em; font-size: 2.8mm; color: var(--green); }
+
+  .foot {
+    margin-top: auto;
+    background: var(--green); color: var(--cream);
+    padding: 4mm 17mm 5mm;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--cond); text-transform: uppercase; letter-spacing: .16em; font-size: 3.4mm; font-weight: 500;
+    border-top: 1mm solid var(--brass);
+  }
+  .foot .os b { color: var(--brass-hi); font-weight: 700; }
+  .foot .est { color: var(--brass-hi); }
+
+  @media print {
+    body { background: none; padding: 0; display: block; }
+    .sheet { box-shadow: none; }
+  }
+  @media screen and (max-width: 230mm) {
+    body { padding: 0; }
+    .sheet { transform-origin: top left; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <span class="tack tl"></span><span class="tack tr"></span><span class="tack bl"></span><span class="tack br"></span>
+
+  <header class="sign">
+    <svg class="paddle" viewBox="0 0 60 84" aria-hidden="true">
+      <path d="M30 4c12 0 22 10 22 23 0 12-9 22-18 24l-1 2 2 25c0 3-2 5-5 5s-5-2-5-5l2-25-1-2C15 49 8 39 8 27 8 14 18 4 30 4z" fill="#3a2716" stroke="#EBCB73" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="30" cy="27" rx="18" ry="19" fill="#8A2E2A" stroke="#EBCB73" stroke-width="1.6"/>
+      <path d="M17 20c3-8 9-11 13-12" stroke="#EBCB73" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".8"/>
+      <path d="M28 53l-1 26M32 53l1 26" stroke="#EBCB73" stroke-width="1" opacity=".5"/>
+    </svg>
+    <svg class="paddle right" viewBox="0 0 60 84" aria-hidden="true">
+      <path d="M30 4c12 0 22 10 22 23 0 12-9 22-18 24l-1 2 2 25c0 3-2 5-5 5s-5-2-5-5l2-25-1-2C15 49 8 39 8 27 8 14 18 4 30 4z" fill="#3a2716" stroke="#EBCB73" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="30" cy="27" rx="18" ry="19" fill="#0b2e22" stroke="#EBCB73" stroke-width="1.6"/>
+      <path d="M17 20c3-8 9-11 13-12" stroke="#EBCB73" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".8"/>
+      <path d="M28 53l-1 26M32 53l1 26" stroke="#EBCB73" stroke-width="1" opacity=".5"/>
+    </svg>
+    <p class="house">Ashdown House &middot; MIT &middot; Cambridge, Mass.</p>
+    <h1>Table Tennis<small>House Ladder</small></h1>
+    <div class="rule"><span>Every match on the board</span></div>
+  </header>
+
+  <p class="lede">
+    <b>One table, one board, one rating each.</b> Nobody signs in and nobody is in charge:
+    anyone can record a match between any two residents, the winner takes points from the loser,
+    and the ladder on the wall moves before you have put the paddle down.
+  </p>
+
+  <section class="steps">
+    <div class="step">
+      <div class="n">1</div>
+      <h3>Create your name</h3>
+      <p>Once, under your own name. You appear on the board at 1000 straight away.</p>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <h3>Record a match</h3>
+      <p>Type both names, tap the side that won. Singles or doubles. Three taps, done.</p>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <h3>Watch the board</h3>
+      <p>Ratings are recomputed from every match ever played, so the board is always honest.</p>
+    </div>
+  </section>
+
+  <div class="rule-strip">
+    <span class="lbl">The rule</span>
+    <span class="f">R&prime; = R + K&thinsp;(S &minus; E), &nbsp;E = 1 / (1 + 10<sup>(R<sub>opp</sub> &minus; R)/400</sup>)</span>
+    <span class="k">K = 32 singles &middot; K = 16 doubles &middot; everyone starts at 1000</span>
+  </div>
+
+  <section class="url">
+    <div class="big">ashdown.win</div>
+    <div class="sub">No app. No account. Just your name.</div>
+  </section>
+
+  <section class="bottom">
+    <div class="board">
+      <h4>On the board this week</h4>
+      <div class="rung"><span class="r">1</span><span class="nm">Priya Raman</span><span class="rt">1142</span></div>
+      <div class="rung"><span class="r">2</span><span class="nm">Tomás Ferreira</span><span class="rt">1108</span></div>
+      <div class="rung"><span class="r">3</span><span class="nm">Anders Bekkevard</span><span class="rt">1071</span></div>
+      <div class="rung you"><span class="r">?</span><span class="nm">Your name here</span><span class="rt">1000</span></div>
+    </div>
+    <div class="qr" aria-label="QR code placeholder">
+      <svg viewBox="0 0 34 34" shape-rendering="crispEdges" aria-hidden="true">
+        <rect width="34" height="34" fill="#F4EAD3"/>
+        <g fill="#1C1A16">
+          <rect x="1" y="1" width="9" height="9"/><rect x="24" y="1" width="9" height="9"/><rect x="1" y="24" width="9" height="9"/>
+          <rect x="13" y="1" width="2" height="2"/><rect x="17" y="1" width="2" height="2"/><rect x="13" y="4" width="4" height="2"/><rect x="19" y="4" width="2" height="2"/>
+          <rect x="13" y="8" width="2" height="2"/><rect x="17" y="8" width="4" height="2"/>
+          <rect x="1" y="13" width="2" height="2"/><rect x="5" y="13" width="4" height="2"/><rect x="11" y="13" width="2" height="2"/><rect x="15" y="13" width="6" height="2"/><rect x="24" y="13" width="2" height="2"/><rect x="29" y="13" width="4" height="2"/>
+          <rect x="3" y="16" width="2" height="2"/><rect x="8" y="16" width="2" height="2"/><rect x="13" y="16" width="2" height="2"/><rect x="19" y="16" width="4" height="2"/><rect x="26" y="16" width="2" height="2"/><rect x="31" y="16" width="2" height="2"/>
+          <rect x="1" y="19" width="4" height="2"/><rect x="7" y="19" width="2" height="2"/><rect x="11" y="19" width="6" height="2"/><rect x="21" y="19" width="2" height="2"/><rect x="25" y="19" width="6" height="2"/>
+          <rect x="13" y="22" width="2" height="2"/><rect x="17" y="22" width="2" height="2"/><rect x="23" y="22" width="4" height="2"/><rect x="30" y="22" width="3" height="2"/>
+          <rect x="13" y="25" width="6" height="2"/><rect x="21" y="25" width="2" height="2"/><rect x="26" y="25" width="2" height="2"/><rect x="30" y="25" width="2" height="2"/>
+          <rect x="13" y="28" width="2" height="2"/><rect x="18" y="28" width="4" height="2"/><rect x="24" y="28" width="6" height="2"/>
+          <rect x="15" y="31" width="4" height="2"/><rect x="21" y="31" width="2" height="2"/><rect x="25" y="31" width="2" height="2"/><rect x="29" y="31" width="4" height="2"/>
+        </g>
+        <g fill="#F4EAD3"><rect x="3" y="3" width="5" height="5"/><rect x="26" y="3" width="5" height="5"/><rect x="3" y="26" width="5" height="5"/></g>
+        <g fill="#1C1A16"><rect x="4" y="4" width="3" height="3"/><rect x="27" y="4" width="3" height="3"/><rect x="4" y="27" width="3" height="3"/></g>
+      </svg>
+      <span class="cap">Scan to open</span>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="os">Open source: <b>github.com/andersbekkevard/ashdown-win</b></span>
+    <span class="est">Est. 2026</span>
+  </footer>
+</div>
+</body>
+</html>

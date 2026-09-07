@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ashdown.win — poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+
+  :root {
+    --ink: #000;
+    --paper: #fff;
+    --mute: #8a8a8a;
+    --margin: 14mm;
+  }
+
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #e6e6e6;
+    font-family: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 12mm 0;
+    box-sizing: border-box;
+    min-height: 100vh;
+  }
+
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--paper);
+    box-sizing: border-box;
+    padding: var(--margin);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1mm 8mm rgba(0,0,0,.14);
+    font-size: 10.5pt;
+    line-height: 1.3;
+    position: relative;
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; min-height: 0; display: block; }
+    .sheet { box-shadow: none; margin: 0; page-break-after: avoid; }
+  }
+  @media screen and (max-width: 860px) {
+    .sheet { zoom: 0.45; }
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9.5pt;
+    padding-bottom: 3mm;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .word {
+    font-weight: 800;
+    font-size: 45mm;
+    line-height: 0.84;
+    letter-spacing: -0.055em;
+    margin: 8mm 0 0 -0.04em;
+    margin-bottom: auto;
+  }
+  .word span { display: block; }
+
+  h1 {
+    font-size: 21pt;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 4mm;
+    max-width: 160mm;
+  }
+  .lede {
+    margin: 0 0 9mm;
+    max-width: 118mm;
+    font-size: 11.5pt;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6mm;
+    border-top: 1px solid var(--ink);
+    padding-top: 3mm;
+    margin-bottom: 8mm;
+  }
+  .step .n {
+    font-size: 30pt;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 3mm;
+  }
+  .step .t { font-weight: 500; margin-bottom: 1mm; }
+  .step .d { color: var(--mute); font-size: 9.5pt; }
+
+  .rule {
+    border-top: 1px solid var(--ink);
+    padding-top: 3mm;
+    margin-bottom: 9mm;
+    display: grid;
+    grid-template-columns: 30mm 1fr;
+    gap: 6mm;
+  }
+  .rule .k { color: var(--mute); font-size: 9.5pt; }
+  .rule .f {
+    font-size: 12pt;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .rule sup { font-size: 0.65em; vertical-align: super; line-height: 0; }
+  .rule sub { font-size: 0.65em; vertical-align: sub; line-height: 0; }
+  .rule .c { color: var(--mute); font-size: 9.5pt; font-weight: 400; margin-top: 1.5mm; }
+
+  .bottom {
+    display: grid;
+    grid-template-columns: 34mm 1fr;
+    gap: 6mm;
+    align-items: end;
+  }
+  .qr { width: 34mm; height: 34mm; display: block; }
+  .scan { font-size: 9.5pt; color: var(--mute); }
+  .scan b { color: var(--ink); font-weight: 500; }
+  .foot {
+    margin-top: 5mm;
+    padding-top: 3mm;
+    border-top: 1px solid var(--ink);
+    font-size: 9.5pt;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="meta">
+    <span>Ashdown House, MIT</span>
+    <span>Table tennis ladder</span>
+  </div>
+
+  <div class="word" aria-label="ashdown.win">
+    <span>ashdown</span>
+    <span>.win</span>
+  </div>
+
+  <h1>Record a match. Watch the number move.</h1>
+  <p class="lede">The public table tennis ladder for the house. No accounts: one name, one rating, and every match ever played on the record.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="n">1</div>
+      <div class="t">Create your name</div>
+      <div class="d">Once. Full name by default; your MIT username if you prefer. You start at 1000.</div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div class="t">Record a match</div>
+      <div class="d">Two names, tap the winner. Doubles count at half weight. Anyone can file it.</div>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <div class="t">Watch the board</div>
+      <div class="d">Ratings are recomputed from the full log every time, so every number can be checked.</div>
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="k">The rule</div>
+    <div>
+      <div class="f">R&prime; = R + K&thinsp;(S &minus; E), &nbsp; E = 1 / (1 + 10<sup>(R<sub>opp</sub> &minus; R)&thinsp;/&thinsp;400</sup>)</div>
+      <div class="c">S is 1 for a win, 0 for a loss. K = 32 singles, 16 doubles. Everyone starts at 1000.</div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <svg class="qr" viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="QR code placeholder">
+      <rect width="33" height="33" fill="#fff"/>
+      <rect x="0.5" y="0.5" width="32" height="32" fill="none" stroke="#000" stroke-width="0.4"/>
+      <!-- finder patterns -->
+      <g fill="#000">
+        <path d="M2 2h7v7H2z M3 3v5h5V3z M4 4h3v3H4z" fill-rule="evenodd"/>
+        <path d="M24 2h7v7h-7z M25 3v5h5V3z M26 4h3v3h-3z" fill-rule="evenodd"/>
+        <path d="M2 24h7v7H2z M3 25v5h5v-5z M4 26h3v3H4z" fill-rule="evenodd"/>
+        <!-- timing rows -->
+        <path d="M10 8h1v1h-1z M12 8h1v1h-1z M14 8h1v1h-1z M16 8h1v1h-1z M18 8h1v1h-1z M20 8h1v1h-1z M22 8h1v1h-1z"/>
+        <path d="M8 10h1v1H8z M8 12h1v1H8z M8 14h1v1H8z M8 16h1v1H8z M8 18h1v1H8z M8 20h1v1H8z M8 22h1v1H8z"/>
+        <!-- placeholder data modules -->
+        <path d="M11 11h2v1h-2z M14 11h1v2h-1z M17 12h2v1h-2z M20 11h1v1h-1z M12 13h1v2h-1z M15 14h3v1h-3z M19 14h1v2h-1z M21 13h2v1h-2z M11 16h2v1h-2z M14 17h1v1h-1z M16 16h1v3h-1z M18 17h2v1h-2z M21 16h1v2h-1z M11 19h1v2h-1z M13 20h2v1h-2z M18 20h1v1h-1z M20 19h2v1h-2z M23 18h1v3h-1z M11 22h2v1h-2z M14 22h1v3h-1z M16 23h3v1h-3z M20 22h1v1h-1z M22 23h2v1h-2z M25 11h1v2h-1z M27 11h2v1h-2z M30 12h1v1h-1z M26 14h1v1h-1z M28 13h1v3h-1z M30 15h1v1h-1z M25 17h2v1h-2z M28 18h2v1h-2z M26 20h1v2h-1z M29 20h1v1h-1z M30 22h1v2h-1z M25 23h2v1h-2z M28 24h1v1h-1z M11 25h1v1h-1z M13 26h2v1h-2z M16 25h1v2h-1z M18 26h2v1h-2z M21 25h1v1h-1z M23 26h1v2h-1z M11 28h2v1h-2z M14 29h1v1h-1z M16 28h1v1h-1z M18 29h3v1h-3z M22 28h1v1h-1z M25 26h1v1h-1z M27 27h2v1h-2z M30 26h1v3h-1z M25 29h2v1h-2z M28 30h2v1h-2z"/>
+      </g>
+    </svg>
+    <div class="scan">Scan, or type <b>ashdown.win</b> into any browser. Nothing to install, nothing to sign up for.</div>
+  </div>
+
+  <div class="foot">
+    <span>open source: github.com/andersbekkevard/ashdown-win</span>
+    <span>MIT licence</span>
+  </div>
+</div>
+</body>
+</html>

@@ -55,3 +55,9 @@ only, every rating derived from a public append-only match log. Read
 - Docs change in the same commit as the behaviour they describe.
 - This repository is public. No personal contact details of residents anywhere
   in the tree.
+
+## Design
+
+- Nine parallel visual explorations, each with a brief, an A4 poster, and a
+  mobile-first app mockup on shared fake data: `design/explorations/`. Open
+  `design/explorations/index.html`. No style has been chosen yet.
