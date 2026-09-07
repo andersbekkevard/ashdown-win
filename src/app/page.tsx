@@ -50,9 +50,6 @@ export default async function HomePage() {
           ))
         )}
       </div>
-      <p className="foot-link">
-        Every match is public. <Link href="/log">See the log</Link> or <Link href="/algorithm">read the maths</Link>.
-      </p>
       <Dock>
         <Link href="/players/new" className="btn lilac">
           Create player
