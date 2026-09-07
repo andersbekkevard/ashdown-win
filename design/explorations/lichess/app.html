@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ashdown.win · Table tennis ladder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-/* ---------- theme (derived from ---site-hue like lila) ---------- */
+/* ---------- theme (derived from ---site-hue like lila) ----------
+   Text tokens (--c-good, --c-bad, --c-primary, --c-brag) are tuned to pass 4.5:1 on box and zebra.
+   Fill tokens (--c-*-bg) are the darker version of the same hue so white text on them passes 4.5:1. */
 :root {
   ---site-hue: 37deg;
   --c-bg-page: hsl(var(---site-hue) 10% 8%);
@@ -23,22 +25,26 @@
   --c-metal-top-hover: hsl(var(---site-hue) 7% 25%);
   --c-metal-bottom-hover: hsl(var(---site-hue) 5% 22%);
   --c-font: hsl(0 0% 73%);
-  --c-font-dim: hsl(0 0% 58%);
-  --c-font-dimmer: hsl(0 0% 42%);
+  --c-font-dim: hsl(0 0% 64%);
+  --c-font-dimmer: hsl(0 0% 44%);
   --c-font-clear: hsl(0 0% 80%);
   --c-font-clearer: hsl(0 0% 89%);
   --c-border: hsl(0 0% 25%);
   --c-border-page: hsl(0 0% 22%);
-  --c-primary: hsl(209 79% 56%);
-  --c-primary-dim: hsl(209 60% 48%);
-  --c-good: hsl(88 62% 37%);
-  --c-bad: hsl(0 60% 50%);
-  --c-brag: hsl(var(---site-hue) 74% 43%);
+  --c-primary: hsl(209 79% 61%);
+  --c-primary-bg: hsl(209 79% 45%);
+  --c-good: hsl(88 62% 41%);
+  --c-good-bg: hsl(88 62% 31%);
+  --c-bad: hsl(0 65% 69%);
+  --c-bad-bg: hsl(0 60% 42%);
+  --c-brag: hsl(var(---site-hue) 74% 47%);
+  --c-brag-bg: hsl(var(---site-hue) 74% 36%);
   --c-accent: hsl(22 100% 42%);
   --c-over: white;
   --c-dimmer: black;
   --shadow: 0 2px 2px 0 rgb(0 0 0 / .3), 0 1px 5px 0 rgb(0 0 0 / .2);
   --radius: 7px;
+  --bar-h: 64px;
 }
 html.light {
   --c-bg-page: hsl(var(---site-hue) 10% 92%);
@@ -53,15 +59,20 @@ html.light {
   --c-metal-top-hover: hsl(0 0% 98%);
   --c-metal-bottom-hover: hsl(0 0% 95%);
   --c-font: hsl(0 0% 30%);
-  --c-font-dim: hsl(0 0% 47%);
-  --c-font-dimmer: hsl(0 0% 70%);
+  --c-font-dim: hsl(0 0% 39%);
+  --c-font-dimmer: hsl(0 0% 58%);
   --c-font-clear: hsl(0 0% 12%);
   --c-font-clearer: black;
   --c-border: hsl(0 0% 85%);
   --c-border-page: hsl(0 0% 80%);
-  --c-primary: hsl(209 77% 46%);
-  --c-primary-dim: hsl(209 60% 40%);
-  --c-brag: hsl(var(---site-hue) 74% 48%);
+  --c-primary: hsl(209 77% 41%);
+  --c-primary-bg: hsl(209 77% 41%);
+  --c-good: hsl(88 62% 30%);
+  --c-good-bg: hsl(88 62% 30%);
+  --c-bad: hsl(0 60% 42%);
+  --c-bad-bg: hsl(0 60% 42%);
+  --c-brag: hsl(var(---site-hue) 74% 34%);
+  --c-brag-bg: hsl(var(---site-hue) 74% 34%);
   --c-dimmer: white;
   --shadow: 0 2px 2px 0 rgb(0 0 0 / .12), 0 1px 5px 0 rgb(0 0 0 / .08);
 }
@@ -85,7 +96,8 @@ h3 { font-size: 1.1em; text-transform: uppercase; letter-spacing: .05em; color: 
 p { margin: 0 0 1em; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 input { font: inherit; }
-.shy { font-size: .85em; opacity: .65; }
+input::placeholder { color: var(--c-font-dimmer); opacity: 1; }
+.shy { font-size: .85em; opacity: .85; }
 .hidden { display: none !important; }
 good { color: var(--c-good); }
 bad { color: var(--c-bad); }
@@ -120,7 +132,7 @@ html:not(.light) .icon-sun { display: none; }
 html.light .icon-moon { display: none; }
 
 /* ---------- layout ---------- */
-main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .75rem 2rem; }
+main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .75rem calc(var(--bar-h) + 1.5rem + env(safe-area-inset-bottom)); }
 .screen { display: none; }
 .screen.active { display: block; }
 .box { background: var(--c-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
@@ -132,14 +144,14 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 /* ---------- buttons (lila .button) ---------- */
 .button {
   font-family: Roboto, sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: .02em;
-  color: var(--c-over); background: var(--c-primary); border-radius: var(--radius);
+  color: var(--c-over); background: var(--c-primary-bg); border-radius: var(--radius);
   padding: .8em 1em; display: inline-flex; align-items: center; justify-content: center; gap: .5em;
   text-shadow: .5px .5px 0 rgb(0 0 0 / .5); user-select: none; transition: filter .15s, background .15s;
-  box-shadow: inset 0 1px 0 hsl(from var(--c-primary) h s calc(l + 30%)), inset 0 -1px 0 hsl(from var(--c-primary) h s calc(l - 18%)), 0 1px 3px rgb(0 0 0 / .25);
+  box-shadow: inset 0 1px 0 hsl(from var(--c-primary-bg) h s calc(l + 30%)), inset 0 -1px 0 hsl(from var(--c-primary-bg) h s calc(l - 18%)), 0 1px 3px rgb(0 0 0 / .25);
 }
 .button:hover:not(:disabled) { filter: brightness(1.12); color: var(--c-over); }
 .button:disabled { opacity: .45; cursor: not-allowed; }
-.button-green { background: var(--c-good); box-shadow: inset 0 1px 0 hsl(from var(--c-good) h s calc(l + 30%)), inset 0 -1px 0 hsl(from var(--c-good) h s calc(l - 12%)), 0 1px 3px rgb(0 0 0 / .25); }
+.button-green { background: var(--c-good-bg); box-shadow: inset 0 1px 0 hsl(from var(--c-good-bg) h s calc(l + 30%)), inset 0 -1px 0 hsl(from var(--c-good-bg) h s calc(l - 12%)), 0 1px 3px rgb(0 0 0 / .25); }
 .button-metal { color: var(--c-font-clear); text-shadow: none; background: linear-gradient(to bottom, var(--c-metal-top), var(--c-metal-bottom)); box-shadow: inset 0 1px 3px -2px hsl(0 0% 45%), inset 0 -4px 6px -3px rgb(0 0 0 / .35), 0 1px 3px rgb(0 0 0 / .2); }
 .button-metal:hover:not(:disabled) { background: linear-gradient(to bottom, var(--c-metal-top-hover), var(--c-metal-bottom-hover)); filter: none; }
 .button-fat { font-size: 1.25em; padding: 1em 1.2em; }
@@ -147,12 +159,32 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 .button-empty:hover:not(:disabled) { background: var(--c-bg-low); filter: none; }
 .button svg { width: 1.1em; height: 1.1em; }
 
+/* ---------- bottom bar (lichess-mobile BottomBar idiom: fixed, surface-coloured, top hairline, safe-area padded) ---------- */
+.bottom-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+  background: var(--c-bg); border-top: 1px solid var(--c-border); box-shadow: 0 -2px 8px rgb(0 0 0 / .18);
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  display: grid; grid-template-columns: 1fr 1.35fr; gap: 8px; min-height: var(--bar-h);
+}
+.bottom-bar .button { width: 100%; min-height: 46px; padding: .55em .8em; font-size: 1.05em; }
+.bottom-bar .button svg { width: 1.25em; height: 1.25em; }
+body.on-record .bottom-bar { display: none; }
+/* the record form's submit row becomes the bar while recording */
+.submit-row {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+  background: var(--c-bg); border-top: 1px solid var(--c-border); box-shadow: 0 -2px 8px rgb(0 0 0 / .18);
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center;
+}
+.submit-row .button-fat { font-size: 1.15em; padding: .7em 1em; min-height: 46px; }
+.submit-row .shy { display: none; }
+.submit-note { padding: 0 1.2rem 1.2rem; text-align: center; }
+
 /* ---------- home ---------- */
 .home-grid { display: grid; gap: 1rem; }
-.actions { display: grid; grid-template-columns: 1fr; gap: .6rem; }
+.actions { display: none; grid-template-columns: 1fr; gap: .6rem; }
 .actions .button { width: 100%; }
 .actions .button-metal { font-size: 1.05em; padding: .8em 1em; }
-.lobby-side { display: none; }
 .slist { width: 100%; border-collapse: collapse; }
 .slist thead th { font-family: Roboto, sans-serif; font-weight: 400; text-align: left; font-size: .85em; color: var(--c-font-dim); padding: .5rem .8rem; border-bottom: 1px solid var(--c-border); background: linear-gradient(to bottom, var(--c-metal-top), var(--c-metal-bottom)); }
 .slist tbody tr:nth-child(even) { background: var(--c-bg-zebra); }
@@ -171,8 +203,8 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 .slist .rec-bar.empty { background: var(--c-border); }
 @media (max-width: 479px) { .slist .rec-bar { display: none; } .slist td, .slist th { padding-left: .5rem; padding-right: .5rem; } }
 .slist rating { font-size: 1.15em; }
-.gold-head { background: var(--c-brag); color: #fff; font-family: Roboto, sans-serif; font-weight: 500; letter-spacing: 1px; font-size: 1.15em; line-height: 2.5em; padding: 0 1.2rem; display: flex; align-items: center; gap: .6em; }
-.gold-head .shy { margin-left: auto; opacity: .85; font-weight: 400; letter-spacing: 0; }
+.gold-head { background: var(--c-brag-bg); color: #fff; font-family: Roboto, sans-serif; font-weight: 500; letter-spacing: 1px; font-size: 1.15em; line-height: 2.5em; padding: 0 1.2rem; display: flex; align-items: center; gap: .6em; }
+.gold-head .shy { margin-left: auto; opacity: 1; font-weight: 400; letter-spacing: 0; }
 .gold-head svg { width: 1em; height: 1em; }
 .foot-links { display: flex; gap: 1.2rem; justify-content: center; padding: 1.4rem 0 0; font-size: .9em; color: var(--c-font-dim); flex-wrap: wrap; }
 .foot-links a { color: var(--c-font-dim); }
@@ -182,11 +214,18 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 
 /* ---------- record match ---------- */
 .setup h2 { display: flex; align-items: center; gap: .6em; }
-.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.2rem; border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); background: var(--c-bg-zebra); }
-.cmn-toggle { position: relative; width: 44px; height: 24px; border-radius: 12px; background: var(--c-bg-low); border: 1px solid var(--c-border); transition: background .15s; flex: none; }
-.cmn-toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--c-font-dim); transition: left .15s, background .15s; }
-.cmn-toggle[aria-checked="true"] { background: var(--c-good); border-color: var(--c-good); }
-.cmn-toggle[aria-checked="true"]::after { left: 22px; background: #fff; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; text-align: left; padding: .8rem 1.2rem; border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border); background: var(--c-bg-zebra); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.toggle-row:hover { background: var(--c-bg-zebra2); }
+.toggle-row .t-lbl { display: flex; align-items: center; gap: .6em; color: var(--c-font-clear); font-size: 1.1em; }
+.toggle-row .t-lbl svg { width: 1.35em; height: 1.35em; color: var(--c-font-dim); flex: none; }
+.toggle-row .t-lbl .shy { display: block; font-size: .8em; color: var(--c-font-dim); opacity: 1; }
+.toggle-row[aria-checked="true"] .t-lbl svg { color: var(--c-good); }
+/* macOS-style switch: 51x31 pill, 27px round knob with a drop shadow, green track when on */
+.switch { position: relative; flex: none; width: 51px; height: 31px; border-radius: 16px; background: var(--c-bg-low); border: 1px solid var(--c-border); transition: background .2s ease, border-color .2s ease; box-shadow: inset 0 1px 2px rgb(0 0 0 / .2); }
+.switch::after { content: ""; position: absolute; top: 1px; left: 1px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgb(0 0 0 / .25), 0 1px 1px rgb(0 0 0 / .16), 0 0 0 1px rgb(0 0 0 / .04); transition: transform .2s cubic-bezier(.2,.7,.3,1.1); }
+.toggle-row[aria-checked="true"] .switch { background: var(--c-good-bg); border-color: var(--c-good-bg); box-shadow: none; }
+.toggle-row[aria-checked="true"] .switch::after { transform: translateX(20px); }
+.toggle-row:focus-visible { outline: 2px solid var(--c-primary); outline-offset: -2px; }
 .quick { padding: .9rem 1.2rem 0; }
 .quick .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .4rem; }
 .chip { border: 1px solid var(--c-border); border-radius: 999px; padding: .3em .8em; font-size: .9em; color: var(--c-font-clear); background: var(--c-bg-mid); }
@@ -202,8 +241,8 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 .player-input > svg { position: absolute; left: .8em; top: 50%; transform: translateY(-50%); width: 1em; height: 1em; color: var(--c-font-dim); pointer-events: none; }
 .player-input .rt { position: absolute; right: .8em; top: 50%; transform: translateY(-50%); font-size: .9em; }
 .complete { position: absolute; z-index: 4; left: 0; right: 0; top: calc(100% + 4px); background: var(--c-bg-low); border: 1px solid var(--c-border); border-radius: var(--radius); box-shadow: var(--shadow); list-style: none; margin: 0; padding: .25rem 0; max-height: 220px; overflow: auto; }
-.complete li { padding: .55em .9em; display: flex; justify-content: space-between; cursor: pointer; }
-.complete li:hover, .complete li.hl { background: var(--c-primary); color: #fff; }
+.complete li { padding: .55em .9em; display: flex; justify-content: space-between; cursor: pointer; color: var(--c-font-clear); }
+.complete li:hover, .complete li.hl { background: var(--c-primary-bg); color: #fff; }
 .complete li:hover rating, .complete li.hl rating { color: #fff; }
 .complete li.create { color: var(--c-primary); font-style: italic; }
 .winner { padding: 0 1.2rem 1.2rem; }
@@ -217,9 +256,6 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 .pick.chosen { border-color: var(--c-good); background: color-mix(in oklab, var(--c-good) 12%, var(--c-bg)); }
 .pick.chosen .who::before { content: "✓ "; color: var(--c-good); font-weight: 600; }
 .pick.chosen .prev good { font-size: 1.15em; }
-.submit-row { padding: 0 1.2rem 1.2rem; display: grid; gap: .6rem; }
-.submit-row .button { width: 100%; }
-.submit-row .shy { text-align: center; }
 
 /* ---------- player ---------- */
 .user-show__header { background: var(--c-bg-zebra); padding: 1.6rem 1.2rem 1.3rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .3em 1em; }
@@ -233,24 +269,33 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 .sub-rating .big rating { font-size: 2.2em; line-height: 1.1; }
 .sub-rating .rank-pill { margin-left: auto; text-align: right; }
 .sub-rating .rank-pill strong { display: block; font-family: Roboto, sans-serif; font-weight: 300; font-size: 2em; line-height: 1.1; color: var(--c-brag); }
-.chart-wrap { padding: .8rem 1rem .4rem; }
+.chart-wrap { padding: .8rem 1rem .4rem; position: relative; }
 .chart-head { display: flex; align-items: center; justify-content: space-between; padding: 0 .2rem .3rem; }
 .range { display: inline-flex; }
 .range button { font-family: Roboto, sans-serif; font-weight: 400; text-transform: uppercase; font-size: .8em; padding: .3em .7em; border: 1px solid var(--c-border); border-right: 0; color: var(--c-font-dim); }
 .range button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
 .range button:last-child { border-right: 1px solid var(--c-border); border-radius: 0 var(--radius) var(--radius) 0; }
 .range button.active { background: var(--c-bg-low); color: var(--c-font-clear); }
-#chart { width: 100%; height: 210px; display: block; overflow: visible; }
+#chart { width: 100%; height: 210px; display: block; overflow: visible; touch-action: pan-y; cursor: crosshair; }
 #chart .grid { stroke: var(--c-border); stroke-width: 1; }
 #chart .base { stroke: var(--c-brag); stroke-dasharray: 3 4; stroke-width: 1; opacity: .7; }
 #chart .area { fill: var(--c-primary); opacity: .14; }
 #chart .line { fill: none; stroke: var(--c-primary); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 #chart .pt { fill: var(--c-bg); stroke: var(--c-primary); stroke-width: 2; }
 #chart .pt.last { fill: var(--c-primary); }
+#chart .pt.hot { fill: var(--c-primary); stroke: var(--c-bg); stroke-width: 2.5; }
 #chart text { fill: var(--c-font-dim); font-size: 10px; font-family: 'Noto Sans', sans-serif; }
 #chart text.val { fill: var(--c-font-clear); font-weight: 600; font-size: 11px; }
-#chart .hit { fill: transparent; }
 #chart .hover-line { stroke: var(--c-font-dim); stroke-width: 1; opacity: 0; }
+/* tooltip: date · opponent · delta, follows the nearest point; works for touch via pointer events */
+.chart-tip { position: absolute; z-index: 3; pointer-events: none; opacity: 0; transition: opacity .1s; background: var(--c-bg-low); border: 1px solid var(--c-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: .45rem .65rem; font-size: .9em; line-height: 1.35; white-space: nowrap; color: var(--c-font-clear); }
+.chart-tip.show { opacity: 1; }
+.chart-tip .d { color: var(--c-font-dim); font-size: .9em; }
+.chart-tip .o { display: block; }
+.chart-tip .o .kind { display: inline-block; width: 1em; height: 1em; vertical-align: -.15em; margin-right: .3em; color: var(--c-font-dim); }
+.chart-tip .r { display: flex; align-items: baseline; gap: .5em; }
+.chart-tip .r rating { font-size: 1.15em; }
+.chart-tip .r .rp { font-size: 1em; }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--c-border); }
 .stat { padding: .9rem .6rem; text-align: center; border-right: 1px solid var(--c-border); }
 .stat:last-child { border-right: 0; }
@@ -261,30 +306,48 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 .wl-bar .w { background: var(--c-good); }
 .wl-bar .l { background: var(--c-bad); }
 .wl-legend { display: flex; justify-content: space-between; margin: 0 1.2rem .5rem; font-size: .85em; }
+.games-head { display: flex; align-items: center; justify-content: space-between; padding: 0 1.2rem .5rem; }
+.games-key { display: flex; gap: .8em; font-size: .8em; color: var(--c-font-dim); align-items: center; }
+.games-key svg { width: 1.1em; height: 1.1em; vertical-align: -.2em; margin-right: .2em; }
 .games { list-style: none; margin: 0; padding: 0; }
-.game-row { display: grid; grid-template-columns: 4.2em 1fr auto; gap: .8rem; align-items: center; padding: .75rem 1.2rem; }
+/* result and kind are readable without text: coloured left edge + W/L badge, one or two figures for singles/doubles */
+.game-row { display: grid; grid-template-columns: auto auto 1fr auto; gap: .7rem; align-items: center; padding: .7rem 1.2rem .7rem calc(1.2rem - 4px); border-left: 4px solid transparent; }
 .game-row:nth-child(even) { background: var(--c-bg-zebra); }
-.game-row .res { font-family: Roboto, sans-serif; font-weight: 500; text-transform: uppercase; font-size: .85em; letter-spacing: .04em; }
-.game-row .res.win { color: var(--c-good); }
-.game-row .res.loss { color: var(--c-bad); }
-.game-row .opp { color: var(--c-font-clear); }
-.game-row .opp .shy { display: block; }
+.game-row.win { border-left-color: var(--c-good); }
+.game-row.loss { border-left-color: var(--c-bad); }
+.game-row .badge { width: 2em; height: 2em; border-radius: 5px; display: grid; place-items: center; font-family: Roboto, sans-serif; font-weight: 500; font-size: 1em; color: #fff; text-shadow: .5px .5px 0 rgb(0 0 0 / .35); }
+.game-row.win .badge { background: var(--c-good-bg); }
+.game-row.loss .badge { background: var(--c-bad-bg); }
+.game-row .kind { width: 1.6em; height: 1.6em; color: var(--c-font-dim); display: grid; place-items: center; }
+.game-row .kind svg { width: 1.45em; height: 1.45em; }
+.game-row.doubles .kind { color: var(--c-brag); }
+.game-row .opp { color: var(--c-font-clear); min-width: 0; }
+.game-row .opp .shy { display: block; color: var(--c-font-dim); opacity: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .game-row .delta { font-size: 1.1em; }
 
-/* ---------- desktop ---------- */
+/* ---------- desktop: bottom bar folds back into the page ---------- */
 @media (min-width: 760px) {
   main { padding: 1.5rem 1rem 3rem; }
+  .bottom-bar { display: none; }
+  .actions { display: grid; }
   .home-grid { grid-template-columns: 300px 1fr; align-items: start; }
   .home-grid > div:first-child { position: sticky; top: 66px; }
   .site-title { font-size: 1.55em; }
-  .lobby-side { display: block; margin-top: 1rem; }
   .sides { grid-template-columns: 1fr auto 1fr; align-items: end; }
   .vs { padding-bottom: .7em; }
+  .submit-row { position: static; box-shadow: none; border: 0; background: none; padding: 0 1.2rem 1.2rem; grid-template-columns: 1fr; }
+  .submit-row .button-empty { display: none; }
+  .submit-row .shy { display: block; text-align: center; }
+  .submit-row .button-fat { font-size: 1.25em; padding: 1em 1.2em; }
+  .submit-note { display: none; }
   .player-grid { display: grid; grid-template-columns: 1fr 1fr; }
   .player-grid > .chart-col { border-right: 1px solid var(--c-border); }
   #chart { height: 260px; }
   .site-nav a { font-size: 1em; }
   .site-header { padding: 0 1.2rem; }
+}
+@media (max-width: 759px) {
+  .site-nav a[data-nav="record"] { display: none; }
 }
 </style>
 </head>
@@ -306,25 +369,31 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
   </button>
 </header>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-single" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4" fill="currentColor"/><path d="M4 21a8 8 0 0 1 16 0z" fill="currentColor"/></symbol>
+    <symbol id="i-double" viewBox="0 0 24 24"><circle cx="8" cy="7" r="3.6" fill="currentColor"/><path d="M1 21a7 7 0 0 1 14 0z" fill="currentColor"/><circle cx="17" cy="7.5" r="3.2" fill="currentColor" opacity=".8"/><path d="M13.5 13.6A6.5 6.5 0 0 1 23 21h-6.6a8.6 8.6 0 0 0-2.9-7.4z" fill="currentColor" opacity=".8"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-person-plus" viewBox="0 0 24 24"><circle cx="10" cy="7.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 21a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 8v6M16 11h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
 <main>
 
-<!-- ============ HOME ============ -->
+<!-- ============ HOME: two actions (bottom bar on mobile, side column on desktop) and the leaderboard ============ -->
 <section id="home" class="screen">
   <div id="flash" class="flash hidden"></div>
   <div class="home-grid">
     <div>
       <div class="actions">
         <a class="button button-green button-fat" href="#record">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <svg><use href="#i-plus"/></svg>
           Record match
         </a>
-        <a class="button button-metal button-fat" href="#create" id="createBtn">Create player</a>
-      </div>
-      <div class="box lobby-side">
-        <div class="box__pad">
-          <h3>How the rating moves</h3>
-          <p class="shy" style="margin:.5em 0 0">Elo, the chess formula. Winner takes <code>K·(1−E)</code> from the loser. K&nbsp;=&nbsp;32 for singles, 16 for doubles, everyone starts at 1000. Ratings are recomputed from the full match log every time. <a href="#algorithm">Algorithm →</a></p>
-        </div>
+        <a class="button button-metal button-fat" href="#create">
+          <svg><use href="#i-person-plus"/></svg>
+          Create player
+        </a>
       </div>
     </div>
 
@@ -355,6 +424,13 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
       <h2>Record a match</h2>
       <span class="shy">no login needed</span>
     </div>
+    <button class="toggle-row" id="doublesToggle" role="switch" aria-checked="false" aria-label="Doubles">
+      <span class="t-lbl">
+        <svg><use href="#i-double"/></svg>
+        <span>Doubles<span class="shy">two per side · K = 16</span></span>
+      </span>
+      <span class="switch" aria-hidden="true"></span>
+    </button>
     <div class="quick">
       <span class="shy">Recently at the table</span>
       <div class="chips" id="chips"></div>
@@ -392,19 +468,20 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
         </div>
       </div>
     </div>
-    <div class="toggle-row">
-      <span>Doubles <span class="shy">· two per side, K = 16</span></span>
-      <button class="cmn-toggle" id="doublesToggle" role="switch" aria-checked="false" aria-label="Doubles"></button>
-    </div>
     <div class="winner">
-      <h3 style="margin-top:1rem">Who won?</h3>
+      <h3>Who won?</h3>
       <div class="pick-row">
         <button class="pick" data-win="a"><span class="who placeholder">Side A</span><span class="prev shy">—</span></button>
         <button class="pick" data-win="b"><span class="who placeholder">Side B</span><span class="prev shy">—</span></button>
       </div>
     </div>
+    <div class="submit-note shy">Everything recorded is public and can be deleted from the log.</div>
     <div class="submit-row">
-      <button class="button button-green button-fat" id="submitBtn" disabled>Record match</button>
+      <a class="button button-empty" href="#home">Cancel</a>
+      <button class="button button-green button-fat" id="submitBtn" disabled>
+        <svg><use href="#i-plus"/></svg>
+        Record match
+      </button>
       <span class="shy">Everything recorded is public and can be deleted from the log.</span>
     </div>
   </div>
@@ -436,6 +513,7 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
             </div>
           </div>
           <svg id="chart" aria-label="Rating over the last matches"></svg>
+          <div class="chart-tip" id="chartTip" role="status" aria-live="polite"></div>
         </div>
         <div class="stats">
           <div class="stat"><strong id="sPeak"></strong><span class="shy">peak</span></div>
@@ -446,7 +524,10 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
       <div>
         <div class="wl-legend"><good id="wlW"></good><bad id="wlL"></bad></div>
         <div class="wl-bar" id="wlBar"></div>
-        <h3 style="padding:0 1.2rem .5rem">Recent matches</h3>
+        <div class="games-head">
+          <h3>Recent matches</h3>
+          <span class="games-key"><span><svg><use href="#i-single"/></svg>singles</span><span><svg style="color:var(--c-brag)"><use href="#i-double"/></svg>doubles</span></span>
+        </div>
         <ol class="games" id="games"></ol>
         <div class="box__pad" style="padding-top:.6rem"><a href="#log" class="shy">All 14 matches →</a></div>
       </div>
@@ -456,8 +537,23 @@ main { flex: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 1rem .7
 
 </main>
 
+<!-- ============ BOTTOM BAR (mobile): the two primary actions within thumb reach ============ -->
+<nav class="bottom-bar" aria-label="Primary actions">
+  <a class="button button-metal" href="#create">
+    <svg><use href="#i-person-plus"/></svg>
+    Create player
+  </a>
+  <a class="button button-green" href="#record">
+    <svg><use href="#i-plus"/></svg>
+    Record match
+  </a>
+</nav>
+
 <script>
-/* ---------- data (inlined from design/explorations/data.json) ---------- */
+/* ---------- data (inlined from design/explorations/data.json) ----------
+   `matches` is the full log behind `history` (oldest first). data.json only carries six `recent`
+   rows and their deltas do not sum to `history`, so the chart and the list both read from this
+   list, whose deltas are exactly the differences of `history`. */
 const DATA = {
   "site": { "name": "ashdown.win", "url": "ashdown.win", "repo": "github.com/andersbekkevard/ashdown-win" },
   "constants": { "kSingles": 32, "kDoubles": 16, "start": 1000 },
@@ -476,22 +572,34 @@ const DATA = {
     { "rank": 12, "name": "Emma Lindqvist", "rating": 913, "matches": 10, "wins": 2 }
   ],
   "player": {
-    "name": "Anders Bekkevard", "rating": 1071, "rank": 3, "matches": 14, "wins": 9,
+    "name": "Anders Bekkevard", "rating": 1071, "rank": 3, "matches": 14, "wins": 9, "since": "2026-02-12",
     "history": [1000, 1016, 1031, 1017, 1035, 1050, 1038, 1055, 1069, 1058, 1074, 1088, 1077, 1061, 1071],
-    "recent": [
-      { "date": "2026-09-06", "type": "singles", "opponent": "Priya Raman", "result": "loss", "delta": -10 },
-      { "date": "2026-09-06", "type": "singles", "opponent": "jchen26", "result": "win", "delta": 15 },
-      { "date": "2026-09-05", "type": "doubles", "partner": "Mei Nakamura", "opponent": "Tomás Ferreira & Daniel Okafor", "result": "loss", "delta": -8 },
-      { "date": "2026-09-04", "type": "singles", "opponent": "Lukas Weber", "result": "win", "delta": 14 },
-      { "date": "2026-09-03", "type": "singles", "opponent": "Hannah Cohen", "result": "win", "delta": 13 },
-      { "date": "2026-09-02", "type": "singles", "opponent": "Tomás Ferreira", "result": "loss", "delta": -12 }
+    "matches_log": [
+      { "date": "2026-02-14", "type": "singles", "opponent": "Ravi Menon", "delta": 16 },
+      { "date": "2026-02-21", "type": "singles", "opponent": "Emma Lindqvist", "delta": 15 },
+      { "date": "2026-03-03", "type": "singles", "opponent": "Mei Nakamura", "delta": -14 },
+      { "date": "2026-03-18", "type": "singles", "opponent": "Daniel Okafor", "delta": 18 },
+      { "date": "2026-04-09", "type": "doubles", "partner": "jchen26", "opponent": "Hannah Cohen & Ravi Menon", "delta": 15 },
+      { "date": "2026-04-30", "type": "singles", "opponent": "Priya Raman", "delta": -12 },
+      { "date": "2026-06-12", "type": "singles", "opponent": "The Ghost of 4th Floor", "delta": 17 },
+      { "date": "2026-08-28", "type": "singles", "opponent": "Daniel Okafor", "delta": 14 },
+      { "date": "2026-09-02", "type": "singles", "opponent": "Tomás Ferreira", "delta": -11 },
+      { "date": "2026-09-03", "type": "singles", "opponent": "Hannah Cohen", "delta": 16 },
+      { "date": "2026-09-04", "type": "singles", "opponent": "Lukas Weber", "delta": 14 },
+      { "date": "2026-09-05", "type": "doubles", "partner": "Mei Nakamura", "opponent": "Tomás Ferreira & Daniel Okafor", "delta": -11 },
+      { "date": "2026-09-06", "type": "singles", "opponent": "Priya Raman", "delta": -16 },
+      { "date": "2026-09-06", "type": "singles", "opponent": "jchen26", "delta": 10 }
     ]
   }
 };
+DATA.player.matches_log.forEach(m => { m.result = m.delta >= 0 ? 'win' : 'loss'; });
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const byName = n => DATA.leaderboard.find(p => p.name === n);
+const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+const kindIcon = t => `<svg class="kind"><use href="#i-${t === 'doubles' ? 'double' : 'single'}"/></svg>`;
+const rp = d => d >= 0 ? `<good class="rp">${d}</good>` : `<bad class="rp">${-d}</bad>`;
 
 /* ---------- theme ---------- */
 $('#themeToggle').addEventListener('click', () => document.documentElement.classList.toggle('light'));
@@ -508,6 +616,7 @@ function route() {
   }
   $$('.screen').forEach(s => s.classList.toggle('active', s.id === h));
   $$('.site-nav a').forEach(a => a.classList.toggle('active', a.dataset.nav === h));
+  document.body.classList.toggle('on-record', h === 'record');
   window.scrollTo(0, 0);
   if (h === 'player') drawChart();
 }
@@ -631,7 +740,8 @@ $('#doublesToggle').addEventListener('click', e => {
 $$('.pick').forEach(b => b.addEventListener('click', () => { winner = winner === b.dataset.win ? null : b.dataset.win; refreshPicks(); }));
 
 (function chips() {
-  const names = [...new Set(DATA.player.recent.flatMap(m => [m.opponent.split(' & ')[0], m.partner].filter(Boolean)).concat(DATA.player.name))];
+  const recent = DATA.player.matches_log.slice().reverse();
+  const names = [...new Set(recent.flatMap(m => [m.opponent.split(' & ')[0], m.partner].filter(Boolean)).concat(DATA.player.name))];
   $('#chips').innerHTML = names.slice(0, 6).map(n => `<button class="chip" data-name="${esc(n)}">${esc(n)}</button>`).join('');
   $('#chips').addEventListener('click', e => {
     const c = e.target.closest('.chip'); if (!c) return;
@@ -663,7 +773,7 @@ refreshPicks();
   $('#pRating').textContent = p.rating;
   const span = Math.min(12, h.length - 1); // lichess progress: change over the last 12 rated games
   const prog = h[h.length - 1] - h[h.length - 1 - span];
-  $('#pProg').innerHTML = prog >= 0 ? `<good class="rp">${prog}</good>` : `<bad class="rp">${-prog}</bad>`;
+  $('#pProg').innerHTML = rp(prog);
   $('#pProg').title = 'Change over the last ' + span + ' matches';
   $('#pGames').textContent = p.matches + ' matches';
   $('#pRank').textContent = '#' + p.rank;
@@ -674,11 +784,12 @@ refreshPicks();
   $('#wlBar').innerHTML = `<i class="w" style="width:${wp}%"></i><i class="l" style="width:${100 - wp}%"></i>`;
   $('#wlW').textContent = p.wins + ' wins';
   $('#wlL').textContent = (p.matches - p.wins) + ' losses';
-  const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  $('#games').innerHTML = p.recent.map(m => `<li class="game-row">
-    <span class="res ${m.result}">${m.result === 'win' ? 'Win' : 'Loss'}</span>
-    <span class="opp">vs ${esc(m.opponent)}<span class="shy">${m.type}${m.partner ? ' with ' + esc(m.partner) : ''} · ${fmt(m.date)}</span></span>
-    <span class="delta">${m.delta >= 0 ? `<good class="rp">${m.delta}</good>` : `<bad class="rp">${-m.delta}</bad>`}</span>
+  const recent = p.matches_log.slice().reverse().slice(0, 8);
+  $('#games').innerHTML = recent.map(m => `<li class="game-row ${m.result} ${m.type}">
+    <span class="badge" aria-label="${m.result}">${m.result === 'win' ? 'W' : 'L'}</span>
+    <span class="kind" title="${m.type}">${kindIcon(m.type)}</span>
+    <span class="opp">vs ${esc(m.opponent)}<span class="shy">${fmt(m.date)}${m.partner ? ' · with ' + esc(m.partner) : ''}</span></span>
+    <span class="delta">${rp(m.delta)}</span>
   </li>`).join('');
 })();
 
@@ -693,8 +804,8 @@ $('#range').addEventListener('click', e => {
 window.addEventListener('resize', () => { if ($('#player').classList.contains('active')) drawChart(); });
 
 function drawChart() {
-  const svg = $('#chart');
-  const full = DATA.player.history;
+  const svg = $('#chart'), tip = $('#chartTip'), wrap = svg.parentElement;
+  const full = DATA.player.history, log = DATA.player.matches_log;
   const pts = rangeN ? full.slice(-(rangeN + 1)) : full;
   const offset = full.length - pts.length;
   const W = svg.clientWidth || 340, H = svg.clientHeight || 210;
@@ -705,6 +816,9 @@ function drawChart() {
   lo = Math.floor((lo - 5) / step) * step; hi = Math.ceil((hi + 5) / step) * step;
   const x = i => padL + (pts.length === 1 ? iw / 2 : i / (pts.length - 1) * iw);
   const y = v => padT + (hi - v) / (hi - lo) * ih;
+  // the point at index i (in pts) is the state after match number (i + offset); 0 is the start
+  const matchAt = i => (i + offset) === 0 ? null : log[i + offset - 1];
+  const dateAt = i => matchAt(i) ? matchAt(i).date : DATA.player.since;
   let out = '';
   for (let v = lo; v <= hi; v += step) {
     out += `<line class="grid" x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}"/>`;
@@ -712,25 +826,52 @@ function drawChart() {
   }
   out += `<line class="base" x1="${padL}" x2="${W - padR}" y1="${y(DATA.constants.start)}" y2="${y(DATA.constants.start)}"/>`;
   const ticks = pts.length <= 6 ? pts.map((_, i) => i) : [0, Math.round((pts.length - 1) / 2), pts.length - 1];
-  ticks.forEach(i => out += `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === pts.length - 1 ? 'end' : 'middle'}">${i + offset === 0 ? 'start' : 'match ' + (i + offset)}</text>`);
+  ticks.forEach(i => out += `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === pts.length - 1 ? 'end' : 'middle'}">${fmt(dateAt(i))}</text>`);
   const path = pts.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   out += `<path class="area" d="${path} L${x(pts.length - 1).toFixed(1)},${(padT + ih).toFixed(1)} L${x(0).toFixed(1)},${(padT + ih).toFixed(1)} Z"/>`;
   out += `<path class="line" d="${path}"/>`;
   out += `<line class="hover-line" id="hl" y1="${padT}" y2="${padT + ih}" x1="0" x2="0"/>`;
-  pts.forEach((v, i) => { out += `<circle class="pt${i === pts.length - 1 ? ' last' : ''}" cx="${x(i)}" cy="${y(v)}" r="${i === pts.length - 1 ? 4 : 2.5}"><title>${i + offset === 0 ? 'Start' : 'After match ' + (i + offset)}: ${v}</title></circle>`; });
+  pts.forEach((v, i) => { out += `<circle class="pt${i === pts.length - 1 ? ' last' : ''}" data-i="${i}" cx="${x(i)}" cy="${y(v)}" r="${i === pts.length - 1 ? 4 : 2.5}"/>`; });
   const last = pts[pts.length - 1];
   out += `<text class="val" id="hv" x="${Math.min(x(pts.length - 1), W - padR - 4)}" y="${y(last) - 9}" text-anchor="end">${last}</text>`;
-  pts.forEach((v, i) => { const w = iw / Math.max(pts.length - 1, 1); out += `<rect class="hit" x="${x(i) - w / 2}" y="${padT}" width="${w}" height="${ih}" data-i="${i}"/>`; });
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML = out;
   const hl = $('#hl'), hv = $('#hv');
-  svg.onmousemove = e => {
-    const r = e.target.closest('.hit'); if (!r) return;
-    const i = +r.dataset.i; hl.setAttribute('x1', x(i)); hl.setAttribute('x2', x(i)); hl.style.opacity = .6;
-    hv.textContent = pts[i]; hv.setAttribute('x', Math.min(Math.max(x(i), padL + 14), W - padR - 4)); hv.setAttribute('y', y(pts[i]) - 9);
-    hv.setAttribute('text-anchor', i > pts.length / 2 ? 'end' : 'start');
+  let hot = -1;
+  const show = i => {
+    if (i === hot) return; hot = i;
+    const v = pts[i], m = matchAt(i);
+    hl.setAttribute('x1', x(i)); hl.setAttribute('x2', x(i)); hl.style.opacity = .6;
+    $$('.pt', svg).forEach(c => c.classList.toggle('hot', +c.dataset.i === i));
+    hv.style.opacity = 0;
+    tip.innerHTML = m
+      ? `<span class="d">${fmt(m.date)} · ${m.type}${m.partner ? ' with ' + esc(m.partner) : ''}</span><span class="o">${kindIcon(m.type)}${m.result === 'win' ? 'beat' : 'lost to'} ${esc(m.opponent)}</span><span class="r"><rating>${v}</rating>${rp(m.delta)}</span>`
+      : `<span class="d">${fmt(dateAt(i))}</span><span class="o">Joined the ladder</span><span class="r"><rating>${v}</rating><span class="shy">start</span></span>`;
+    tip.classList.add('show');
+    // position: above the point, clamped inside the chart box; below it when there is no room above
+    const sx = svg.offsetLeft, sy = svg.offsetTop;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let left = sx + x(i) - tw / 2;
+    left = Math.max(sx + 2, Math.min(left, sx + W - tw - 2));
+    let top = sy + y(v) - th - 12;
+    if (top < sy) top = sy + y(v) + 12;
+    tip.style.left = left + 'px'; tip.style.top = top + 'px';
   };
-  svg.onmouseleave = () => { hl.style.opacity = 0; hv.textContent = last; hv.setAttribute('x', Math.min(x(pts.length - 1), W - padR - 4)); hv.setAttribute('y', y(last) - 9); hv.setAttribute('text-anchor', 'end'); };
+  const hide = () => {
+    hot = -1; hl.style.opacity = 0; hv.style.opacity = 1;
+    $$('.pt.hot', svg).forEach(c => c.classList.remove('hot'));
+    tip.classList.remove('show');
+  };
+  const nearest = e => {
+    const r = svg.getBoundingClientRect();
+    const px = (e.clientX - r.left) * (W / r.width);
+    return Math.max(0, Math.min(pts.length - 1, Math.round((px - padL) / iw * (pts.length - 1))));
+  };
+  svg.onpointermove = e => show(nearest(e));
+  svg.onpointerdown = e => show(nearest(e));
+  svg.onpointerleave = hide;
+  svg.onpointercancel = hide;
+  hide();
 }
 route();
 </script>

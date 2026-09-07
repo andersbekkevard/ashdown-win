@@ -34,3 +34,13 @@ Noto Sans 400/600 for body and numbers; Roboto 300 for headings and wordmark, Ro
 ## Why it suits a dorm ladder
 
 The people at the table already read chess ratings on their phones. A board that looks like the one they trust needs no explanation: a four-digit number, a green or red arrow, a line that goes up. The style is honest about what the site is, a public log with derived numbers, and its dark default reads well on a phone held over a table.
+
+## Refinement 2026-09-07
+
+- Primary actions moved to a fixed bottom bar on mobile (Create player metal, Record match green), following the lichess-mobile bottom-bar idiom: surface-coloured, top hairline, safe-area padded. On the record screen the bar becomes the submit row (Cancel + Record match) so the confirming tap is in the same place. Desktop keeps the side column.
+- Home is now the two actions and the leaderboard; the "How the rating moves" side box is gone (the Algorithm link in the footer covers it).
+- Doubles is a macOS-style pill switch (51×31, round white knob with drop shadow, green track when on); the whole row is the tap target and sits above the name boxes so the form grows below it.
+- Chart tooltip shows date, singles/doubles, opponent, new rating and delta; it follows the nearest point and works with touch (pointer events). X axis now shows dates. History rows carry a coloured left edge, a W/L badge, and a one-figure/two-figure icon for singles/doubles, so result and kind read without text. The full 14-match log is inlined because `data.json`'s six `recent` deltas do not reconcile with `history`; the mockup's list deltas equal the history differences.
+- Contrast: text tokens pass 4.5:1 on box and zebra in both themes (dark: dim grey 58→64%, red 50→69% lightness, green 37→41%, gold 43→47%, blue 56→61%; light: dim grey 47→39%, blue 46→41%, green 37→30%, gold 48→34%). Filled surfaces got separate `*-bg` tokens (green button, blue button, gold bar) darkened so white text passes; `.shy` opacity raised .65→.85. Hues and saturations are unchanged. Theme toggle untouched.
+- Poster: real QR for https://ashdown.win from an inline encoder written for this file (version 1, level M, alphanumeric mode, upper-case URL so it fits 21 modules; verified against a reference encoder and decoded with OpenCV). 72 mm white box, 2.5 mm modules, the largest that fits the A4 layout; comfortable at about 1.5 m, marginal at 2 m.
+- Not visually verified in headless Chrome: the run was cut short before the screenshot pass, so a review of the render at 390 px and 1200 px is still owed.
