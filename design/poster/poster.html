@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Print poster · ashdown.win poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Titan+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #FB3AA3;
+    --raspberry: #C81C74;
+    --blue: #00B5FE;
+    --deep: #0866D7;
+    --banana: #FCC601;
+    --gold: #FFD046;
+    --mint: #5EEAC0;
+    --lilac: #7C7BE8;
+    --ink: #222126;
+    --paper: #FFFFFF;
+    --display: "Titan One", "Arial Rounded MT Bold", "Fredoka", system-ui, sans-serif;
+    --body: "Fredoka", "Arial Rounded MT Bold", system-ui, sans-serif;
+  }
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--body);
+    color: var(--ink);
+    background: var(--deep)
+      repeating-radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06) 0 24px, rgba(255,255,255,0) 24px 60px);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12mm 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--banana);
+    /* tiled line-art crown, as on the game's title screen */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><g fill='none' stroke='%23E2A800' stroke-width='2.2' stroke-linejoin='round' opacity='0.55'><path d='M12 30 L9 14 L18 21 L24 9 L30 21 L39 14 L36 30 Z'/><path d='M48 66 L45 50 L54 57 L60 45 L66 57 L75 50 L72 66 Z'/><path d='M50 22 l4 -4 M6 52 l4 -4 M40 40 l3 -3'/></g></svg>");
+    background-size: 72px 72px;
+    box-shadow: 0 12px 0 rgba(0,0,0,0.35), 0 30px 60px rgba(0,0,0,0.35);
+    padding: 14mm 14mm 12mm;
+    display: flex;
+    flex-direction: column;
+    gap: 6mm;
+  }
+
+  /* Outlined display type, the QUALIFIED! treatment */
+  .shout {
+    font-family: var(--display);
+    font-weight: 400;
+    color: var(--paper);
+    -webkit-text-stroke: 0.11em var(--pink);
+    paint-order: stroke fill;
+    text-shadow: 0.06em 0.09em 0 var(--ink);
+    letter-spacing: 0.01em;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .slab {
+    border: 4px solid var(--paper);
+    border-radius: 22px;
+    box-shadow: 0 6px 0 var(--ink);
+  }
+
+  /* header */
+  .kicker {
+    align-self: flex-start;
+    transform: rotate(-2deg);
+    background: var(--pink);
+    color: var(--paper);
+    font-family: var(--display);
+    font-size: 15pt;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3mm 8mm;
+    border-radius: 999px;
+    border: 3px solid var(--paper);
+    box-shadow: 0 5px 0 var(--ink);
+    margin-left: 2mm;
+  }
+  .hero {
+    position: relative;
+    margin-top: 1mm;
+  }
+  h1 {
+    margin: 0;
+    font-size: 52pt;
+    transform: rotate(-2deg);
+  }
+  h1 .line2 { display: block; margin-left: 10mm; }
+  .lede {
+    font-size: 14.5pt;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 4mm 0 0;
+    max-width: 150mm;
+    color: var(--ink);
+  }
+  .lede b { color: var(--raspberry); }
+
+  /* decorations */
+  .star { position: absolute; }
+  .confetti { position: absolute; width: 6mm; height: 2.6mm; border-radius: 1mm; border: 1.5px solid var(--ink); }
+
+  /* steps */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6mm;
+    margin-top: 2mm;
+  }
+  .step {
+    background: var(--blue);
+    color: var(--paper);
+    padding: 8mm 5mm 5mm;
+    position: relative;
+    min-height: 40mm;
+  }
+  .step:nth-child(2) { background: var(--mint); color: var(--ink); }
+  .step:nth-child(3) { background: var(--lilac); }
+  .hex {
+    position: absolute;
+    top: -8mm;
+    left: 50%;
+    transform: translateX(-50%) rotate(-4deg);
+    width: 16mm;
+    height: 16mm;
+    background: var(--paper);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    display: grid;
+    place-items: center;
+  }
+  .hex span {
+    width: 12.5mm;
+    height: 12.5mm;
+    background: var(--pink);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    display: grid;
+    place-items: center;
+    font-family: var(--display);
+    font-size: 18pt;
+    color: var(--paper);
+    text-shadow: 0 2px 0 var(--raspberry);
+  }
+  .step h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 17pt;
+    margin: 3mm 0 2mm;
+    line-height: 1;
+    text-transform: uppercase;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.25);
+  }
+  .step:nth-child(2) h2 { text-shadow: none; }
+  .step p { margin: 0; font-size: 11pt; font-weight: 600; line-height: 1.3; }
+
+  /* elo rule */
+  .rule {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 16px;
+    padding: 4mm 6mm;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5mm;
+    align-items: center;
+    box-shadow: 0 5px 0 var(--raspberry);
+  }
+  .rule .tag {
+    background: var(--gold);
+    color: var(--ink);
+    font-family: var(--display);
+    font-size: 11pt;
+    text-transform: uppercase;
+    padding: 2mm 4mm;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .rule .math {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 11.5pt;
+    line-height: 1.4;
+  }
+  .rule .math b { color: var(--gold); font-weight: 700; }
+
+  /* url block */
+  .url {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 74mm;
+    gap: 8mm;
+    align-items: center;
+    margin-top: 6mm;
+    flex: 1;
+  }
+  .url .big {
+    position: relative;
+    font-size: 37pt;
+    white-space: nowrap;
+    transform: rotate(-2deg);
+    margin-top: 6mm;
+  }
+  .url .big .crown { position: absolute; top: -14mm; left: 4mm; width: 18mm; transform: rotate(-12deg); }
+  .url .sub {
+    font-weight: 700;
+    font-size: 13pt;
+    margin: 5mm 0 0 2mm;
+    color: var(--ink);
+  }
+  .url .sub span {
+    display: inline-block;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 1.5mm 4mm;
+    box-shadow: 0 3px 0 var(--ink);
+  }
+  .qr {
+    width: 74mm;
+    height: 74mm;
+    background: var(--paper);
+    border: 4px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 0 6px 0 var(--ink);
+    padding: 3mm;
+    position: relative;
+  }
+  .qr svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
+  .qr .cap { position: absolute; left: 50%; bottom: -5.5mm; transform: translateX(-50%); background: var(--pink); color: var(--paper); font-family: var(--display); font-size: 9pt; text-transform: uppercase; padding: 1mm 4mm; border-radius: 999px; border: 2.5px solid var(--ink); white-space: nowrap; }
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3mm;
+    font-weight: 600;
+    font-size: 10.5pt;
+    text-align: center;
+  }
+  footer .os {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 2mm 6mm;
+    box-shadow: 0 3px 0 var(--ink);
+    white-space: nowrap;
+  }
+  footer .house { color: var(--raspberry); font-weight: 700; }
+
+  @media print {
+    body { background: none; padding: 0; display: block; }
+    .sheet { box-shadow: none; margin: 0; }
+  }
+  @media screen and (max-width: 820px) {
+    body { padding: 0; }
+    .sheet { transform-origin: top left; transform: scale(0.45); margin-bottom: calc(-297mm * 0.55); }
+  }
+
+  /* ---- print poster: two-column middle with phone frame ---- */
+  h1 { font-size: 46pt; }
+  .lede { font-size: 13pt; max-width: 118mm; }
+  .mid { display: grid; grid-template-columns: minmax(0,1fr) 62mm; gap: 8mm; align-items: start; margin-top: 3mm; }
+  .steps { grid-template-columns: 1fr; gap: 5mm; margin-top: 4mm; }
+  .step { min-height: 0; padding: 4mm 5mm 4mm 17mm; border-radius: 16px; }
+  .step .hex { top: 50%; left: 2.5mm; transform: translateY(-50%) rotate(-4deg); width: 12mm; height: 12mm; }
+  .step .hex span { width: 9.4mm; height: 9.4mm; font-size: 13pt; }
+  .step h2 { font-size: 14pt; margin: 0 0 1.2mm; }
+  .step p { font-size: 9.6pt; }
+  .rule { margin-top: 5mm; padding: 3.5mm 5mm; }
+  .rule .math { font-size: 10.5pt; }
+  .rule .tag { font-size: 10pt; }
+
+  .phone {
+    width: 62mm; height: 122mm; background: var(--ink); border-radius: 9mm; padding: 2.4mm;
+    box-shadow: 0 6px 0 var(--raspberry), 0 0 0 4px var(--paper), 0 12px 0 4px var(--ink);
+    transform: rotate(2.5deg); position: relative; margin-top: 3mm;
+  }
+  .phone .notch { position: absolute; top: 3.2mm; left: 50%; transform: translateX(-50%); width: 18mm; height: 3mm; background: var(--ink); border-radius: 999px; z-index: 2; }
+  .screen {
+    width: 100%; height: 100%; border-radius: 7mm; overflow: hidden;
+    background: var(--blue) repeating-radial-gradient(circle at 50% 30%, rgba(255,255,255,0.10) 0 9px, rgba(255,255,255,0) 9px 22px);
+    display: flex; flex-direction: column; padding: 7mm 3mm 3mm; gap: 2.5mm; font-family: var(--body);
+  }
+  .screen .top { display: flex; align-items: center; justify-content: space-between; }
+  .screen .brand { font-family: var(--display); color: var(--paper); -webkit-text-stroke: 0.09em var(--pink); paint-order: stroke fill; text-shadow: 0.05em 0.08em 0 var(--ink); font-size: 12pt; transform: rotate(-2deg); }
+  .screen .pillmini { white-space: nowrap; background: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 0.6mm 2.2mm; font-size: 6.5pt; font-weight: 700; box-shadow: 0 1.5px 0 var(--ink); }
+  .board { background: var(--paper); border: 3px solid var(--ink); border-radius: 14px; box-shadow: 0 4px 0 var(--ink); padding: 2mm; flex: 1; display: flex; flex-direction: column; gap: 1.1mm; overflow: hidden; }
+  .board .head { display: flex; justify-content: space-between; align-items: baseline; padding: 0 1mm 1mm; border-bottom: 2px dashed #E6E3EA; margin-bottom: 0.6mm; }
+  .board .head b { font-family: var(--display); font-weight: 400; font-size: 9pt; text-transform: uppercase; }
+  .board .head span { font-size: 6pt; font-weight: 700; color: #8A8794; }
+  .prow { display: grid; grid-template-columns: 7mm 1fr auto; align-items: center; gap: 1.6mm; padding: 1mm 1.2mm; border-radius: 8px; background: #F6F4F9; }
+  .prow.top1 { background: var(--gold); border: 2px solid var(--ink); box-shadow: 0 2px 0 var(--ink); }
+  .prow .rk { width: 6.4mm; height: 6.4mm; display: grid; place-items: center; font-family: var(--display); font-size: 7pt; color: var(--paper); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: var(--lilac); text-shadow: 0 1px 0 rgba(0,0,0,.35); }
+  .prow.r1 .rk { background: #F2B705; color: var(--ink); text-shadow: none; }
+  .prow.r2 .rk { background: #C0C4CC; color: var(--ink); text-shadow: none; }
+  .prow.r3 .rk { background: #D0813F; }
+  .prow .nm { font-size: 7.2pt; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 1mm; }
+  .prow .nm svg { width: 4.2mm; flex: none; }
+  .prow .rt { font-family: var(--display); font-size: 8.5pt; }
+  .prow .rt small { font-family: var(--body); font-size: 5.5pt; font-weight: 700; margin-left: 0.8mm; }
+  .prow .rt small.up { color: #1E9E6C; } .prow .rt small.dn { color: var(--raspberry); }
+  .dock { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm; }
+  .dock div { text-align: center; font-family: var(--display); font-size: 7pt; text-transform: uppercase; color: var(--paper); background: var(--pink); border: 2px solid var(--paper); border-radius: 999px; padding: 1.6mm 1mm; box-shadow: 0 2.5px 0 var(--ink); }
+  .dock div:first-child { background: var(--lilac); }
+  .phone .bubble { position: absolute; left: -14mm; top: 8mm; background: var(--paper); border: 3px solid var(--ink); border-radius: 999px; padding: 1.6mm 4mm; font-family: var(--display); font-size: 9pt; text-transform: uppercase; box-shadow: 0 3px 0 var(--ink); transform: rotate(-8deg); white-space: nowrap; }
+
+  .url { grid-template-columns: minmax(0,1fr) 64mm; margin-top: 5mm; }
+  .url .big { font-size: 36pt; margin-top: 4mm; }
+  .qr { width: 64mm; height: 64mm; }
+  footer { margin-top: 0; }
+  .sheet { gap: 4mm; padding-top: 12mm; }
+  h1 { font-size: 44pt; }
+  .mid { margin-top: 0; }
+  .phone { height: 112mm; margin-top: 2mm; }
+  .phone .bubble { left: -12mm; top: -7mm; }
+  .rule { margin-top: 3.5mm; }
+  .url { grid-template-columns: minmax(0,1fr) 58mm; margin-top: 1mm; }
+  .qr { width: 58mm; height: 58mm; }
+  .url .big { margin-top: 2mm; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="kicker">Ashdown House · Table Tennis Ladder</div>
+
+  <div class="hero">
+    <h1 class="shout">Who rules<span class="line2">the table?</span></h1>
+    <p class="lede">A public Elo ladder for the ping-pong table downstairs. <b>No accounts, no app, no excuses.</b> Play, tap in the result, and watch your name climb the board.</p>
+
+    <svg class="star" style="right:6mm; top:-4mm; width:16mm" viewBox="0 0 24 24"><path d="M12 1.5l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.6l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z" fill="#FFD046" stroke="#222126" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    <svg class="star" style="right:30mm; top:20mm; width:9mm" viewBox="0 0 24 24"><path d="M12 1.5l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.6l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z" fill="#FFFFFF" stroke="#222126" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    <i class="confetti" style="right:14mm; top:24mm; background:var(--pink); transform:rotate(25deg)"></i>
+    <i class="confetti" style="right:22mm; top:6mm; background:var(--blue); transform:rotate(-40deg)"></i>
+    <i class="confetti" style="right:4mm; top:34mm; background:var(--mint); transform:rotate(70deg)"></i>
+  </div>
+
+  <div class="mid">
+    <div>
+  <div class="steps">
+    <div class="step slab">
+      <div class="hex"><span>1</span></div>
+      <h2>Create your name</h2>
+      <p>Once. Full name, MIT username, or anything the house will recognise. You start at 1000.</p>
+    </div>
+    <div class="step slab">
+      <div class="hex"><span>2</span></div>
+      <h2>Record a match</h2>
+      <p>Two names, tap the winner, done. Doubles works too. Anyone can file it, and every match is public.</p>
+    </div>
+    <div class="step slab">
+      <div class="hex"><span>3</span></div>
+      <h2>Watch the board</h2>
+      <p>The ladder updates the moment you submit. Winner takes points, loser gives them up. First place wears the crown.</p>
+    </div>
+  </div>
+
+  <div class="rule">
+    <div class="tag">The rule</div>
+    <div class="math">
+      R′ = R + K · (S − E), where E = 1 / (1 + 10<sup>(R<sub>opp</sub> − R) / 400</sup>).
+      <b>K = 32</b> singles, <b>K = 16</b> doubles, everyone starts at <b>1000</b>. Same maths as chess.
+    </div>
+  </div>
+
+    </div>
+
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="bubble">Live board</div>
+      <div class="screen">
+        <div class="top"><div class="brand">ashdown.win</div><div class="pillmini">MIT · Ashdown</div></div>
+        <div class="board">
+          <div class="head"><b>Leaderboard</b><span>12 players</span></div>
+          <div class="prow r1 top1"><div class="rk">1</div><div class="nm"><svg viewBox="0 0 64 48"><path d="M6 40 L2 12 L20 24 L32 4 L44 24 L62 12 L58 40 Z" fill="#FFD046" stroke="#222126" stroke-width="5" stroke-linejoin="round"/><rect x="6" y="38" width="52" height="8" rx="3" fill="#FFFFFF" stroke="#222126" stroke-width="5"/></svg>Priya Raman</div><div class="rt">1142<small class="up">+15</small></div></div><div class="prow r2 "><div class="rk">2</div><div class="nm">Tomás Ferreira</div><div class="rt">1108<small class="up">+9</small></div></div><div class="prow r3 "><div class="rk">3</div><div class="nm">Anders Bekkevard</div><div class="rt">1071<small class="up">+12</small></div></div><div class="prow r4 "><div class="rk">4</div><div class="nm">jchen26</div><div class="rt">1054<small class="dn">-8</small></div></div><div class="prow r5 "><div class="rk">5</div><div class="nm">Mei Nakamura</div><div class="rt">1033<small class="up">+6</small></div></div><div class="prow r6 "><div class="rk">6</div><div class="nm">Daniel Okafor</div><div class="rt">1012<small class="up">+3</small></div></div><div class="prow r7 "><div class="rk">7</div><div class="nm">Sofia Almeida</div><div class="rt">1000<small>new</small></div></div><div class="prow r8 "><div class="rk">8</div><div class="nm">Lukas Weber</div><div class="rt">987<small class="dn">-4</small></div></div><div class="prow r9 "><div class="rk">9</div><div class="nm">The Ghost of 4th Floor</div><div class="rt">971<small class="up">+2</small></div></div><div class="prow r10 "><div class="rk">10</div><div class="nm">Hannah Cohen</div><div class="rt">958<small class="dn">-7</small></div></div>
+        </div>
+        <div class="dock"><div>Create player</div><div>Record match</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="url">
+    <div>
+      <div class="big shout">
+        <svg class="crown" viewBox="0 0 64 48"><path d="M6 40 L2 12 L20 24 L32 4 L44 24 L62 12 L58 40 Z" fill="#FFD046" stroke="#222126" stroke-width="4" stroke-linejoin="round"/><rect x="6" y="38" width="52" height="8" rx="3" fill="#FB3AA3" stroke="#222126" stroke-width="4"/><circle cx="32" cy="27" r="4" fill="#00B5FE" stroke="#222126" stroke-width="3"/></svg>
+        ashdown.win
+      </div>
+      <p class="sub"><span>Scan it, or type it. Works on any phone.</span></p>
+    </div>
+    <div class="qr"><svg id="qr" viewBox="0 0 1 1" role="img" aria-label="QR code for https://ashdown.win"></svg><span class="cap">scan me</span></div>
+  </div>
+
+  <footer>
+    <div class="house">The table is in the Ashdown lounge. Bring a friend.</div>
+    <div class="os">open source: github.com/andersbekkevard/ashdown-win</div>
+  </footer>
+
+</div>
+<script>
+// Inline QR encoder (byte mode, versions 1-4, EC L/M/Q/H): no external library.
+// Minimal QR encoder: byte mode, versions 1-4, EC levels L/M/Q/H.
+function qrMatrix(text, level) {
+  const bytes = Array.from(new TextEncoder().encode(text));
+  // [ecPerBlock, blocks, dataPerBlock] per version, per level L M Q H
+  const T = {
+    1: { L: [7, 1, 19], M: [10, 1, 16], Q: [13, 1, 13], H: [17, 1, 9] },
+    2: { L: [10, 1, 34], M: [16, 1, 28], Q: [22, 1, 22], H: [28, 1, 16] },
+    3: { L: [15, 1, 55], M: [26, 1, 44], Q: [18, 2, 17], H: [22, 2, 13] },
+    4: { L: [20, 1, 80], M: [18, 2, 32], Q: [26, 2, 24], H: [16, 4, 9] },
+  };
+  const ALIGN = { 1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26] };
+  const LEVEL_BITS = { L: 1, M: 0, Q: 3, H: 2 };
+  let ver = 1;
+  while (ver <= 4 && T[ver][level][1] * T[ver][level][2] < bytes.length + 3) ver++;
+  if (ver > 4) throw new Error("too long");
+  const [ecn, nb, dpb] = T[ver][level];
+  const N = ver * 4 + 17;
+
+  // --- bitstream ---
+  const bits = [];
+  const push = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >> i) & 1); };
+  push(4, 4); push(bytes.length, 8); bytes.forEach(b => push(b, 8));
+  const cap = nb * dpb * 8;
+  push(0, Math.min(4, cap - bits.length));
+  while (bits.length % 8) bits.push(0);
+  const data = [];
+  for (let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i + 8).join(""), 2));
+  for (let p = 0; data.length < nb * dpb; p ^= 1) data.push(p ? 0x11 : 0xec);
+
+  // --- GF(256) and Reed-Solomon ---
+  const EXP = new Array(512), LOG = new Array(256);
+  for (let i = 0, x = 1; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 256) x ^= 0x11d; }
+  for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+  const mul = (a, b) => (a && b) ? EXP[LOG[a] + LOG[b]] : 0;
+  let gen = [1];
+  for (let i = 0; i < ecn; i++) {
+    const g = new Array(gen.length + 1).fill(0);
+    for (let j = 0; j < gen.length; j++) { g[j] ^= gen[j]; g[j + 1] ^= mul(gen[j], EXP[i]); }
+    gen = g;
+  }
+  const rs = block => {
+    const r = block.concat(new Array(ecn).fill(0));
+    for (let i = 0; i < block.length; i++) {
+      const c = r[i]; if (!c) continue;
+      for (let j = 0; j < gen.length; j++) r[i + j] ^= mul(gen[j], c);
+    }
+    return r.slice(block.length);
+  };
+  const blocks = [], ecs = [];
+  for (let b = 0; b < nb; b++) { const d = data.slice(b * dpb, (b + 1) * dpb); blocks.push(d); ecs.push(rs(d)); }
+  const out = [];
+  for (let i = 0; i < dpb; i++) blocks.forEach(b => out.push(b[i]));
+  for (let i = 0; i < ecn; i++) ecs.forEach(e => out.push(e[i]));
+
+  // --- matrix and function patterns ---
+  const m = Array.from({ length: N }, () => new Array(N).fill(0));
+  const fn = Array.from({ length: N }, () => new Array(N).fill(false));
+  const set = (r, c, v) => { m[r][c] = v; fn[r][c] = true; };
+  const finder = (r0, c0) => {
+    for (let r = -1; r <= 7; r++) for (let c = -1; c <= 7; c++) {
+      const rr = r0 + r, cc = c0 + c; if (rr < 0 || cc < 0 || rr >= N || cc >= N) continue;
+      const on = r >= 0 && r <= 6 && c >= 0 && c <= 6 && (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4));
+      set(rr, cc, on ? 1 : 0);
+    }
+  };
+  finder(0, 0); finder(0, N - 7); finder(N - 7, 0);
+  for (let i = 8; i < N - 8; i++) { set(6, i, i % 2 ? 0 : 1); set(i, 6, i % 2 ? 0 : 1); }
+  const al = ALIGN[ver];
+  al.forEach(r0 => al.forEach(c0 => {
+    if (fn[r0][c0]) return;
+    for (let r = -2; r <= 2; r++) for (let c = -2; c <= 2; c++)
+      set(r0 + r, c0 + c, (Math.max(Math.abs(r), Math.abs(c)) === 1) ? 0 : 1);
+  }));
+  set(N - 8, 8, 1);
+  // reserve format areas
+  for (let i = 0; i < 8; i++) { fn[8][i] = true; fn[i][8] = true; fn[8][N - 1 - i] = true; fn[N - 1 - i][8] = true; }
+  fn[8][8] = true;
+
+  // --- place data ---
+  let bi = 0;
+  const total = out.length * 8;
+  for (let c = N - 1; c > 0; c -= 2) {
+    if (c === 6) c--;
+    for (let k = 0; k < N; k++) {
+      const r = ((N - 1 - c) / 2) % 2 === 0 ? N - 1 - k : k;
+      for (let d = 0; d < 2; d++) {
+        const cc = c - d;
+        if (fn[r][cc]) continue;
+        m[r][cc] = bi < total ? (out[bi >> 3] >> (7 - (bi & 7))) & 1 : 0;
+        bi++;
+      }
+    }
+  }
+
+  // --- masks ---
+  const MASK = [
+    (r, c) => (r + c) % 2 === 0, (r, c) => r % 2 === 0, (r, c) => c % 3 === 0,
+    (r, c) => (r + c) % 3 === 0, (r, c) => ((r >> 1) + Math.floor(c / 3)) % 2 === 0,
+    (r, c) => (r * c) % 2 + (r * c) % 3 === 0, (r, c) => ((r * c) % 2 + (r * c) % 3) % 2 === 0,
+    (r, c) => ((r + c) % 2 + (r * c) % 3) % 2 === 0,
+  ];
+  const applyFormat = (g, mask) => {
+    let f = (LEVEL_BITS[level] << 3) | mask, v = f << 10;
+    for (let i = 14; i >= 10; i--) if ((v >> i) & 1) v ^= 0x537 << (i - 10);
+    f = ((f << 10) | v) ^ 0x5412;
+    const bit = i => (f >> i) & 1;
+    for (let i = 0; i < 6; i++) { g[8][i] = bit(14 - i); g[i][8] = bit(i); }
+    g[8][7] = bit(8); g[8][8] = bit(7); g[7][8] = bit(6);
+    for (let i = 0; i < 8; i++) g[8][N - 1 - i] = bit(i);
+    for (let i = 0; i < 7; i++) g[N - 1 - i][8] = bit(14 - i);
+  };
+  const penalty = g => {
+    let p = 0;
+    const run = line => { let s = 0; for (let i = 0; i < N; i++) { let j = i; while (j < N && line(j) === line(i)) j++; if (j - i >= 5) s += 3 + (j - i - 5); i = j - 1; } return s; };
+    for (let i = 0; i < N; i++) { p += run(j => g[i][j]); p += run(j => g[j][i]); }
+    for (let r = 0; r < N - 1; r++) for (let c = 0; c < N - 1; c++) { const v = g[r][c]; if (v === g[r][c + 1] && v === g[r + 1][c] && v === g[r + 1][c + 1]) p += 3; }
+    const pat = [1, 0, 1, 1, 1, 0, 1];
+    const find = line => { let s = 0; for (let i = 0; i + 7 <= N; i++) { let ok = true; for (let k = 0; k < 7; k++) if (line(i + k) !== pat[k]) { ok = false; break; } if (!ok) continue; const before = [0, 1, 2, 3].every(k => i - 1 - k >= 0 && line(i - 1 - k) === 0); const after = [0, 1, 2, 3].every(k => i + 7 + k < N && line(i + 7 + k) === 0); if (before || after) s += 40; } return s; };
+    for (let i = 0; i < N; i++) { p += find(j => g[i][j]); p += find(j => g[j][i]); }
+    let dark = 0; for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) dark += g[r][c];
+    const pct = dark * 100 / (N * N); p += Math.floor(Math.abs(pct - 50) / 5) * 10;
+    return p;
+  };
+  let best = null, bestP = Infinity;
+  for (let mk = 0; mk < 8; mk++) {
+    const g = m.map(r => r.slice());
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (!fn[r][c] && MASK[mk](r, c)) g[r][c] ^= 1;
+    applyFormat(g, mk);
+    const p = penalty(g);
+    if (p < bestP) { bestP = p; best = g; }
+  }
+  return best;
+}
+
+
+(() => {
+  const g = qrMatrix("https://ashdown.win", "Q"), N = g.length, Z = 1;
+  let d = "";
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (g[r][c]) d += `M${c + Z} ${r + Z}h1v1h-1z`;
+  const svg = document.getElementById("qr");
+  svg.setAttribute("viewBox", `0 0 ${N + 2 * Z} ${N + 2 * Z}`);
+  svg.innerHTML = `<rect width="${N + 2 * Z}" height="${N + 2 * Z}" fill="#FFFFFF"/><path d="${d}" fill="#222126"/>`;
+})();
+</script>
+</body>
+</html>
