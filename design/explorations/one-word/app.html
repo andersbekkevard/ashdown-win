@@ -14,6 +14,7 @@
     --mute: #8a8a8a;
     --ph: #bbb;
     --pad: 20px;
+    --bar: 64px;
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
@@ -31,9 +32,11 @@
   .app {
     max-width: 560px;
     margin: 0 auto;
-    padding: 0 var(--pad) 96px;
+    padding: 0 var(--pad) 48px;
     min-height: 100vh;
   }
+  /* On the home screen the fixed bottom bar needs room below the last row. */
+  body[data-screen="home"] .app { padding-bottom: calc(var(--bar) + 40px + env(safe-area-inset-bottom)); }
 
   header {
     display: flex;
@@ -53,7 +56,8 @@
     margin-left: 18px;
     font-size: 15px;
   }
-  nav a.on { text-decoration: underline; text-underline-offset: 4px; }
+  nav a[hidden] { display: none; }
+  body[data-screen="home"] nav { display: none; }
 
   section { display: none; }
   section.on { display: block; }
@@ -71,29 +75,35 @@
     font-variant-numeric: tabular-nums;
     margin: 24px 0 6px -0.04em;
   }
-  .lead-name {
-    font-size: 22px;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    margin: 0 0 32px;
-  }
-  .lead-name .link { text-decoration: none; }
 
+  /* The two actions. Mobile: a fixed bar at the bottom, in thumb reach.
+     Desktop: a hairline row under the header, in the flow. Home only. */
+  .actions {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 5;
+    background: var(--paper);
+    border-top: 1px solid var(--ink);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  body[data-screen="home"] .actions { display: grid; }
   .actions a {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 18px 0;
-    border-top: 1px solid var(--ink);
-    font-size: 28px;
+    align-items: center;
+    justify-content: center;
+    height: var(--bar);
+    font-size: 20px;
     font-weight: 500;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.02em;
     text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
   }
-  .actions a:last-child { border-bottom: 1px solid var(--ink); }
-  .actions .arrow { font-weight: 400; }
+  .actions a + a { background: var(--ink); color: var(--paper); }
+  .actions .arrow { display: none; }
 
-  .board { margin-top: 40px; }
+  .board { margin-top: 28px; }
   .board .head {
     display: flex;
     justify-content: space-between;
@@ -165,9 +175,42 @@
   .sugg li.new { color: var(--mute); }
   .sugg li.new b { color: var(--ink); font-weight: 500; }
 
-  .seg { display: flex; gap: 20px; margin: -8px 0 28px; font-size: 15px; }
-  .seg button { background: none; border: 0; padding: 0; color: var(--mute); }
-  .seg button.on { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  /* Doubles: a switch with a round knob. The whole row is the control. */
+  .switch-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    margin: -8px 0 28px;
+    border: 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    background: none;
+    text-align: left;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .switch-row .t { font-weight: 500; letter-spacing: -0.01em; }
+  .switch-row .t small { display: block; font-weight: 400; color: var(--mute); font-size: 13px; }
+  .switch {
+    flex: none;
+    position: relative;
+    width: 52px;
+    height: 30px;
+    border: 1px solid var(--ink);
+    border-radius: 15px;
+    background: var(--paper);
+  }
+  .switch .knob {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .switch-row[aria-checked="true"] .switch { background: var(--ink); }
+  .switch-row[aria-checked="true"] .knob { left: 24px; background: var(--paper); }
 
   .partner { display: none; }
   .doubles .partner { display: block; }
@@ -238,32 +281,81 @@
   }
   .meta-line { color: var(--mute); font-size: 15px; margin: 0 0 32px; font-variant-numeric: tabular-nums; }
 
-  .graph { border-top: 1px solid var(--ink); padding-top: 8px; margin-bottom: 32px; }
-  .graph .head { display: flex; justify-content: space-between; font-size: 13px; color: var(--mute); margin-bottom: 8px; }
-  .graph svg { width: 100%; height: auto; display: block; overflow: visible; }
-
-  .matches .head { font-size: 13px; color: var(--mute); margin-bottom: 6px; }
-  .match {
-    display: grid;
-    grid-template-columns: 1fr auto;
+  /* Graph. The readout above it is the "tooltip": same type, fixed place. */
+  .graph { border-top: 1px solid var(--ink); padding-top: 10px; margin-bottom: 32px; }
+  .graph .read {
+    display: flex;
+    justify-content: space-between;
     align-items: baseline;
     gap: 12px;
+    font-size: 15px;
+    color: var(--mute);
+    min-height: 20px;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .graph .read.on { color: var(--ink); }
+  .graph .read b { font-weight: 500; }
+  .graph .read .val { font-size: 22px; font-weight: 500; letter-spacing: -0.02em; color: var(--ink); }
+  .graph svg { width: 100%; height: 180px; display: block; overflow: visible; touch-action: pan-y; cursor: crosshair; }
+  .graph text { font-family: inherit; font-size: 11px; fill: var(--mute); }
+  .graph .axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--mute); margin-top: 6px; font-variant-numeric: tabular-nums; }
+
+  .matches .head {
+    display: grid;
+    grid-template-columns: 3.4em 1fr auto 3.2em;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--mute);
+    margin-bottom: 6px;
+  }
+  .matches .head span:nth-child(n+3) { text-align: right; }
+  .match {
+    display: grid;
+    grid-template-columns: 3.4em 1fr auto 3.2em;
+    gap: 12px;
+    align-items: baseline;
     padding: 12px 0;
     border-top: 1px solid var(--ink);
   }
   .match:last-child { border-bottom: 1px solid var(--ink); }
-  .match .opp { font-weight: 500; letter-spacing: -0.01em; }
+  .match .when { color: var(--mute); font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .match .opp { font-weight: 500; letter-spacing: -0.01em; min-width: 0; }
+  .match .opp .v { font-weight: 400; }
   .match .opp small { display: block; color: var(--mute); font-weight: 400; font-size: 13px; }
   .match .delta {
     font-variant-numeric: tabular-nums;
     font-size: 22px;
     font-weight: 500;
     letter-spacing: -0.02em;
+    text-align: right;
   }
+  .match .after { color: var(--mute); font-variant-numeric: tabular-nums; font-size: 15px; text-align: right; }
+  .match.on .opp { text-decoration: underline; text-underline-offset: 4px; }
+  .match.on .after { color: var(--ink); }
 
   @media (min-width: 720px) {
     .app { max-width: 640px; padding-bottom: 120px; }
+    body[data-screen="home"] .app { padding-bottom: 120px; }
     .giant { font-size: 200px; }
+    .actions {
+      position: static;
+      border-top: 0;
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 0;
+    }
+    .actions a {
+      height: auto;
+      justify-content: space-between;
+      padding: 18px 0;
+      font-size: 28px;
+      letter-spacing: -0.025em;
+    }
+    .actions a + a { background: none; color: inherit; border-left: 1px solid var(--ink); padding-left: 20px; }
+    .actions a:first-child { padding-right: 20px; }
+    .actions .arrow { display: inline; font-weight: 400; }
+    .board { margin-top: 40px; }
+    .graph svg { height: 220px; }
   }
 </style>
 </head>
@@ -277,17 +369,13 @@
     </nav>
   </header>
 
-  <!-- HOME -->
+  <div class="actions">
+    <a href="#create">Create player <span class="arrow">&rarr;</span></a>
+    <a href="#record">Record match <span class="arrow">&rarr;</span></a>
+  </div>
+
+  <!-- HOME: two actions and the board. Nothing else. -->
   <section id="home">
-    <p class="label" style="margin-top:28px">Leader</p>
-    <div class="giant" id="leadRating">1142</div>
-    <p class="lead-name"><a class="link" id="leadName" href="#player">Priya Raman</a></p>
-
-    <div class="actions">
-      <a href="#create">Create player <span class="arrow">&rarr;</span></a>
-      <a href="#record">Record match <span class="arrow">&rarr;</span></a>
-    </div>
-
     <div class="board">
       <div class="head"><span id="boardCount">12 players</span><span>Rating</span></div>
       <div id="board"></div>
@@ -312,10 +400,10 @@
   <section id="record">
     <div id="recordForm">
       <h2>Record match</h2>
-      <div class="seg">
-        <button id="segS" class="on">Singles</button>
-        <button id="segD">Doubles</button>
-      </div>
+      <button class="switch-row" id="dbl" role="switch" aria-checked="false">
+        <span class="t">Doubles<small>Two per side, half weight</small></span>
+        <span class="switch" aria-hidden="true"><span class="knob"></span></span>
+      </button>
 
       <div class="field">
         <p class="label">Side A</p>
@@ -366,15 +454,15 @@
     <p class="meta-line" id="pMeta">3rd of 12 &middot; 14 matches &middot; 9 wins</p>
 
     <div class="graph">
-      <div class="head"><span>Rating over 14 matches</span><span id="gRange">1000 – 1088</span></div>
-      <svg id="graph" viewBox="0 0 350 140" preserveAspectRatio="none" role="img" aria-label="Rating history"></svg>
+      <div class="read" id="gRead"><span id="gText">Rating after each match. Touch a point.</span><span id="gVal">1000 – 1081</span></div>
+      <svg id="graph" role="img" aria-label="Rating history"></svg>
+      <div class="axis"><span id="gFrom"></span><span id="gTo"></span></div>
     </div>
 
     <div class="matches">
-      <div class="head">Recent matches</div>
+      <div class="head"><span></span><span id="mCount">14 matches, newest first</span><span>Change</span><span>Rating</span></div>
       <div id="recent"></div>
     </div>
-    <p class="foot-link"><a href="#player">All 14 matches</a></p>
   </section>
 </div>
 
@@ -415,12 +503,32 @@ const DATA = {
   }
 };
 
+// The player page shows every match, so the graph and the list come from one
+// list: eight earlier matches (invented here, since data.json only carries the
+// six most recent) followed by data.json's `recent` in chronological order.
+// The rating path is replayed from these deltas, which is how the real site
+// works too: ratings are derived, never stored.
+const EARLIER = [
+  { date: "2026-08-20", type: "singles", opponent: "Ravi Menon", result: "win", delta: 16 },
+  { date: "2026-08-21", type: "singles", opponent: "Emma Lindqvist", result: "win", delta: 15 },
+  { date: "2026-08-23", type: "singles", opponent: "Tomás Ferreira", result: "loss", delta: -14 },
+  { date: "2026-08-25", type: "singles", opponent: "Priya Raman", result: "win", delta: 18 },
+  { date: "2026-08-27", type: "singles", opponent: "Mei Nakamura", result: "win", delta: 15 },
+  { date: "2026-08-28", type: "singles", opponent: "Priya Raman", result: "loss", delta: -12 },
+  { date: "2026-08-30", type: "singles", opponent: "Daniel Okafor", result: "win", delta: 13 },
+  { date: "2026-08-31", type: "doubles", partner: "Mei Nakamura", opponent: "Lukas Weber & Hannah Cohen", result: "win", delta: 8 }
+];
+const MATCHES = EARLIER.concat(DATA.player.recent.slice().reverse());
+const HISTORY = MATCHES.reduce((h, m) => h.concat(h[h.length - 1] + m.delta), [DATA.constants.start]);
+
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
 const players = DATA.leaderboard.map(p => ({ ...p }));
 const MINUS = '−';
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function fmtDelta(d) { return (d < 0 ? MINUS : '+') + Math.abs(d); }
+function fmtDate(iso) { const [, m, d] = iso.split('-'); return `${+d} ${MONTHS[+m - 1]}`; }
 function ordinal(n) {
   const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
@@ -449,9 +557,6 @@ function renderBoard() {
       <span class="rating">${p.rating}</span>
     </a>`).join('');
   $('#boardCount').textContent = players.length + ' players';
-  const lead = players[0];
-  $('#leadRating').textContent = lead.rating;
-  $('#leadName').textContent = lead.name;
 }
 
 // ---------- Create ----------
@@ -525,12 +630,10 @@ inputs.forEach(i => {
 function setDoubles(on) {
   rec.doubles = on;
   $('#recordForm').classList.toggle('doubles', on);
-  $('#segS').classList.toggle('on', !on);
-  $('#segD').classList.toggle('on', on);
+  $('#dbl').setAttribute('aria-checked', on ? 'true' : 'false');
   refreshWinner();
 }
-$('#segS').addEventListener('click', () => setDoubles(false));
-$('#segD').addEventListener('click', () => setDoubles(true));
+$('#dbl').addEventListener('click', () => setDoubles(!rec.doubles));
 $$('.winner button').forEach(b => b.addEventListener('click', () => { rec.winner = b.dataset.w; refreshWinner(); }));
 
 function find(name) { return players.find(p => p.name.toLowerCase() === name.toLowerCase()); }
@@ -573,39 +676,122 @@ function resetRecord() {
 $('#again').addEventListener('click', e => { e.preventDefault(); resetRecord(); window.scrollTo(0, 0); });
 
 // ---------- Player ----------
+// Graph geometry is recomputed from the real pixel width so circles stay round
+// and the type stays at its set size at every viewport.
+const G = { xs: [], ys: [], sel: -1, pinned: false };
+
+function describe(i) {
+  if (i <= 0) return { text: `${fmtDate(MATCHES[0].date)} &middot; joined the board`, val: HISTORY[0] };
+  const m = MATCHES[i - 1];
+  const who = (m.result === 'win' ? 'beat ' : 'lost to ') + m.opponent;
+  const dbl = m.type === 'doubles' ? ` &middot; doubles with ${m.partner}` : '';
+  return { text: `${fmtDate(m.date)} &middot; <b>${who}</b>${dbl} &middot; ${fmtDelta(m.delta)}`, val: HISTORY[i] };
+}
+
+function select(i) {
+  G.sel = i;
+  const read = $('#gRead');
+  if (i < 0) {
+    read.classList.remove('on');
+    $('#gText').innerHTML = 'Rating after each match. Touch a point.';
+    $('#gVal').innerHTML = `${Math.min(...HISTORY)} – ${Math.max(...HISTORY)}`;
+    $('#gVal').classList.remove('val');
+  } else {
+    const d = describe(i);
+    read.classList.add('on');
+    $('#gText').innerHTML = d.text;
+    $('#gVal').textContent = d.val;
+    $('#gVal').classList.add('val');
+  }
+  $$('#graph .pt').forEach((c, k) => {
+    c.setAttribute('r', k === i ? 4.5 : 2.5);
+    c.setAttribute('fill', k === i ? '#000' : '#fff');
+  });
+  const cur = $('#graph .cursor');
+  if (cur) {
+    cur.style.display = i < 0 ? 'none' : '';
+    if (i >= 0) { cur.setAttribute('x1', G.xs[i]); cur.setAttribute('x2', G.xs[i]); }
+  }
+  $$('#recent .match').forEach(row => row.classList.toggle('on', +row.dataset.i === i));
+}
+
+function drawGraph() {
+  const svg = $('#graph');
+  const h = HISTORY, W = svg.clientWidth || 350, H = svg.clientHeight || 180;
+  const padT = 18, padB = 8, padX = 6;
+  const min = Math.min(...h, DATA.constants.start), max = Math.max(...h);
+  const x = i => padX + i * (W - 2 * padX) / (h.length - 1);
+  const y = v => padT + (max - v) * (H - padT - padB) / (max - min || 1);
+  G.xs = h.map((_, i) => +x(i).toFixed(1));
+  G.ys = h.map(v => +y(v).toFixed(1));
+  const pts = G.xs.map((px, i) => `${px},${G.ys[i]}`).join(' ');
+  const hi = h.indexOf(max), last = h.length - 1, base = DATA.constants.start;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = `
+    <line x1="0" y1="${y(base).toFixed(1)}" x2="${W}" y2="${y(base).toFixed(1)}" stroke="#8a8a8a" stroke-width="1" stroke-dasharray="2 4"/>
+    <text x="0" y="${(y(base) - 5).toFixed(1)}">${base}</text>
+    <line class="cursor" x1="0" y1="0" x2="0" y2="${H}" stroke="#000" stroke-width="1" style="display:none"/>
+    <polyline points="${pts}" fill="none" stroke="#000" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="${x(hi).toFixed(1)}" y="${(y(max) - 9).toFixed(1)}" fill="#000" text-anchor="${hi > h.length * 0.8 ? 'end' : 'middle'}">${max}</text>
+    ${h.map((v, i) => `<circle class="pt" cx="${G.xs[i]}" cy="${G.ys[i]}" r="2.5" fill="#fff" stroke="#000" stroke-width="1.5"/>`).join('')}
+    <circle class="pt-last" cx="${G.xs[last]}" cy="${G.ys[last]}" r="4" fill="#000" pointer-events="none"/>
+  `;
+  $('#gFrom').textContent = fmtDate(MATCHES[0].date);
+  $('#gTo').textContent = fmtDate(MATCHES[MATCHES.length - 1].date);
+  select(G.sel);
+}
+
+function nearest(ev) {
+  const r = $('#graph').getBoundingClientRect();
+  const px = ev.clientX - r.left;
+  let best = 0;
+  G.xs.forEach((x, i) => { if (Math.abs(x - px) < Math.abs(G.xs[best] - px)) best = i; });
+  return best;
+}
+{
+  const svg = $('#graph');
+  svg.addEventListener('pointermove', ev => { if (ev.pointerType === 'mouse' && !G.pinned) select(nearest(ev)); });
+  svg.addEventListener('pointerleave', ev => { if (ev.pointerType === 'mouse' && !G.pinned) select(-1); });
+  svg.addEventListener('pointerdown', ev => {
+    const i = nearest(ev);
+    if (G.pinned && G.sel === i) { G.pinned = false; select(-1); }
+    else { G.pinned = true; select(i); }
+    ev.preventDefault();
+  });
+  document.addEventListener('pointerdown', ev => {
+    if (G.pinned && !ev.target.closest('#graph') && !ev.target.closest('#recent')) { G.pinned = false; select(-1); }
+  });
+  window.addEventListener('resize', () => { if ($('#player').classList.contains('on')) drawGraph(); });
+}
+
 function renderPlayer() {
   const P = DATA.player;
   const live = find(P.name) || P;
   $('#pName').textContent = P.name;
   $('#pMeta').innerHTML = `${ordinal(live.rank || P.rank)} of ${players.length} &middot; ${live.matches} matches &middot; ${live.wins} wins`;
 
-  // Graph: hand-drawn polyline in a 350 x 140 box, baseline at the start rating.
-  const h = P.history, W = 350, H = 140, padT = 10, padB = 18, padX = 4;
-  const min = Math.min(...h, DATA.constants.start), max = Math.max(...h);
-  const x = i => padX + i * (W - 2 * padX) / (h.length - 1);
-  const y = v => padT + (max - v) * (H - padT - padB) / (max - min || 1);
-  const pts = h.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-  const hi = h.indexOf(max);
-  const last = h.length - 1;
-  const base = DATA.constants.start;
-  $('#graph').innerHTML = `
-    <line x1="0" y1="${y(base).toFixed(1)}" x2="${W}" y2="${y(base).toFixed(1)}" stroke="#8a8a8a" stroke-width="1" stroke-dasharray="2 4" vector-effect="non-scaling-stroke"/>
-    <text x="0" y="${(y(base) + 14).toFixed(1)}" font-size="11" fill="#8a8a8a" font-family="inherit">${base}</text>
-    <polyline points="${pts}" fill="none" stroke="#000" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-    <circle cx="${x(hi).toFixed(1)}" cy="${y(max).toFixed(1)}" r="2.5" fill="#fff" stroke="#000" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-    <text x="${x(hi).toFixed(1)}" y="${(y(max) - 8).toFixed(1)}" font-size="11" fill="#000" text-anchor="${hi > h.length * 0.8 ? 'end' : 'middle'}" font-family="inherit">${max}</text>
-    <circle cx="${x(last).toFixed(1)}" cy="${y(h[last]).toFixed(1)}" r="4" fill="#000"/>
-  `;
-  $('#gRange').textContent = `${min} – ${max}`;
-
-  $('#recent').innerHTML = P.recent.map(m => `
-    <div class="match">
-      <span class="opp">${m.result === 'win' ? 'beat' : 'lost to'} ${m.opponent}<small>${m.date}${m.type === 'doubles' ? ' &middot; doubles with ' + m.partner : ''}</small></span>
+  $('#mCount').textContent = `${MATCHES.length} matches, newest first`;
+  $('#recent').innerHTML = MATCHES.map((m, k) => ({ m, i: k + 1 })).reverse().map(({ m, i }) => `
+    <div class="match" data-i="${i}">
+      <span class="when">${fmtDate(m.date)}</span>
+      <span class="opp"><span class="v">${m.result === 'win' ? 'beat' : 'lost to'}</span> ${m.opponent}${m.type === 'doubles' ? '<small>doubles with ' + m.partner + '</small>' : ''}</span>
       <span class="delta">${fmtDelta(m.delta)}</span>
+      <span class="after">${HISTORY[i]}</span>
     </div>`).join('');
+  $$('#recent .match').forEach(row => {
+    row.addEventListener('pointerenter', ev => { if (ev.pointerType === 'mouse' && !G.pinned) select(+row.dataset.i); });
+    row.addEventListener('pointerleave', ev => { if (ev.pointerType === 'mouse' && !G.pinned) select(-1); });
+    row.addEventListener('click', () => {
+      const i = +row.dataset.i;
+      if (G.pinned && G.sel === i) { G.pinned = false; select(-1); } else { G.pinned = true; select(i); }
+    });
+  });
+
+  G.sel = -1; G.pinned = false;
+  drawGraph();
 
   // Rating rolls in from the previous point in the history: the one moment motion is earned.
-  const prev = h[h.length - 2] ?? live.rating;
+  const prev = HISTORY[HISTORY.length - 2] ?? live.rating;
   roll($('#pRating'), prev, live.rating);
 }
 
@@ -614,8 +800,9 @@ const screens = ['home', 'create', 'record', 'player'];
 function route() {
   let h = (location.hash || '#home').slice(1);
   if (!screens.includes(h)) h = 'home';
+  document.body.dataset.screen = h;
   screens.forEach(s => document.getElementById(s).classList.toggle('on', s === h));
-  $$('nav a').forEach(a => a.classList.toggle('on', a.dataset.nav === h));
+  $$('nav a').forEach(a => { a.hidden = a.dataset.nav === h; });
   if (h === 'player') renderPlayer();
   if (h === 'record' && $('#recordResult').hidden === false) resetRecord();
   if (h === 'record') setTimeout(() => inputs[0].focus(), 0);

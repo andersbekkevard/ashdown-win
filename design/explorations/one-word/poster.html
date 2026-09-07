@@ -66,7 +66,7 @@
     font-size: 45mm;
     line-height: 0.84;
     letter-spacing: -0.055em;
-    margin: 8mm 0 0 -0.04em;
+    margin: 6mm 0 0 -0.04em;
     margin-bottom: auto;
   }
   .word span { display: block; }
@@ -80,7 +80,7 @@
     max-width: 160mm;
   }
   .lede {
-    margin: 0 0 9mm;
+    margin: 0 0 7mm;
     max-width: 118mm;
     font-size: 11.5pt;
   }
@@ -124,11 +124,11 @@
 
   .bottom {
     display: grid;
-    grid-template-columns: 34mm 1fr;
+    grid-template-columns: 60mm 1fr;
     gap: 6mm;
     align-items: end;
   }
-  .qr { width: 34mm; height: 34mm; display: block; }
+  .qr { width: 60mm; height: 60mm; display: block; }
   .scan { font-size: 9.5pt; color: var(--mute); }
   .scan b { color: var(--ink); font-weight: 500; }
   .foot {
@@ -183,21 +183,7 @@
   </div>
 
   <div class="bottom">
-    <svg class="qr" viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="QR code placeholder">
-      <rect width="33" height="33" fill="#fff"/>
-      <rect x="0.5" y="0.5" width="32" height="32" fill="none" stroke="#000" stroke-width="0.4"/>
-      <!-- finder patterns -->
-      <g fill="#000">
-        <path d="M2 2h7v7H2z M3 3v5h5V3z M4 4h3v3H4z" fill-rule="evenodd"/>
-        <path d="M24 2h7v7h-7z M25 3v5h5V3z M26 4h3v3h-3z" fill-rule="evenodd"/>
-        <path d="M2 24h7v7H2z M3 25v5h5v-5z M4 26h3v3H4z" fill-rule="evenodd"/>
-        <!-- timing rows -->
-        <path d="M10 8h1v1h-1z M12 8h1v1h-1z M14 8h1v1h-1z M16 8h1v1h-1z M18 8h1v1h-1z M20 8h1v1h-1z M22 8h1v1h-1z"/>
-        <path d="M8 10h1v1H8z M8 12h1v1H8z M8 14h1v1H8z M8 16h1v1H8z M8 18h1v1H8z M8 20h1v1H8z M8 22h1v1H8z"/>
-        <!-- placeholder data modules -->
-        <path d="M11 11h2v1h-2z M14 11h1v2h-1z M17 12h2v1h-2z M20 11h1v1h-1z M12 13h1v2h-1z M15 14h3v1h-3z M19 14h1v2h-1z M21 13h2v1h-2z M11 16h2v1h-2z M14 17h1v1h-1z M16 16h1v3h-1z M18 17h2v1h-2z M21 16h1v2h-1z M11 19h1v2h-1z M13 20h2v1h-2z M18 20h1v1h-1z M20 19h2v1h-2z M23 18h1v3h-1z M11 22h2v1h-2z M14 22h1v3h-1z M16 23h3v1h-3z M20 22h1v1h-1z M22 23h2v1h-2z M25 11h1v2h-1z M27 11h2v1h-2z M30 12h1v1h-1z M26 14h1v1h-1z M28 13h1v3h-1z M30 15h1v1h-1z M25 17h2v1h-2z M28 18h2v1h-2z M26 20h1v2h-1z M29 20h1v1h-1z M30 22h1v2h-1z M25 23h2v1h-2z M28 24h1v1h-1z M11 25h1v1h-1z M13 26h2v1h-2z M16 25h1v2h-1z M18 26h2v1h-2z M21 25h1v1h-1z M23 26h1v2h-1z M11 28h2v1h-2z M14 29h1v1h-1z M16 28h1v1h-1z M18 29h3v1h-3z M22 28h1v1h-1z M25 26h1v1h-1z M27 27h2v1h-2z M30 26h1v3h-1z M25 29h2v1h-2z M28 30h2v1h-2z"/>
-      </g>
-    </svg>
+    <svg class="qr" id="qr" shape-rendering="crispEdges" role="img" aria-label="QR code for https://ashdown.win"></svg>
     <div class="scan">Scan, or type <b>ashdown.win</b> into any browser. Nothing to install, nothing to sign up for.</div>
   </div>
 
@@ -206,5 +192,123 @@
     <span>MIT licence</span>
   </div>
 </div>
+<script>
+// Real QR code for https://ashdown.win, generated inline (no library). Version 2, EC level Q, 25 modules.
+// Minimal QR encoder: byte mode, versions 1-10, EC levels L/M/Q/H, mask chosen by penalty score.
+function qrMatrix(text, ecl) {
+  const ECC = { L: [7,10,15,20,26,18,20,24,30,18], M: [10,16,26,18,24,16,18,22,22,26],
+                Q: [13,22,18,26,18,24,18,22,20,24], H: [17,28,22,16,22,28,26,26,24,28] };
+  const BLK = { L: [1,1,1,1,1,2,2,2,2,4], M: [1,1,1,2,2,4,4,4,5,5],
+                Q: [1,1,2,2,4,4,6,6,8,8], H: [1,1,2,4,4,4,5,6,8,8] };
+  const FMT = { L: 1, M: 0, Q: 3, H: 2 };
+  const bytes = Array.from(new TextEncoder().encode(text));
+  const rawWords = v => { let r = (16 * v + 128) * v + 64; if (v >= 2) { const a = Math.floor(v / 7) + 2; r -= (25 * a - 10) * a - 55; if (v >= 7) r -= 36; } return Math.floor(r / 8); };
+  let ver = 1;
+  while (ver <= 10 && (rawWords(ver) - ECC[ecl][ver - 1] * BLK[ecl][ver - 1]) * 8 < 4 + 8 + bytes.length * 8) ver++;
+  if (ver > 10) throw new Error('too long');
+  const size = ver * 4 + 17;
+  const capWords = rawWords(ver) - ECC[ecl][ver - 1] * BLK[ecl][ver - 1];
+  // Bit stream
+  const bits = [];
+  const push = (val, n) => { for (let i = n - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+  push(4, 4); push(bytes.length, 8); bytes.forEach(b => push(b, 8));
+  push(0, Math.min(4, capWords * 8 - bits.length));
+  while (bits.length % 8) bits.push(0);
+  for (let pad = 0xEC; bits.length < capWords * 8; pad ^= 0xEC ^ 0x11) push(pad, 8);
+  const data = []; for (let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i + 8).join(''), 2));
+  // Reed-Solomon over GF(256), prime 0x11D
+  const mul = (x, y) => { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; };
+  const divisor = deg => { const r = new Array(deg).fill(0); r[deg - 1] = 1; let root = 1;
+    for (let i = 0; i < deg; i++) { for (let j = 0; j < deg; j++) r[j] = mul(r[j], root) ^ (j + 1 < deg ? r[j + 1] : 0); root = mul(root, 2); } return r; };
+  const remainder = (dat, div) => { const r = new Array(div.length).fill(0);
+    dat.forEach(b => { const f = b ^ r.shift(); r.push(0); div.forEach((d, i) => { r[i] ^= mul(d, f); }); }); return r; };
+  const nBlocks = BLK[ecl][ver - 1], eccLen = ECC[ecl][ver - 1], raw = rawWords(ver);
+  const nShort = nBlocks - raw % nBlocks, shortLen = Math.floor(raw / nBlocks);
+  const div = divisor(eccLen), blocks = [];
+  for (let i = 0, k = 0; i < nBlocks; i++) {
+    const len = shortLen - eccLen + (i < nShort ? 0 : 1);
+    const dat = data.slice(k, k + len); k += len;
+    const ecc = remainder(dat, div);
+    if (i < nShort) dat.push(-1);
+    blocks.push(dat.concat(ecc));
+  }
+  const words = [];
+  for (let i = 0; i < blocks[0].length; i++) blocks.forEach(b => { if (b[i] >= 0) words.push(b[i]); });
+  // Modules
+  const m = Array.from({ length: size }, () => new Array(size).fill(0));
+  const fn = Array.from({ length: size }, () => new Array(size).fill(false));
+  const set = (x, y, v) => { m[y][x] = v ? 1 : 0; fn[y][x] = true; };
+  const finder = (cx, cy) => { for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+    const x = cx + dx, y = cy + dy; if (x < 0 || y < 0 || x >= size || y >= size) continue;
+    const d = Math.max(Math.abs(dx), Math.abs(dy)); set(x, y, d !== 2 && d !== 4); } };
+  const align = (cx, cy) => { for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) set(cx + dx, cy + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1); };
+  for (let i = 0; i < size; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+  finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+  if (ver >= 2) {
+    const nA = Math.floor(ver / 7) + 2;
+    const step = Math.floor((ver * 4 + nA * 2 + 1) / (nA * 2 - 2)) * 2;
+    const pos = [6]; for (let p = size - 7; pos.length < nA; p -= step) pos.splice(1, 0, p);
+    pos.forEach((px, i) => pos.forEach((py, j) => {
+      if ((i === 0 && j === 0) || (i === 0 && j === nA - 1) || (i === nA - 1 && j === 0)) return;
+      align(px, py); }));
+  }
+  const format = mask => {
+    const d = FMT[ecl] << 3 | mask; let rem = d;
+    for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+    const b = ((d << 10) | rem) ^ 0x5412; const bit = i => (b >>> i) & 1;
+    for (let i = 0; i <= 5; i++) set(8, i, bit(i));
+    set(8, 7, bit(6)); set(8, 8, bit(7)); set(7, 8, bit(8));
+    for (let i = 9; i < 15; i++) set(14 - i, 8, bit(i));
+    for (let i = 0; i < 8; i++) set(size - 1 - i, 8, bit(i));
+    for (let i = 8; i < 15; i++) set(8, size - 15 + i, bit(i));
+    set(8, size - 8, 1);
+  };
+  format(0);
+  // Data placement
+  let bi = 0; const total = words.length * 8;
+  for (let right = size - 1; right >= 1; right -= 2) {
+    if (right === 6) right = 5;
+    for (let v = 0; v < size; v++) for (let j = 0; j < 2; j++) {
+      const x = right - j, up = ((right + 1) & 2) === 0, y = up ? size - 1 - v : v;
+      if (!fn[y][x] && bi < total) { m[y][x] = (words[bi >>> 3] >>> (7 - (bi & 7))) & 1; bi++; }
+    }
+  }
+  const MASKS = [(i, j) => (i + j) % 2 === 0, (i, j) => i % 2 === 0, (i, j) => j % 3 === 0, (i, j) => (i + j) % 3 === 0,
+    (i, j) => (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0, (i, j) => (i * j) % 2 + (i * j) % 3 === 0,
+    (i, j) => ((i * j) % 2 + (i * j) % 3) % 2 === 0, (i, j) => ((i + j) % 2 + (i * j) % 3) % 2 === 0];
+  const apply = k => { for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (!fn[y][x] && MASKS[k](y, x)) m[y][x] ^= 1; };
+  const penalty = () => {
+    let p = 0, dark = 0;
+    const lines = [];
+    for (let i = 0; i < size; i++) { lines.push(m[i].join('')); lines.push(m.map(r => r[i]).join('')); }
+    lines.forEach(s => {
+      for (let i = 0; i < size;) { let j = i; while (j < size && s[j] === s[i]) j++; if (j - i >= 5) p += 3 + (j - i - 5); i = j; }
+      for (const pat of ['00001011101', '10111010000']) for (let i = s.indexOf(pat); i >= 0; i = s.indexOf(pat, i + 1)) p += 40;
+    });
+    for (let y = 0; y < size - 1; y++) for (let x = 0; x < size - 1; x++)
+      if (m[y][x] === m[y][x + 1] && m[y][x] === m[y + 1][x] && m[y][x] === m[y + 1][x + 1]) p += 3;
+    m.forEach(r => r.forEach(v => { dark += v; }));
+    const n = size * size, k = Math.floor((Math.abs(dark * 20 - n * 10) + n - 1) / n) - 1;
+    return p + k * 10;
+  };
+  let best = 0, bestP = Infinity;
+  for (let k = 0; k < 8; k++) { format(k); apply(k); const p = penalty(); if (p < bestP) { bestP = p; best = k; } apply(k); }
+  format(best); apply(best);
+  m.mask = best; m.ver = ver;
+  return m;
+}
+function qrPath(m) {
+  let d = '';
+  m.forEach((row, y) => row.forEach((v, x) => { if (v) d += `M${x} ${y}h1v1h-1z`; }));
+  return d;
+}
+
+(function () {
+  const m = qrMatrix('https://ashdown.win', 'Q');
+  const svg = document.getElementById('qr');
+  svg.setAttribute('viewBox', `0 0 ${m.length} ${m.length}`);
+  svg.innerHTML = `<rect width="${m.length}" height="${m.length}" fill="#fff"/><path d="${qrPath(m)}" fill="#000"/>`;
+})();
+</script>
 </body>
 </html>
