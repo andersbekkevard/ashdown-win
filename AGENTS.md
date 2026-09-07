@@ -16,6 +16,26 @@ only, every rating derived from a public append-only match log. Read
 - Every decision taken so far, small and large: `docs/decision-ledger.md`
 - Decisions that are hard to reverse, with options and triggers: `docs/adr/`
 
+## Where things live
+
+- Rating constants (K, start rating, name length): `src/lib/config.ts`. Nothing
+  else hard-codes them.
+- Rating engine, pure and framework-free: `src/lib/rating.ts`. Tests beside it
+  in `src/lib/rating.test.ts` (`pnpm test`).
+- Schema, one file, append-only: `src/db/schema.ts`. Lazy Neon client:
+  `src/db/index.ts`. Migrations are generated into `drizzle/` with
+  `pnpm db:generate` and applied with `pnpm db:migrate`; check them in.
+- Reads (leaderboard, search, player page, log): `src/lib/queries.ts`. Every
+  read replays the log; nothing caches a rating.
+- Writes (create player, record match, delete match, search):
+  `src/app/actions.ts`, zod-validated server actions.
+- Pages under `src/app/`: `/` leaderboard, `/players/new`, `/matches/new`,
+  `/players/[id]`, `/log`, `/algorithm`. Client components in `src/components/`.
+- `/algorithm` renders `docs/algorithm.md` at build time via
+  `src/lib/algorithm-doc.ts`; edit the doc, not the page.
+- Environment: `.env.example`. `next build` must pass with no `DATABASE_URL`.
+- Checks: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`.
+
 ## Conditional pointers
 
 - Changing K, the starting rating, or the doubles rule: read `docs/algorithm.md`

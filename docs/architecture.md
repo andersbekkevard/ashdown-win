@@ -49,7 +49,8 @@ start with the current constants. This makes three things free that are
 otherwise painful:
 
 - Changing K, the starting rating, or the doubles rule applies to all of
-  history at once. The constants live in one config file.
+  history at once. The constants live in one config file,
+  `src/lib/config.ts`.
 - Deleting a match is just an entry in the log. Nothing has to be unwound.
 - The log is the audit trail. Any rating can be reproduced by hand from
   public data, which is what makes an open ladder trustworthy.
