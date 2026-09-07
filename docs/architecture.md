@@ -79,6 +79,12 @@ Vercel serves the site and Neon provides Postgres. Both are on free tiers and
 the site is designed to stay within them indefinitely, so a future resident
 can inherit it without a bill. See ADR 0004.
 
+Deploys happen on every push to `main`. The build runs `scripts/migrate.mjs`
+first, which applies pending Drizzle migrations against `DATABASE_URL` when
+one is set, so a schema change ships with the code that needs it. The Neon
+integration in the Vercel project sets `DATABASE_URL` for production and
+preview. Since 2026-09-07 the production site is https://ashdown.win.
+
 ## Name
 
 The domain is ashdown.win and the repository is ashdown-win. The name belongs
