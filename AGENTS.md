@@ -1,67 +1,31 @@
-# AGENTS.md
+# ashdown.win agent instructions
 
-Agent map for the ashdown.win repository. Keep this file short. It points;
-it does not explain.
-
-## What this is
-
-A public table tennis Elo ladder for Ashdown House, MIT. No accounts, names
-only, every rating derived from a public append-only match log. Read
-`README.md` first for the product in one page.
+Public Ashdown House table-tennis Elo ladder: no accounts, names only, with
+ratings derived from a public append-only match log. Read `README.md` for
+orientation and `docs/architecture.md` for a structural change.
 
 Human commitments for operating or developing this app belong in Google Tasks
 `Hub`. Use the installed `anders-environment` skill for current list IDs and
 verified writes.
 
-## Read before changing
+## Boundaries and routes
 
-- Product shape and the reasons for it: `docs/architecture.md`
-- The rating maths: `docs/algorithm.md`
-- Every decision taken so far, small and large: `docs/decision-ledger.md`
-- Decisions that are hard to reverse, with options and triggers: `docs/adr/`
+- Match-log entries are immutable; a deletion is a new event. Rating constants
+  have one owner, `src/lib/config.ts`; reads replay the log rather than cache
+  ratings. Before changing rating or doubles rules, read `docs/algorithm.md`
+  and ADR 0003.
+- `/algorithm` renders `docs/algorithm.md` at build time through
+  `src/lib/algorithm-doc.ts`. Edit that doc to change the explanation.
+- Before adding login, identity or contact fields, read ADRs 0001 and 0002.
+  The no-account choice is deliberate. This repository is public: resident
+  contact details must stay out of the tree.
+- Before adding another game, read ADR 0005; keep one match log per game.
+- For deployment, read ADR 0004. Builds must succeed without `DATABASE_URL`.
+- For schema changes, use the commands in `package.json`, inspect generated
+  migrations under `drizzle/`, and commit them. Preserve append-only semantics.
+- For visual design, read `design/explorations/index.html` and its current
+  selection state before treating an exploration as the accepted design.
 
-## Where things live
-
-- Rating constants (K, start rating, name length): `src/lib/config.ts`. Nothing
-  else hard-codes them.
-- Rating engine, pure and framework-free: `src/lib/rating.ts`. Tests beside it
-  in `src/lib/rating.test.ts` (`pnpm test`).
-- Schema, one file, append-only: `src/db/schema.ts`. Lazy Neon client:
-  `src/db/index.ts`. Migrations are generated into `drizzle/` with
-  `pnpm db:generate` and applied with `pnpm db:migrate`; check them in.
-- Reads (leaderboard, search, player page, log): `src/lib/queries.ts`. Every
-  read replays the log; nothing caches a rating.
-- Writes (create player, record match, delete match, search):
-  `src/app/actions.ts`, zod-validated server actions.
-- Pages under `src/app/`: `/` leaderboard, `/players/new`, `/matches/new`,
-  `/players/[id]`, `/log`, `/algorithm`. Client components in `src/components/`.
-- `/algorithm` renders `docs/algorithm.md` at build time via
-  `src/lib/algorithm-doc.ts`; edit the doc, not the page.
-- Environment: `.env.example`. `next build` must pass with no `DATABASE_URL`.
-- Checks: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`.
-
-## Conditional pointers
-
-- Changing K, the starting rating, or the doubles rule: read `docs/algorithm.md`
-  and ADR 0003 first. Constants live in one config file; the log is recomputed.
-- Adding any form of login, identity, or contact field: read ADR 0001 and
-  ADR 0002. The no-account model is deliberate and has a reversal trigger.
-- Adding a second game such as pool: the domain and repo name were chosen to
-  allow this, see ADR 0005. Keep one match log per game.
-- Hosting or deployment: ADR 0004. Vercel plus Neon Postgres.
-- Any new decision with lasting consequences: append to
-  `docs/decision-ledger.md`, and write an ADR if it meets the bar in
-  `docs/adr/README.md`.
-
-## Rules
-
-- Nothing in the match log is ever mutated. Deletions are new log entries.
-- Docs change in the same commit as the behaviour they describe.
-- This repository is public. No personal contact details of residents anywhere
-  in the tree.
-
-## Design
-
-- Nine parallel visual explorations, each with a brief, an A4 poster, and a
-  mobile-first app mockup on shared fake data: `design/explorations/`. Open
-  `design/explorations/index.html`. No style has been chosen yet.
+Keep behavior and its docs in the same commit. Record lasting decisions in
+`docs/decision-ledger.md`; use `docs/adr/README.md` to decide whether an ADR is
+needed. `package.json` owns check commands; run those relevant to the change.
