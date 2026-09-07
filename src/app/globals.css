@@ -324,3 +324,14 @@ h2.shout { font-size: 26px; margin: 0; }
 .dock .group.one { grid-template-columns: 1fr; }
 .dock .btn { font-size: 18px; padding: 16px 12px; }
 @media (max-width: 370px) { .dock .btn { font-size: 16px; gap: 6px; padding: 16px 8px; } }
+
+/* history: range tabs and linked highlighting */
+.ranges { display: inline-flex; gap: 4px; }
+.ranges button { font-family: var(--body); font-weight: 700; font-size: 12px; color: var(--muted); background: #f0f2f8; border: 2px solid transparent; border-radius: 999px; padding: 4px 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
+.ranges button.on { background: var(--gold); color: var(--ink); border-color: var(--ink); box-shadow: 0 2px 0 var(--ink); }
+.ranges button[disabled] { opacity: 0.4; cursor: default; }
+.legend .hint { margin-left: auto; color: var(--deep); }
+.match { cursor: pointer; border-radius: 12px; padding-left: 6px; padding-right: 6px; margin: 0 -6px; transition: background 120ms; }
+.match.hot { background: var(--cream); }
+.match.dim { opacity: 0.55; }
+.match.gone { cursor: default; }
