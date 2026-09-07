@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Crown } from "@/components/crown";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -8,24 +9,39 @@ export const metadata: Metadata = {
   description: "The table tennis ladder for Ashdown House at MIT.",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#00b5fe",
+  viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="mx-auto max-w-2xl p-4">
-        <header className="mb-6 flex items-baseline justify-between border-b pb-2">
-          <Link href="/" className="text-xl font-bold">
-            ashdown.win
-          </Link>
-          <nav className="flex gap-4 text-sm">
-            <Link href="/log" className="underline">
-              Log
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font -- app router root layout, loads once */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Titan+One&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>
+        <div className="phone">
+          <header className="topbar">
+            <Link href="/" className="logo" aria-label="ashdown.win home">
+              <Crown />
+              ashdown.win
             </Link>
-            <Link href="/algorithm" className="underline">
-              Algorithm
-            </Link>
-          </nav>
-        </header>
-        <main>{children}</main>
+            <nav className="chips">
+              <Link href="/algorithm" className="chip">How?</Link>
+              <Link href="/log" className="chip">Log</Link>
+            </nav>
+          </header>
+          <main>{children}</main>
+        </div>
       </body>
     </html>
   );

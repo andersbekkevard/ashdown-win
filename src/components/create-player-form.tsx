@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 import { createPlayer, type ActionResult } from "@/app/actions";
 import { MAX_NAME_LENGTH } from "@/lib/config";
+import { Dock } from "./dock";
 
 type State = ActionResult<{ id: number; name: string }> | null;
 
@@ -15,6 +16,7 @@ export function CreatePlayerForm({ initialName }: { initialName: string }) {
       const result = await createPlayer(formData.get("name"));
       if (result.ok) {
         router.push(`/players/${result.value.id}`);
+        router.refresh();
       }
       return result;
     },
@@ -22,62 +24,66 @@ export function CreatePlayerForm({ initialName }: { initialName: string }) {
   );
 
   return (
-    <form action={formAction} className="flex max-w-md flex-col gap-3">
-      <label className="flex flex-col gap-1">
-        <span>Full name</span>
-        <input
-          type="text"
-          name="name"
-          defaultValue={initialName}
-          maxLength={MAX_NAME_LENGTH}
-          required
-          autoFocus
-          className="rounded border px-2 py-1"
-        />
-      </label>
-
-      <details className="text-sm">
-        <summary className="cursor-pointer underline">
-          I&apos;d rather not use my full name
-        </summary>
-        <div className="mt-2 flex flex-col gap-2">
-          <p>
-            Use your MIT username instead, the part of your email before the
-            @. It is unique, so nobody else can take it.
-          </p>
-          <p>
-            Or use any other name you know to be unique. Others must be able
-            to find it when they record a match against you, so pick
-            something they will recognise.
-          </p>
+    <form action={formAction}>
+      <div className="form-card slab pop-in">
+        <h2 className="shout">New player</h2>
+        <label htmlFor="name">Your name</label>
+        <div className="field plain">
+          <input
+            id="name"
+            type="text"
+            name="name"
+            defaultValue={initialName}
+            maxLength={MAX_NAME_LENGTH}
+            required
+            autoFocus
+            autoComplete="name"
+            autoCapitalize="words"
+            placeholder="Full name"
+          />
         </div>
-      </details>
-
-      {state && !state.ok && (
-        <div className="text-sm text-red-700" role="alert">
-          <p>{state.error}</p>
-          {state.existing && (
+        <p className="hint">
+          Once is enough. You start at 1000, and anyone can record a match against you by
+          finding this name.
+        </p>
+        <details>
+          <summary>I&apos;d rather not use my full name</summary>
+          <div className="altbox">
             <p>
-              Did you mean{" "}
-              <Link
-                href={`/players/${state.existing.id}`}
-                className="underline"
-              >
-                {state.existing.name}
-              </Link>
-              ?
+              Use your MIT username instead, the part of your email before the @. It is unique,
+              so nobody else can take it.
             </p>
-          )}
-        </div>
-      )}
+            <p>
+              Or any other name you know to be unique. Remember that the people who record
+              matches against you will have to find it.
+            </p>
+          </div>
+        </details>
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded border px-3 py-1"
-      >
-        {pending ? "Creating…" : "Create"}
-      </button>
+        {state && !state.ok && (
+          <div className="error" role="alert">
+            <p style={{ margin: 0 }}>{state.error}</p>
+            {state.existing && (
+              <p style={{ margin: "6px 0 0" }}>
+                Did you mean{" "}
+                <Link href={`/players/${state.existing.id}`} style={{ textDecoration: "underline" }}>
+                  {state.existing.name}
+                </Link>
+                ?
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      <Dock>
+        <Link href="/" className="btn ghost">
+          Cancel
+        </Link>
+        <button type="submit" className="btn lilac" disabled={pending}>
+          {pending ? "Creating…" : "Create"}
+        </button>
+      </Dock>
     </form>
   );
 }

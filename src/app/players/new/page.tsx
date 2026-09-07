@@ -9,10 +9,5 @@ export default async function NewPlayerPage({
 }) {
   const { name } = await searchParams;
   const initialName = typeof name === "string" ? name : "";
-  return (
-    <div>
-      <h1 className="mb-4 text-lg font-semibold">Create player</h1>
-      <CreatePlayerForm initialName={initialName} />
-    </div>
-  );
+  return <CreatePlayerForm initialName={initialName} />;
 }

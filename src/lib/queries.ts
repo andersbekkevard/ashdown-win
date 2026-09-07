@@ -50,6 +50,7 @@ export interface LeaderboardRow {
   name: string;
   rating: number;
   matchesPlayed: number;
+  wins: number;
 }
 
 /** Every player, including those with no matches, best rating first. */
@@ -62,6 +63,7 @@ export async function leaderboard(): Promise<LeaderboardRow[]> {
       name: p.name,
       rating: ratings.get(p.id) ?? START_RATING,
       matchesPlayed: history.get(p.id)?.length ?? 0,
+      wins: (history.get(p.id) ?? []).filter((h) => h.delta > 0).length,
     }))
     .sort((x, y) => y.rating - x.rating || x.name.localeCompare(y.name));
 }

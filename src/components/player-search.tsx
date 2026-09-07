@@ -10,21 +10,32 @@ export interface Selected {
   name: string;
 }
 
+function PaddleIcon() {
+  return (
+    <svg className="ico" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="10" cy="9" r="7" fill="#FB3AA3" stroke="#222126" strokeWidth="2" />
+      <path d="M14.5 14.5 L20 20" stroke="#222126" strokeWidth="3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /**
  * One search box. Type a substring, pick a hit. A query that matches nobody
  * offers a link to create that player; it never creates one itself.
  */
 export function PlayerSearch({
-  label,
+  placeholder,
   value,
   onChange,
   exclude,
+  autoFocus = false,
 }: {
-  label: string;
+  placeholder: string;
   value: Selected | null;
   onChange: (next: Selected | null) => void;
   /** Ids already used elsewhere in the match; hidden from results. */
   exclude: number[];
+  autoFocus?: boolean;
 }) {
   const inputId = useId();
   const [query, setQuery] = useState("");
@@ -63,16 +74,14 @@ export function PlayerSearch({
 
   if (value) {
     return (
-      <div className="flex items-center gap-2">
-        <span className="text-sm">{label}:</span>
-        <span className="font-medium">{value.name}</span>
+      <div className="picked pop-in">
+        <b>{value.name}</b>
         <button
           type="button"
           onClick={() => {
             onChange(null);
             reset();
           }}
-          className="text-sm underline"
         >
           change
         </button>
@@ -84,48 +93,36 @@ export function PlayerSearch({
   const trimmed = query.trim();
 
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={inputId} className="text-sm">
-        {label}
-      </label>
+    <div className="field">
+      <PaddleIcon />
       <input
         id={inputId}
         type="search"
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
         maxLength={MAX_NAME_LENGTH}
-        placeholder="Search by name"
+        placeholder={placeholder}
         autoComplete="off"
-        className="rounded border px-2 py-1"
+        autoCapitalize="words"
+        enterKeyHint="search"
+        autoFocus={autoFocus}
+        aria-label={placeholder}
       />
       {trimmed && (
-        <div className="text-sm">
+        <div className="sugg pop-in">
           {searching && visible === null ? (
-            <p>Searching…</p>
+            <div className="hint">Searching…</div>
           ) : visible && visible.length > 0 ? (
-            <ul className="flex flex-col">
-              {visible.map((h) => (
-                <li key={h.id}>
-                  <button
-                    type="button"
-                    onClick={() => onChange(h)}
-                    className="w-full py-1 text-left underline"
-                  >
-                    {h.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            visible.map((h) => (
+              <button key={h.id} type="button" onClick={() => onChange(h)}>
+                {h.name}
+              </button>
+            ))
           ) : visible ? (
-            <p>
-              No player matches &ldquo;{trimmed}&rdquo;.{" "}
-              <Link
-                href={`/players/new?name=${encodeURIComponent(trimmed)}`}
-                className="underline"
-              >
-                Create this player
-              </Link>
-            </p>
+            <Link href={`/players/new?name=${encodeURIComponent(trimmed)}`} className="create">
+              <span>No one called &ldquo;{trimmed}&rdquo;</span>
+              <b>Create</b>
+            </Link>
           ) : null}
         </div>
       )}

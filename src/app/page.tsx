@@ -1,61 +1,66 @@
 import Link from "next/link";
+import { Crown } from "@/components/crown";
+import { Dock } from "@/components/dock";
 import { formatRating } from "@/lib/format";
 import { leaderboard } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
+const hexClass = ["gold", "silver", "bronze"];
+
 export default async function HomePage() {
   const rows = await leaderboard();
   return (
-    <div>
-      <div className="mb-6 flex gap-3">
-        <Link
-          href="/players/new"
-          className="rounded border px-3 py-2 underline"
-        >
+    <>
+      <div className="board slab pop-in">
+        <div className="board-head">
+          <h1 className="shout">Leaderboard</h1>
+          <div className="count">
+            {rows.length}
+            <small>players</small>
+          </div>
+        </div>
+        {rows.length === 0 ? (
+          <p className="empty">Nobody on the board yet. Create the first player.</p>
+        ) : (
+          rows.map((r, i) => (
+            <Link
+              key={r.id}
+              href={`/players/${r.id}`}
+              className={`row${i === 0 ? " top1" : ""}${r.matchesPlayed === 0 ? " fresh" : ""}`}
+            >
+              <div className={`hex ${hexClass[i] ?? ""}`}>{i + 1}</div>
+              <div className="who">
+                <div className="name">
+                  {i === 0 && <Crown />}
+                  <span>{r.name}</span>
+                </div>
+                <div className="rec">
+                  {r.matchesPlayed === 0 ? (
+                    "New. No matches yet"
+                  ) : (
+                    <>
+                      <b>{r.wins}W</b> · {r.matchesPlayed - r.wins}L
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="rating">{formatRating(r.rating)}</div>
+            </Link>
+          ))
+        )}
+      </div>
+      <p className="foot-link">
+        Every match is public. <Link href="/log">See the log</Link> or <Link href="/algorithm">read the maths</Link>.
+      </p>
+      <Dock>
+        <Link href="/players/new" className="btn lilac">
           Create player
         </Link>
-        <Link
-          href="/matches/new"
-          className="rounded border px-3 py-2 underline"
-        >
+        <Link href="/matches/new" className="btn">
           Record match
         </Link>
-      </div>
-
-      <h1 className="mb-2 text-lg font-semibold">Leaderboard</h1>
-      {rows.length === 0 ? (
-        <p>No players yet. Create the first one.</p>
-      ) : (
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th className="py-1 pr-2">#</th>
-              <th className="py-1 pr-2">Player</th>
-              <th className="py-1 pr-2 text-right">Rating</th>
-              <th className="py-1 text-right">Matches</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, i) => (
-              <tr key={r.id} className="border-b">
-                <td className="py-1 pr-2">{i + 1}</td>
-                <td className="py-1 pr-2">
-                  <Link href={`/players/${r.id}`} className="underline">
-                    {r.name}
-                  </Link>
-                </td>
-                <td className="py-1 pr-2 text-right tabular-nums">
-                  {formatRating(r.rating)}
-                </td>
-                <td className="py-1 text-right tabular-nums">
-                  {r.matchesPlayed}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+      </Dock>
+    </>
   );
 }

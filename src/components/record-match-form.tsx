@@ -1,8 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { recordMatch } from "@/app/actions";
+import { Crown } from "./crown";
+import { Dock } from "./dock";
 import { PlayerSearch, type Selected } from "./player-search";
 
 type Side = "a" | "b";
@@ -24,33 +27,51 @@ export function RecordMatchForm() {
   const sideA = doubles ? [a1, a2] : [a1];
   const sideB = doubles ? [b1, b2] : [b1];
   const complete =
-    sideA.every((p) => p !== null) &&
-    sideB.every((p) => p !== null) &&
-    winner !== null;
+    sideA.every((p) => p !== null) && sideB.every((p) => p !== null) && winner !== null;
 
-  const sideLabel = (side: Side, members: (Selected | null)[]) => {
-    const names = members.filter((p) => p !== null).map((p) => p.name);
-    return names.length ? names.join(" & ") : `Side ${side.toUpperCase()}`;
-  };
+  const names = (members: (Selected | null)[]) =>
+    members.filter((p): p is Selected => p !== null).map((p) => p.name).join(" & ");
+
+  function toggleDoubles() {
+    const next = !doubles;
+    setDoubles(next);
+    if (!next) {
+      setA2(null);
+      setB2(null);
+    }
+  }
 
   function submit() {
     if (!complete || winner === null) return;
     setError(null);
-    const toIds = (members: (Selected | null)[]) =>
-      members.map((p) => (p as Selected).id);
+    const toIds = (members: (Selected | null)[]) => members.map((p) => (p as Selected).id);
     startTransition(async () => {
-      const result = await recordMatch({
-        a: toIds(sideA),
-        b: toIds(sideB),
-        winner,
-      });
+      const result = await recordMatch({ a: toIds(sideA), b: toIds(sideB), winner });
       if (result.ok) {
         router.push("/");
+        router.refresh();
       } else {
         setError(result.error);
       }
     });
   }
+
+  const tile = (side: Side, members: (Selected | null)[]) => {
+    const label = names(members);
+    const on = winner === side;
+    return (
+      <button
+        type="button"
+        className={`win ${side}${on ? " on" : ""}`}
+        onClick={() => setWinner(side)}
+        aria-pressed={on}
+      >
+        <Crown className="crown" />
+        <div className={`wname${label ? "" : " empty"}`}>{label || "Pick a side first"}</div>
+        <div className="tag">{side === "a" ? "Side A" : "Side B"}</div>
+      </button>
+    );
+  };
 
   return (
     <form
@@ -58,76 +79,67 @@ export function RecordMatchForm() {
         e.preventDefault();
         submit();
       }}
-      className="flex max-w-md flex-col gap-4"
     >
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={doubles}
-          onChange={(e) => {
-            setDoubles(e.target.checked);
-            if (!e.target.checked) {
-              setA2(null);
-              setB2(null);
-            }
+      <div
+        className={`toggle-row slab${doubles ? " on" : ""}`}
+        onClick={toggleDoubles}
+        role="presentation"
+      >
+        <div className="tlabel">
+          <b>{doubles ? "Doubles" : "Singles"}</b>
+          <span>{doubles ? "Two on each side, half the K" : "Flip for doubles"}</span>
+        </div>
+        <button
+          type="button"
+          className="switch"
+          role="switch"
+          aria-checked={doubles}
+          aria-label="Doubles"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleDoubles();
           }}
-        />
-        Doubles
-      </label>
+        >
+          <span className="knob">{doubles ? "2v2" : "1v1"}</span>
+        </button>
+      </div>
 
-      <fieldset className="flex flex-col gap-2 rounded border p-3">
-        <legend className="px-1 text-sm font-medium">Side A</legend>
-        <PlayerSearch label="Player" value={a1} onChange={setA1} exclude={exclude} />
+      <div className="side a slab">
+        <div className="label">Side A</div>
+        <PlayerSearch placeholder="Player" value={a1} onChange={setA1} exclude={exclude} autoFocus />
         {doubles && (
-          <PlayerSearch label="Partner" value={a2} onChange={setA2} exclude={exclude} />
+          <PlayerSearch placeholder="Partner" value={a2} onChange={setA2} exclude={exclude} />
         )}
-      </fieldset>
-
-      <fieldset className="flex flex-col gap-2 rounded border p-3">
-        <legend className="px-1 text-sm font-medium">Side B</legend>
-        <PlayerSearch label="Player" value={b1} onChange={setB1} exclude={exclude} />
+      </div>
+      <div className="vs">VS</div>
+      <div className="side b slab">
+        <div className="label">Side B</div>
+        <PlayerSearch placeholder="Player" value={b1} onChange={setB1} exclude={exclude} />
         {doubles && (
-          <PlayerSearch label="Partner" value={b2} onChange={setB2} exclude={exclude} />
+          <PlayerSearch placeholder="Partner" value={b2} onChange={setB2} exclude={exclude} />
         )}
-      </fieldset>
+      </div>
 
-      <fieldset className="flex flex-col gap-2 rounded border p-3">
-        <legend className="px-1 text-sm font-medium">Winner</legend>
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            name="winner"
-            value="a"
-            checked={winner === "a"}
-            onChange={() => setWinner("a")}
-          />
-          {sideLabel("a", sideA)}
-        </label>
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            name="winner"
-            value="b"
-            checked={winner === "b"}
-            onChange={() => setWinner("b")}
-          />
-          {sideLabel("b", sideB)}
-        </label>
-      </fieldset>
+      <div className="winner-title">Who won?</div>
+      <div className="winners">
+        {tile("a", sideA)}
+        {tile("b", sideB)}
+      </div>
 
       {error && (
-        <p className="text-sm text-red-700" role="alert">
+        <p className="error" role="alert">
           {error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={!complete || pending}
-        className="self-start rounded border px-3 py-1 disabled:opacity-50"
-      >
-        {pending ? "Recording…" : "Record match"}
-      </button>
+      <Dock>
+        <Link href="/" className="btn ghost">
+          Cancel
+        </Link>
+        <button type="submit" className="btn" disabled={!complete || pending}>
+          {pending ? "Recording…" : "Record it"}
+        </button>
+      </Dock>
     </form>
   );
 }

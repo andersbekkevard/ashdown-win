@@ -12,16 +12,12 @@ export function DeleteMatchButton({ matchId }: { matchId: number }) {
   );
 
   return (
-    <form action={formAction} className="inline">
-      <button
-        type="submit"
-        disabled={pending}
-        className="text-sm underline disabled:opacity-50"
-      >
-        {pending ? "Deleting…" : "Delete"}
+    <form action={formAction}>
+      <button type="submit" className="mini" disabled={pending}>
+        {pending ? "…" : "Delete"}
       </button>
       {state && !state.ok && (
-        <span className="ml-2 text-sm text-red-700" role="alert">
+        <span className="error" role="alert" style={{ display: "block", margin: "6px 0 0" }}>
           {state.error}
         </span>
       )}
