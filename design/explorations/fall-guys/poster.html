@@ -125,7 +125,7 @@
     color: var(--paper);
     padding: 8mm 5mm 5mm;
     position: relative;
-    min-height: 44mm;
+    min-height: 40mm;
   }
   .step:nth-child(2) { background: var(--mint); color: var(--ink); }
   .step:nth-child(3) { background: var(--lilac); }
@@ -198,7 +198,7 @@
   /* url block */
   .url {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 44mm;
+    grid-template-columns: minmax(0, 1fr) 74mm;
     gap: 8mm;
     align-items: center;
     margin-top: 6mm;
@@ -206,12 +206,12 @@
   }
   .url .big {
     position: relative;
-    font-size: 49pt;
+    font-size: 37pt;
     white-space: nowrap;
     transform: rotate(-2deg);
     margin-top: 6mm;
   }
-  .url .big .crown { position: absolute; top: -17mm; left: 6mm; width: 22mm; transform: rotate(-12deg); }
+  .url .big .crown { position: absolute; top: -14mm; left: 4mm; width: 18mm; transform: rotate(-12deg); }
   .url .sub {
     font-weight: 700;
     font-size: 13pt;
@@ -227,37 +227,17 @@
     box-shadow: 0 3px 0 var(--ink);
   }
   .qr {
-    width: 44mm;
-    height: 44mm;
+    width: 74mm;
+    height: 74mm;
     background: var(--paper);
     border: 4px solid var(--ink);
     border-radius: 12px;
     box-shadow: 0 6px 0 var(--ink);
-    display: grid;
-    place-items: center;
-    text-align: center;
-    font-weight: 700;
-    font-size: 10pt;
-    color: var(--ink);
     padding: 3mm;
     position: relative;
   }
-  .qr::before, .qr::after {
-    content: "";
-    position: absolute;
-    width: 9mm; height: 9mm;
-    border: 2.5px solid var(--ink);
-    border-radius: 2mm;
-  }
-  .qr::before { top: 2.5mm; left: 2.5mm; }
-  .qr::after { top: 2.5mm; right: 2.5mm; }
-  .qr i {
-    position: absolute;
-    bottom: 2.5mm; left: 2.5mm;
-    width: 9mm; height: 9mm;
-    border: 2.5px solid var(--ink);
-    border-radius: 2mm;
-  }
+  .qr svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
+  .qr .cap { position: absolute; left: 50%; bottom: -5.5mm; transform: translateX(-50%); background: var(--pink); color: var(--paper); font-family: var(--display); font-size: 9pt; text-transform: uppercase; padding: 1mm 4mm; border-radius: 999px; border: 2.5px solid var(--ink); white-space: nowrap; }
 
   footer {
     display: flex;
@@ -338,7 +318,7 @@
       </div>
       <p class="sub"><span>Scan it, or type it. Works on any phone.</span></p>
     </div>
-    <div class="qr"><i></i>QR code goes here</div>
+    <div class="qr"><svg id="qr" viewBox="0 0 1 1" role="img" aria-label="QR code for https://ashdown.win"></svg><span class="cap">scan me</span></div>
   </div>
 
   <footer>
@@ -347,5 +327,151 @@
   </footer>
 
 </div>
+<script>
+// Inline QR encoder (byte mode, versions 1-4, EC L/M/Q/H): no external library.
+// Minimal QR encoder: byte mode, versions 1-4, EC levels L/M/Q/H.
+function qrMatrix(text, level) {
+  const bytes = Array.from(new TextEncoder().encode(text));
+  // [ecPerBlock, blocks, dataPerBlock] per version, per level L M Q H
+  const T = {
+    1: { L: [7, 1, 19], M: [10, 1, 16], Q: [13, 1, 13], H: [17, 1, 9] },
+    2: { L: [10, 1, 34], M: [16, 1, 28], Q: [22, 1, 22], H: [28, 1, 16] },
+    3: { L: [15, 1, 55], M: [26, 1, 44], Q: [18, 2, 17], H: [22, 2, 13] },
+    4: { L: [20, 1, 80], M: [18, 2, 32], Q: [26, 2, 24], H: [16, 4, 9] },
+  };
+  const ALIGN = { 1: [], 2: [6, 18], 3: [6, 22], 4: [6, 26] };
+  const LEVEL_BITS = { L: 1, M: 0, Q: 3, H: 2 };
+  let ver = 1;
+  while (ver <= 4 && T[ver][level][1] * T[ver][level][2] < bytes.length + 3) ver++;
+  if (ver > 4) throw new Error("too long");
+  const [ecn, nb, dpb] = T[ver][level];
+  const N = ver * 4 + 17;
+
+  // --- bitstream ---
+  const bits = [];
+  const push = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >> i) & 1); };
+  push(4, 4); push(bytes.length, 8); bytes.forEach(b => push(b, 8));
+  const cap = nb * dpb * 8;
+  push(0, Math.min(4, cap - bits.length));
+  while (bits.length % 8) bits.push(0);
+  const data = [];
+  for (let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i + 8).join(""), 2));
+  for (let p = 0; data.length < nb * dpb; p ^= 1) data.push(p ? 0x11 : 0xec);
+
+  // --- GF(256) and Reed-Solomon ---
+  const EXP = new Array(512), LOG = new Array(256);
+  for (let i = 0, x = 1; i < 255; i++) { EXP[i] = x; LOG[x] = i; x <<= 1; if (x & 256) x ^= 0x11d; }
+  for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+  const mul = (a, b) => (a && b) ? EXP[LOG[a] + LOG[b]] : 0;
+  let gen = [1];
+  for (let i = 0; i < ecn; i++) {
+    const g = new Array(gen.length + 1).fill(0);
+    for (let j = 0; j < gen.length; j++) { g[j] ^= gen[j]; g[j + 1] ^= mul(gen[j], EXP[i]); }
+    gen = g;
+  }
+  const rs = block => {
+    const r = block.concat(new Array(ecn).fill(0));
+    for (let i = 0; i < block.length; i++) {
+      const c = r[i]; if (!c) continue;
+      for (let j = 0; j < gen.length; j++) r[i + j] ^= mul(gen[j], c);
+    }
+    return r.slice(block.length);
+  };
+  const blocks = [], ecs = [];
+  for (let b = 0; b < nb; b++) { const d = data.slice(b * dpb, (b + 1) * dpb); blocks.push(d); ecs.push(rs(d)); }
+  const out = [];
+  for (let i = 0; i < dpb; i++) blocks.forEach(b => out.push(b[i]));
+  for (let i = 0; i < ecn; i++) ecs.forEach(e => out.push(e[i]));
+
+  // --- matrix and function patterns ---
+  const m = Array.from({ length: N }, () => new Array(N).fill(0));
+  const fn = Array.from({ length: N }, () => new Array(N).fill(false));
+  const set = (r, c, v) => { m[r][c] = v; fn[r][c] = true; };
+  const finder = (r0, c0) => {
+    for (let r = -1; r <= 7; r++) for (let c = -1; c <= 7; c++) {
+      const rr = r0 + r, cc = c0 + c; if (rr < 0 || cc < 0 || rr >= N || cc >= N) continue;
+      const on = r >= 0 && r <= 6 && c >= 0 && c <= 6 && (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4));
+      set(rr, cc, on ? 1 : 0);
+    }
+  };
+  finder(0, 0); finder(0, N - 7); finder(N - 7, 0);
+  for (let i = 8; i < N - 8; i++) { set(6, i, i % 2 ? 0 : 1); set(i, 6, i % 2 ? 0 : 1); }
+  const al = ALIGN[ver];
+  al.forEach(r0 => al.forEach(c0 => {
+    if (fn[r0][c0]) return;
+    for (let r = -2; r <= 2; r++) for (let c = -2; c <= 2; c++)
+      set(r0 + r, c0 + c, (Math.max(Math.abs(r), Math.abs(c)) === 1) ? 0 : 1);
+  }));
+  set(N - 8, 8, 1);
+  // reserve format areas
+  for (let i = 0; i < 8; i++) { fn[8][i] = true; fn[i][8] = true; fn[8][N - 1 - i] = true; fn[N - 1 - i][8] = true; }
+  fn[8][8] = true;
+
+  // --- place data ---
+  let bi = 0;
+  const total = out.length * 8;
+  for (let c = N - 1; c > 0; c -= 2) {
+    if (c === 6) c--;
+    for (let k = 0; k < N; k++) {
+      const r = ((N - 1 - c) / 2) % 2 === 0 ? N - 1 - k : k;
+      for (let d = 0; d < 2; d++) {
+        const cc = c - d;
+        if (fn[r][cc]) continue;
+        m[r][cc] = bi < total ? (out[bi >> 3] >> (7 - (bi & 7))) & 1 : 0;
+        bi++;
+      }
+    }
+  }
+
+  // --- masks ---
+  const MASK = [
+    (r, c) => (r + c) % 2 === 0, (r, c) => r % 2 === 0, (r, c) => c % 3 === 0,
+    (r, c) => (r + c) % 3 === 0, (r, c) => ((r >> 1) + Math.floor(c / 3)) % 2 === 0,
+    (r, c) => (r * c) % 2 + (r * c) % 3 === 0, (r, c) => ((r * c) % 2 + (r * c) % 3) % 2 === 0,
+    (r, c) => ((r + c) % 2 + (r * c) % 3) % 2 === 0,
+  ];
+  const applyFormat = (g, mask) => {
+    let f = (LEVEL_BITS[level] << 3) | mask, v = f << 10;
+    for (let i = 14; i >= 10; i--) if ((v >> i) & 1) v ^= 0x537 << (i - 10);
+    f = ((f << 10) | v) ^ 0x5412;
+    const bit = i => (f >> i) & 1;
+    for (let i = 0; i < 6; i++) { g[8][i] = bit(14 - i); g[i][8] = bit(i); }
+    g[8][7] = bit(8); g[8][8] = bit(7); g[7][8] = bit(6);
+    for (let i = 0; i < 8; i++) g[8][N - 1 - i] = bit(i);
+    for (let i = 0; i < 7; i++) g[N - 1 - i][8] = bit(14 - i);
+  };
+  const penalty = g => {
+    let p = 0;
+    const run = line => { let s = 0; for (let i = 0; i < N; i++) { let j = i; while (j < N && line(j) === line(i)) j++; if (j - i >= 5) s += 3 + (j - i - 5); i = j - 1; } return s; };
+    for (let i = 0; i < N; i++) { p += run(j => g[i][j]); p += run(j => g[j][i]); }
+    for (let r = 0; r < N - 1; r++) for (let c = 0; c < N - 1; c++) { const v = g[r][c]; if (v === g[r][c + 1] && v === g[r + 1][c] && v === g[r + 1][c + 1]) p += 3; }
+    const pat = [1, 0, 1, 1, 1, 0, 1];
+    const find = line => { let s = 0; for (let i = 0; i + 7 <= N; i++) { let ok = true; for (let k = 0; k < 7; k++) if (line(i + k) !== pat[k]) { ok = false; break; } if (!ok) continue; const before = [0, 1, 2, 3].every(k => i - 1 - k >= 0 && line(i - 1 - k) === 0); const after = [0, 1, 2, 3].every(k => i + 7 + k < N && line(i + 7 + k) === 0); if (before || after) s += 40; } return s; };
+    for (let i = 0; i < N; i++) { p += find(j => g[i][j]); p += find(j => g[j][i]); }
+    let dark = 0; for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) dark += g[r][c];
+    const pct = dark * 100 / (N * N); p += Math.floor(Math.abs(pct - 50) / 5) * 10;
+    return p;
+  };
+  let best = null, bestP = Infinity;
+  for (let mk = 0; mk < 8; mk++) {
+    const g = m.map(r => r.slice());
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (!fn[r][c] && MASK[mk](r, c)) g[r][c] ^= 1;
+    applyFormat(g, mk);
+    const p = penalty(g);
+    if (p < bestP) { bestP = p; best = g; }
+  }
+  return best;
+}
+
+
+(() => {
+  const g = qrMatrix("https://ashdown.win", "Q"), N = g.length, Z = 1;
+  let d = "";
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (g[r][c]) d += `M${c + Z} ${r + Z}h1v1h-1z`;
+  const svg = document.getElementById("qr");
+  svg.setAttribute("viewBox", `0 0 ${N + 2 * Z} ${N + 2 * Z}`);
+  svg.innerHTML = `<rect width="${N + 2 * Z}" height="${N + 2 * Z}" fill="#FFFFFF"/><path d="${d}" fill="#222126"/>`;
+})();
+</script>
 </body>
 </html>

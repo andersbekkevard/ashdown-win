@@ -24,6 +24,7 @@
     --display: "Titan One", "Arial Rounded MT Bold", "Fredoka", system-ui, sans-serif;
     --body: "Fredoka", "Arial Rounded MT Bold", system-ui, sans-serif;
     --u: 8px;
+    --dock-h: 96px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; }
@@ -42,7 +43,7 @@
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
-    padding: 0 14px 108px;
+    padding: 0 14px calc(var(--dock-h) + 24px + env(safe-area-inset-bottom));
     position: relative;
   }
   @media (min-width: 700px) {
@@ -88,6 +89,7 @@
     text-shadow: 0 2px 0 rgba(0,0,0,0.25);
     transition: transform 80ms, box-shadow 80ms;
     user-select: none;
+    white-space: nowrap;
   }
   .btn:active, .btn.pressed { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
   .btn.blue { background: var(--blue); }
@@ -111,6 +113,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .wobble, .pop-in, .confetti i { animation: none !important; }
+    .switch .knob { transition: none !important; }
   }
 
   /* --- top bar --- */
@@ -147,31 +150,38 @@
     border: 0;
     font-family: var(--body);
     cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
   }
+  .chip svg { width: 14px; height: 14px; }
+  body.at-home .chip.back { display: none; }
+  body:not(.at-home) .chip.how { display: none; }
 
   /* --- screens --- */
   .screen { display: none; }
   .screen.active { display: block; }
-  h1.shout { font-size: 40px; margin: 8px 0 14px; transform: rotate(-1.5deg); }
+  h1.shout { font-size: 34px; margin: 8px 0 16px; transform: rotate(-1.5deg); }
   h2.shout { font-size: 26px; margin: 0; }
 
-  /* --- home --- */
-  .actions { display: grid; gap: 14px; margin: 6px 0 22px; }
-  .actions .btn { font-size: 24px; padding: 20px 22px; }
-
+  /* --- home: the board is the hero --- */
+  .kicker {
+    color: var(--paper); font-weight: 700; font-size: 14px; text-align: center;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.3); margin: 0 0 12px; letter-spacing: 0.02em;
+  }
   .board { padding: 4px 0 6px; overflow: hidden; }
   .board-head {
     display: flex; justify-content: space-between; align-items: center;
     padding: 12px 18px 10px;
     border-bottom: 3px dashed #e9ecf4;
   }
-  .board-head .count { font-weight: 700; color: var(--lilac); font-size: 14px; }
+  .board-head h1 { font-size: 30px; margin: 0; transform: rotate(-1.5deg); }
+  .board-head .count { font-weight: 700; color: var(--lilac); font-size: 14px; text-align: right; line-height: 1.15; }
+  .board-head .count small { display: block; color: #8a8fa3; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
   .row {
     display: grid;
-    grid-template-columns: 52px 1fr auto;
+    grid-template-columns: 48px 1fr auto;
     align-items: center;
     gap: 12px;
-    padding: 10px 14px 10px 12px;
+    padding: 9px 14px 9px 12px;
     border-bottom: 2px solid #f0f2f8;
     cursor: pointer;
     transition: background 120ms;
@@ -180,7 +190,7 @@
   .row:active { background: var(--cream); }
   .row.top1 { background: linear-gradient(90deg, #fff3c2, #fff 70%); }
   .hex {
-    width: 46px; height: 46px;
+    width: 44px; height: 44px;
     display: grid; place-items: center;
     font-family: var(--display);
     font-size: 20px;
@@ -221,21 +231,45 @@
   .foot-link a { color: var(--paper); }
 
   /* --- record --- */
-  .segmented {
-    display: grid; grid-template-columns: 1fr 1fr;
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 12px 14px 12px 18px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle-row .tlabel b { display: block; font-family: var(--display); font-weight: 400; font-size: 19px; text-transform: uppercase; letter-spacing: 0.02em; }
+  .toggle-row .tlabel span { display: block; font-size: 13px; font-weight: 600; color: #6b7080; margin-top: 2px; }
+  .toggle-row.on .tlabel b { color: var(--raspberry); }
+  .switch {
+    flex: none;
+    width: 78px; height: 44px;
+    border-radius: 999px;
+    border: 3px solid var(--ink);
+    background: #dfe3ef;
+    box-shadow: 0 4px 0 var(--ink);
+    position: relative;
+    padding: 0; margin: 0;
+    cursor: pointer;
+    transition: background 160ms;
+    font-family: var(--display);
+  }
+  .switch .knob {
+    position: absolute; top: 3px; left: 3px;
+    width: 32px; height: 32px; border-radius: 50%;
     background: var(--paper);
     border: 3px solid var(--ink);
-    border-radius: 999px;
-    padding: 4px;
-    box-shadow: 0 4px 0 var(--ink);
-    margin-bottom: 18px;
+    box-shadow: 0 2px 0 var(--ink);
+    display: grid; place-items: center;
+    font-size: 10px; color: #8a8fa3; text-transform: uppercase; letter-spacing: 0.02em;
+    transition: transform 200ms cubic-bezier(.3,1.5,.5,1), color 160ms;
   }
-  .segmented button {
-    font-family: var(--display); font-size: 17px; text-transform: uppercase;
-    border: 0; border-radius: 999px; padding: 10px; background: transparent; color: #8a8fa3; cursor: pointer;
-    transition: background 120ms, color 120ms;
-  }
-  .segmented button.on { background: var(--pink); color: var(--paper); text-shadow: 0 2px 0 var(--raspberry); }
+  .switch .knob::after { content: "1v1"; }
+  .switch[aria-checked="true"] { background: var(--pink); }
+  .switch[aria-checked="true"] .knob { transform: translateX(34px); color: var(--raspberry); }
+  .switch[aria-checked="true"] .knob::after { content: "2v2"; }
+  .switch:active .knob { transform: scale(0.94); }
+  .switch[aria-checked="true"]:active .knob { transform: translateX(34px) scale(0.94); }
 
   .side {
     padding: 14px 14px 16px;
@@ -269,7 +303,7 @@
   .field input::placeholder { color: #a0a5b8; font-weight: 500; }
   .field .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; }
   .field.partner { display: none; }
-  .doubles .field.partner { display: block; }
+  .doubles .field.partner { display: block; animation: popin 260ms cubic-bezier(.2,1.4,.4,1); }
   .sugg {
     position: absolute; left: 0; right: 0; top: calc(100% + 6px);
     background: var(--paper);
@@ -297,7 +331,7 @@
   }
 
   .winner-title { text-align: center; font-weight: 700; font-size: 15px; color: var(--paper); text-shadow: 0 2px 0 rgba(0,0,0,0.3); margin: 6px 0 10px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .winners { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .winners { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
   .win {
     min-height: 118px;
     border: 4px solid var(--ink);
@@ -330,6 +364,7 @@
     padding: 4px 10px; border-radius: 999px; border: 3px solid var(--ink);
     transform: rotate(6deg);
   }
+  #kHint { margin-top: 16px; font-size: 13px; }
 
   /* --- result overlay --- */
   .overlay {
@@ -399,13 +434,83 @@
   .card { padding: 16px; margin-bottom: 18px; }
   .card h3 { font-family: var(--display); font-weight: 400; font-size: 18px; text-transform: uppercase; margin: 0 0 10px; display: flex; justify-content: space-between; align-items: center; }
   .card h3 span { font-family: var(--body); font-weight: 700; font-size: 13px; color: #6b7080; }
-  .graph { width: 100%; height: auto; display: block; }
+  .card.graph-card { padding: 16px 10px 12px 10px; }
+  .card.graph-card h3 { padding: 0 6px; }
+
+  /* --- rating graph --- */
+  .graph-wrap { position: relative; touch-action: pan-y; }
+  .graph { width: 100%; height: auto; display: block; overflow: visible; cursor: crosshair; }
+  .graph text { font-family: "Fredoka", "Arial Rounded MT Bold", system-ui, sans-serif; font-weight: 700; }
+  .graph .grid { stroke: #eceef5; stroke-width: 2; }
+  .graph .tick { fill: #8a8fa3; font-size: 11px; }
+  .graph .tick.base { fill: var(--lilac); font-size: 12px; }
+  .graph .base-line { stroke: var(--lilac); stroke-width: 2.5; stroke-dasharray: 5 6; stroke-linecap: round; }
+  .graph .base-cap { fill: var(--lilac); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .graph .area-up { fill: var(--mint); opacity: 0.32; }
+  .graph .area-down { fill: var(--pink); opacity: 0.28; }
+  .graph .ink { fill: none; stroke: var(--ink); stroke-width: 7.5; stroke-linejoin: round; stroke-linecap: round; }
+  .graph .seg { fill: none; stroke-width: 3.5; stroke-linecap: round; }
+  .graph .seg.up { stroke: var(--mint); }
+  .graph .seg.down { stroke: var(--pink); }
+  .graph .pt { stroke: var(--ink); stroke-width: 2.5; transition: r 120ms; }
+  .graph .pt.up { fill: var(--mint); }
+  .graph .pt.down { fill: var(--pink); }
+  .graph .pt.start { fill: var(--lilac); }
+  .graph .pt.last { fill: var(--gold); }
+  .graph .pt.hot { r: 8; }
+  .graph .hl { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 3 4; opacity: 0; }
+  .graph .hl.on { opacity: 0.55; }
+  .graph .now rect { fill: var(--gold); stroke: var(--ink); stroke-width: 2.5; }
+  .graph .now .val { font-family: "Titan One", "Fredoka", sans-serif; font-weight: 400; font-size: 16px; fill: var(--ink); }
+  .graph .now .cap { font-size: 9px; fill: var(--ink); text-transform: uppercase; letter-spacing: 0.1em; }
+  .graph .now .stem { stroke: var(--ink); stroke-width: 2.5; }
+  .graph .axis { fill: #8a8fa3; font-size: 11px; }
+  .tip {
+    position: absolute; z-index: 5;
+    background: var(--paper); border: 3px solid var(--ink); border-radius: 16px;
+    box-shadow: 0 4px 0 var(--ink);
+    padding: 8px 12px 9px;
+    font-size: 13px; line-height: 1.25; white-space: nowrap;
+    pointer-events: none; opacity: 0;
+    transform: translate(-50%, calc(-100% - 18px));
+    transition: opacity 100ms;
+  }
+  .tip.show { opacity: 1; }
+  .tip::after {
+    content: ""; position: absolute; left: 50%; bottom: -10px; width: 14px; height: 14px;
+    background: var(--paper); border-right: 3px solid var(--ink); border-bottom: 3px solid var(--ink);
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .tip.l { transform: translate(-22px, calc(-100% - 18px)); }
+  .tip.l::after { left: 22px; }
+  .tip.r { transform: translate(calc(-100% + 22px), calc(-100% - 18px)); }
+  .tip.r::after { left: auto; right: 15px; transform: rotate(45deg); }
+  .tip .tdate { font-size: 11px; font-weight: 700; color: #8a8fa3; text-transform: uppercase; letter-spacing: 0.06em; }
+  .tip .twho { font-weight: 700; font-size: 15px; margin: 2px 0 5px; }
+  .tip .twho small { font-weight: 600; color: #6b7080; font-size: 12px; }
+  .tip .tline { display: flex; align-items: center; gap: 7px; font-weight: 700; color: #6b7080; }
+  .tip .d {
+    font-family: var(--display); font-weight: 400; font-size: 15px;
+    padding: 2px 10px; border-radius: 999px; border: 2.5px solid var(--ink);
+  }
+  .tip .d.up { background: var(--mint); color: var(--ink); }
+  .tip .d.down { background: var(--pink); color: var(--paper); text-shadow: 0 1px 0 var(--raspberry); }
+  .tip .d.start { background: var(--lilac); color: var(--paper); }
+  .tip .tline b { color: var(--ink); font-size: 15px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 10px 6px 0; font-size: 12px; font-weight: 700; color: #6b7080; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--ink); vertical-align: -2px; margin-right: 4px; }
+  .legend i.up { background: var(--mint); }
+  .legend i.down { background: var(--pink); }
+  .legend i.base { width: 18px; height: 0; border: 0; border-top: 3px dashed var(--lilac); border-radius: 0; vertical-align: 2px; }
+  .legend .hint { margin-left: auto; color: var(--deep); }
 
   .match {
     display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
     padding: 10px 0; border-bottom: 2px solid #f0f2f8;
+    cursor: pointer; border-radius: 8px;
   }
   .match:last-child { border-bottom: 0; }
+  .match:active { background: var(--cream); }
   .match .opp { font-weight: 700; font-size: 16px; line-height: 1.15; }
   .match .meta { font-size: 13px; color: #6b7080; font-weight: 600; margin-top: 3px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   .match .meta .type { background: var(--lilac); color: var(--paper); padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -426,7 +531,7 @@
     background: var(--paper);
     border: 4px solid var(--ink); border-bottom: 0;
     border-radius: 28px 28px 0 0;
-    padding: 18px 18px 28px;
+    padding: 18px 18px calc(28px + env(safe-area-inset-bottom));
     box-shadow: 0 -6px 0 var(--pink);
   }
   .sheet h2 { font-size: 30px; margin: 4px 0 12px; }
@@ -438,7 +543,7 @@
   .sheet .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
   .toast {
-    position: fixed; left: 50%; bottom: 112px; transform: translateX(-50%) translateY(20px);
+    position: fixed; left: 50%; bottom: calc(var(--dock-h) + 16px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
     background: var(--ink); color: var(--paper); font-weight: 700; font-size: 15px;
     padding: 12px 18px; border-radius: 999px; border: 3px solid var(--paper);
     box-shadow: 0 5px 0 rgba(0,0,0,0.4); opacity: 0; pointer-events: none; z-index: 120;
@@ -446,34 +551,25 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* --- bottom tabs --- */
-  nav.tabs {
+  /* --- bottom action dock: primary actions within thumb reach --- */
+  .dock {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 80;
     display: flex; justify-content: center;
-    padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+    padding: 26px 14px calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(0,181,254,1) 0%, rgba(0,181,254,0.96) 55%, rgba(0,181,254,0) 100%);
     pointer-events: none;
   }
-  nav.tabs .bar {
-    pointer-events: auto;
-    width: 100%; max-width: 402px;
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
-    background: var(--paper);
-    border: 3px solid var(--ink); border-radius: 999px;
-    padding: 6px;
-    box-shadow: 0 6px 0 var(--ink);
+  .dock .group { pointer-events: auto; width: 100%; max-width: 402px; display: none; gap: 10px; }
+  .dock .group.on { display: grid; }
+  .dock .group.two { grid-template-columns: 1.15fr 1fr; }
+  .dock .btn { font-size: 18px; padding: 16px 12px; }
+  .dock .btn svg { width: 22px; height: 22px; }
+  @media (max-width: 370px) {
+    .dock .btn { font-size: 16px; gap: 6px; padding: 16px 8px; }
   }
-  nav.tabs button {
-    font-family: var(--display); font-size: 15px; text-transform: uppercase;
-    border: 0; background: transparent; color: #8a8fa3;
-    border-radius: 999px; padding: 12px 4px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: background 120ms, color 120ms;
-  }
-  nav.tabs button svg { width: 20px; height: 20px; }
-  nav.tabs button.on { background: var(--pink); color: var(--paper); text-shadow: 0 2px 0 var(--raspberry); }
 </style>
 </head>
-<body>
+<body class="at-home">
 <div class="phone">
 
   <header>
@@ -481,41 +577,33 @@
       <svg viewBox="0 0 64 48"><path d="M6 40 L2 12 L20 24 L32 4 L44 24 L62 12 L58 40 Z" fill="#FFD046" stroke="#222126" stroke-width="5" stroke-linejoin="round"/><rect x="6" y="38" width="52" height="8" rx="3" fill="#FFFFFF" stroke="#222126" stroke-width="5"/></svg>
       ashdown.win
     </a>
-    <button class="chip" type="button" onclick="toast('The algorithm page: the Elo maths as a short paper.')">how it works</button>
+    <button class="chip how" type="button" onclick="toast('The algorithm page: the Elo maths as a short paper.')">how it works</button>
+    <button class="chip back" type="button" data-go="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      Board
+    </button>
   </header>
 
   <!-- ================= HOME ================= -->
   <section class="screen active" id="home">
-    <h1 class="shout">Table tennis ladder</h1>
-
-    <div class="actions">
-      <button class="btn" type="button" data-go="record">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5 L20 20"/><path d="M17 3l4 4"/></svg>
-        Record match
-      </button>
-      <button class="btn blue" type="button" onclick="openSheet()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        Create player
-      </button>
-    </div>
-
+    <p class="kicker">Ashdown House table tennis ladder · every match is public</p>
     <div class="board slab">
       <div class="board-head">
-        <h2 class="shout" style="font-size:24px">The board</h2>
+        <h1 class="shout">The board</h1>
         <span class="count" id="boardCount"></span>
       </div>
       <div id="board"></div>
     </div>
-    <p class="foot-link">Every match is public. <a href="#" onclick="toast('The full match log, newest first.');return false;">See the log</a> · <a href="#" onclick="toast('github.com/andersbekkevard/ashdown-win');return false;">Source</a></p>
+    <p class="foot-link"><a href="#" onclick="toast('The full match log, newest first.');return false;">See the log</a> · <a href="#" onclick="toast('github.com/andersbekkevard/ashdown-win');return false;">Source</a></p>
   </section>
 
   <!-- ================= RECORD ================= -->
   <section class="screen" id="record">
     <h1 class="shout">Record a match</h1>
 
-    <div class="segmented" role="tablist">
-      <button type="button" class="on" id="segSingles" onclick="setDoubles(false)">Singles</button>
-      <button type="button" id="segDoubles" onclick="setDoubles(true)">Doubles</button>
+    <div class="toggle-row slab" id="dblRow">
+      <div class="tlabel"><b>Doubles</b><span id="dblHint">Off · one player a side, K = 32</span></div>
+      <button type="button" class="switch" role="switch" aria-checked="false" aria-label="Doubles" id="dblSwitch"><span class="knob"></span></button>
     </div>
 
     <form id="form" autocomplete="off" onsubmit="submitMatch(event)">
@@ -562,11 +650,6 @@
           <div class="tag">won</div>
         </div>
       </div>
-
-      <button class="btn" type="submit" id="submitBtn" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>
-        Record it
-      </button>
       <p class="foot-link" id="kHint"></p>
     </form>
   </section>
@@ -582,31 +665,46 @@
       </div>
     </div>
 
-    <div class="card slab">
+    <div class="card slab graph-card">
       <h3>Rating over time <span id="gSpan"></span></h3>
-      <svg class="graph" id="graph" viewBox="0 0 360 180" role="img" aria-label="Rating history line graph"></svg>
+      <div class="graph-wrap" id="graphWrap">
+        <svg class="graph" id="graph" viewBox="0 0 360 210" role="img" aria-label="Rating after each match, starting at 1000"></svg>
+        <div class="tip" id="tip" aria-live="polite"></div>
+      </div>
+      <div class="legend">
+        <span><i class="up"></i>won</span>
+        <span><i class="down"></i>lost</span>
+        <span><i class="base"></i>start, 1000</span>
+        <span class="hint" id="gHint">tap a dot</span>
+      </div>
     </div>
 
     <div class="card slab">
-      <h3>Recent matches <span>newest first</span></h3>
+      <h3>All matches <span>newest first</span></h3>
       <div id="matches"></div>
     </div>
   </section>
-
-  <nav class="tabs">
-    <div class="bar">
-      <button type="button" class="on" data-go="home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10l8-6 8 6v10H4z"/></svg>Board
-      </button>
-      <button type="button" data-go="record">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Record
-      </button>
-      <button type="button" data-go="player">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Player
-      </button>
-    </div>
-  </nav>
 </div>
+
+<!-- bottom action dock -->
+<nav class="dock" aria-label="Actions">
+  <div class="group two on" id="dockMain">
+    <button class="btn" type="button" data-go="record">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5 L20 20"/><path d="M17 3l4 4"/></svg>
+      Record match
+    </button>
+    <button class="btn blue" type="button" onclick="openSheet()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Create player
+    </button>
+  </div>
+  <div class="group" id="dockRecord">
+    <button class="btn" type="submit" form="form" id="submitBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>
+      Record it
+    </button>
+  </div>
+</nav>
 
 <!-- result overlay -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeOverlay()">
@@ -673,15 +771,41 @@ const DATA = {
   }
 };
 
+// One match per step of `history`, oldest first, so the graph tooltip and the
+// match list agree with each other. Deltas are derived from `history`; the
+// opponents and dates are mockup fill (data.json only names the last six).
+const TIMELINE = [
+  { date: "2026-08-21", type: "singles", opponent: "Lukas Weber" },
+  { date: "2026-08-22", type: "singles", opponent: "Hannah Cohen" },
+  { date: "2026-08-24", type: "singles", opponent: "Mei Nakamura" },
+  { date: "2026-08-25", type: "singles", opponent: "Tomás Ferreira" },
+  { date: "2026-08-27", type: "singles", opponent: "Daniel Okafor" },
+  { date: "2026-08-29", type: "singles", opponent: "The Ghost of 4th Floor" },
+  { date: "2026-08-31", type: "singles", opponent: "Mei Nakamura" },
+  { date: "2026-09-01", type: "singles", opponent: "Ravi Menon" },
+  { date: "2026-09-02", type: "singles", opponent: "Tomás Ferreira" },
+  { date: "2026-09-03", type: "singles", opponent: "Hannah Cohen" },
+  { date: "2026-09-04", type: "singles", opponent: "Lukas Weber" },
+  { date: "2026-09-05", type: "doubles", partner: "Mei Nakamura", opponent: "Tomás Ferreira & Daniel Okafor" },
+  { date: "2026-09-06", type: "singles", opponent: "Priya Raman" },
+  { date: "2026-09-06", type: "singles", opponent: "jchen26" }
+].map((m, i) => {
+  const h = DATA.player.history, delta = h[i + 1] - h[i];
+  return Object.assign(m, { delta, result: delta >= 0 ? "win" : "loss", before: h[i], after: h[i + 1] });
+});
+
 const CROWN = '<svg viewBox="0 0 64 48"><path d="M6 40 L2 12 L20 24 L32 4 L44 24 L62 12 L58 40 Z" fill="#FFD046" stroke="#222126" stroke-width="5" stroke-linejoin="round"/><rect x="6" y="38" width="52" height="8" rx="3" fill="#FFFFFF" stroke="#222126" stroke-width="5"/></svg>';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmtDate = iso => new Date(iso + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 
 /* ---------- navigation ---------- */
 function go(id) {
   $$(".screen").forEach(s => s.classList.toggle("active", s.id === id));
-  $$("nav.tabs button").forEach(b => b.classList.toggle("on", b.dataset.go === id));
+  document.body.className = "at-" + id;
+  $("#dockMain").classList.toggle("on", id !== "record");
+  $("#dockRecord").classList.toggle("on", id === "record");
   const sc = $("#" + id);
   sc.classList.remove("pop-in"); void sc.offsetWidth; sc.classList.add("pop-in");
   window.scrollTo(0, 0);
@@ -715,7 +839,8 @@ function renderBoard() {
       <div class="rating">${p.rating}</div>
     </div>`;
   }).join("");
-  $("#boardCount").textContent = rows.length + " players";
+  const played = rows.reduce((t, p) => t + p.matches, 0) / 2;
+  $("#boardCount").innerHTML = `${rows.length} players<small>${Math.round(played)} matches</small>`;
   $$(".row", board).forEach(r => r.addEventListener("click", () => {
     wobble(r);
     if (r.dataset.name === DATA.player.name) go("player");
@@ -731,11 +856,16 @@ const ratingOf = n => (DATA.leaderboard.find(p => p.name === n) || { rating: DAT
 function setDoubles(on) {
   state.doubles = on;
   $("#form").classList.toggle("doubles", on);
-  $("#segSingles").classList.toggle("on", !on);
-  $("#segDoubles").classList.toggle("on", on);
-  wobble(on ? $("#segDoubles") : $("#segSingles"));
+  $("#dblSwitch").setAttribute("aria-checked", on ? "true" : "false");
+  $("#dblRow").classList.toggle("on", on);
+  $("#dblHint").textContent = on
+    ? `On · two a side, K = ${DATA.constants.kDoubles}, partners move together`
+    : `Off · one player a side, K = ${DATA.constants.kSingles}`;
+  if (!on) { state.slots.a2 = ""; state.slots.b2 = ""; $$("#form input[data-slot$='2']").forEach(i => i.value = ""); }
   refreshWinners();
 }
+$("#dblRow").addEventListener("click", () => setDoubles(!state.doubles));
+$("#dblSwitch").addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); setDoubles(!state.doubles); } });
 
 $$("#form input[data-slot]").forEach(inp => {
   const box = inp.parentElement.querySelector(".sugg");
@@ -867,55 +997,125 @@ function renderPlayer() {
   $("#pRating").textContent = p.rating;
   $("#pRank").innerHTML = "#" + p.rank + "<small>RANK</small>";
   $("#pRec").innerHTML = `<span class="w">${p.wins} wins</span><span class="l">${p.matches - p.wins} losses</span><span>${p.matches} played</span>`;
+  drawGraph();
+  $("#gSpan").textContent = `${p.history.length - 1} matches · high ${Math.max(...p.history)}`;
 
-  // graph, drawn by hand
-  const h = p.history, W = 360, H = 180, padL = 40, padR = 16, padT = 18, padB = 26;
-  const lo = Math.min(...h, DATA.constants.start) - 12, hi = Math.max(...h) + 12;
-  const x = i => padL + (i / (h.length - 1)) * (W - padL - padR);
-  const y = v => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
-  const pts = h.map((v, i) => [x(i), y(v)]);
-  const line = pts.map(([px, py], i) => (i ? "L" : "M") + px.toFixed(1) + " " + py.toFixed(1)).join(" ");
-  const area = line + ` L${x(h.length - 1).toFixed(1)} ${(H - padB).toFixed(1)} L${padL} ${(H - padB).toFixed(1)} Z`;
-  const ticks = [];
-  for (let v = Math.ceil(lo / 25) * 25; v <= hi; v += 25) ticks.push(v);
-  let svg = "";
-  svg += ticks.map(v => `<line x1="${padL}" x2="${W - padR}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="#eceef5" stroke-width="2"/>
-    <text x="${padL - 8}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" font-size="11" font-weight="700" fill="#8a8fa3" font-family="Fredoka, system-ui, sans-serif">${v}</text>`).join("");
-  svg += `<line x1="${padL}" x2="${W - padR}" y1="${y(DATA.constants.start).toFixed(1)}" y2="${y(DATA.constants.start).toFixed(1)}" stroke="#7C7BE8" stroke-width="2" stroke-dasharray="4 5"/>`;
-  svg += `<path d="${area}" fill="#00B5FE" opacity="0.18"/>`;
-  svg += `<path d="${line}" fill="none" stroke="#222126" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>`;
-  svg += `<path d="${line}" fill="none" stroke="#00B5FE" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>`;
-  svg += pts.map(([px, py], i) => {
-    const up = i === 0 || h[i] >= h[i - 1];
-    const last = i === pts.length - 1;
-    return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${last ? 7 : 4.5}" fill="${last ? "#FCC601" : up ? "#5EEAC0" : "#FB3AA3"}" stroke="#222126" stroke-width="2.5"/>`;
-  }).join("");
-  const [lx, ly] = pts[pts.length - 1];
-  svg += `<g transform="translate(${(lx - 46).toFixed(1)} ${(ly - 36).toFixed(1)})"><rect width="44" height="22" rx="11" fill="#FCC601" stroke="#222126" stroke-width="2.5"/><text x="22" y="15" text-anchor="middle" font-size="12" font-weight="700" fill="#222126" font-family="Fredoka, system-ui, sans-serif">${h[h.length - 1]}</text></g>`;
-  svg += `<text x="${padL}" y="${H - 6}" font-size="11" font-weight="700" fill="#8a8fa3" font-family="Fredoka, system-ui, sans-serif">first match</text>
-          <text x="${W - padR}" y="${H - 6}" text-anchor="end" font-size="11" font-weight="700" fill="#8a8fa3" font-family="Fredoka, system-ui, sans-serif">now</text>`;
-  $("#graph").innerHTML = svg;
-  $("#gSpan").textContent = `${h.length - 1} matches · high ${Math.max(...h)}`;
-
-  $("#matches").innerHTML = p.recent.map(m => {
-    const d = new Date(m.date + "T12:00:00");
-    const date = d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  $("#matches").innerHTML = TIMELINE.map((m, i) => {
     const partner = m.partner ? ` <span>with ${esc(m.partner)}</span>` : "";
-    return `<div class="match">
+    return `<div class="match" data-i="${i + 1}">
       <div>
         <div class="opp">${m.result === "win" ? "beat" : "lost to"} ${esc(m.opponent)}</div>
-        <div class="meta"><span class="type ${m.type}">${m.type}</span>${partner}<span>${date}</span></div>
+        <div class="meta"><span class="type ${m.type}">${m.type}</span>${partner}<span>${fmtDate(m.date)}</span></div>
       </div>
       <div class="delta ${m.delta >= 0 ? "up" : "down"}">${m.delta >= 0 ? "+" : ""}${m.delta}</div>
     </div>`;
-  }).join("");
+  }).reverse().join("");
+  $$("#matches .match").forEach(r => r.addEventListener("click", () => {
+    wobble(r.querySelector(".delta"));
+    graphSelect(+r.dataset.i, true);
+    $("#graphWrap").scrollIntoView({ behavior: "smooth", block: "center" });
+  }));
 }
+
+/* ---------- rating graph ---------- */
+// Layout is in viewBox units; the tooltip is HTML positioned by percentage so
+// it scales with the card. The right margin leaves room for the NOW pill.
+const G = { W: 360, H: 210, padL: 44, padR: 84, padT: 24, padB: 30, x: null, y: null, n: 0, pinned: false };
+function drawGraph() {
+  const h = DATA.player.history, n = h.length, start = DATA.constants.start;
+  const { W, H, padL, padR, padT, padB } = G;
+  let lo = Math.min(...h, start), hi = Math.max(...h, start);
+  lo = Math.floor((lo - 8) / 25) * 25; hi = Math.ceil((hi + 8) / 25) * 25;
+  const x = i => padL + (n === 1 ? 0.5 : i / (n - 1)) * (W - padL - padR);
+  const y = v => padT + (hi - v) / (hi - lo) * (H - padT - padB);
+  G.x = x; G.y = y; G.n = n;
+  const yb = y(start), x0 = x(0), xN = x(n - 1);
+  let s = "";
+  // grid and tick labels
+  for (let v = lo; v <= hi; v += 25) {
+    if (v !== start) s += `<line class="grid" x1="${padL}" x2="${W - padR + 6}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>`;
+    s += `<text class="tick ${v === start ? "base" : ""}" x="${padL - 8}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v}</text>`;
+  }
+  // the 1000 start line, labelled so a newcomer knows what it is
+  s += `<line class="base-line" x1="${padL}" x2="${W - padR + 6}" y1="${yb.toFixed(1)}" y2="${yb.toFixed(1)}"/>`;
+  const above = h.filter(v => v >= start).length >= n / 2;
+  s += `<text class="base-cap" x="${W - padR + 4}" y="${(above ? yb + 13 : yb - 6).toFixed(1)}" text-anchor="end">everyone starts here</text>`;
+  // area between the line and the start line: mint above, pink below
+  const line = h.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ");
+  const area = `${line} L${xN.toFixed(1)} ${yb.toFixed(1)} L${x0.toFixed(1)} ${yb.toFixed(1)} Z`;
+  s += `<clipPath id="clipUp"><rect x="0" y="0" width="${W}" height="${yb.toFixed(1)}"/></clipPath>
+        <clipPath id="clipDown"><rect x="0" y="${yb.toFixed(1)}" width="${W}" height="${(H - yb).toFixed(1)}"/></clipPath>
+        <path class="area-up" d="${area}" clip-path="url(#clipUp)"/>
+        <path class="area-down" d="${area}" clip-path="url(#clipDown)"/>`;
+  // hover line sits behind the line itself
+  s += `<line class="hl" id="hl" x1="0" x2="0" y1="${padT - 6}" y2="${(H - padB + 4)}"/>`;
+  // ink underlay, then one coloured segment per match: up is mint, down is pink
+  s += `<path class="ink" d="${line}"/>`;
+  for (let i = 1; i < n; i++) {
+    s += `<path class="seg ${h[i] >= h[i - 1] ? "up" : "down"}" d="M${x(i - 1).toFixed(1)} ${y(h[i - 1]).toFixed(1)} L${x(i).toFixed(1)} ${y(h[i]).toFixed(1)}"/>`;
+  }
+  // dots
+  for (let i = 0; i < n; i++) {
+    const cls = i === 0 ? "start" : i === n - 1 ? "last" : h[i] >= h[i - 1] ? "up" : "down";
+    s += `<circle class="pt ${cls}" id="pt${i}" cx="${x(i).toFixed(1)}" cy="${y(h[i]).toFixed(1)}" r="${i === n - 1 ? 7 : 4.5}"/>`;
+  }
+  // NOW pill to the right of the last dot, level with it
+  const lx = xN, ly = y(h[n - 1]);
+  const pw = 66, ph = 30, px = lx + 14, py = Math.max(padT - 10, Math.min(H - padB - ph, ly - ph / 2));
+  s += `<g class="now">
+          <line class="stem" x1="${(lx + 7).toFixed(1)}" x2="${px.toFixed(1)}" y1="${ly.toFixed(1)}" y2="${ly.toFixed(1)}"/>
+          <rect x="${px}" y="${py.toFixed(1)}" width="${pw}" height="${ph}" rx="${ph / 2}"/>
+          <text class="val" x="${px + pw / 2}" y="${(py + ph / 2 + 6).toFixed(1)}" text-anchor="middle">${h[n - 1]}</text>
+          <text class="cap" x="${px + pw / 2}" y="${(py - 5).toFixed(1)}" text-anchor="middle">now</text>
+        </g>`;
+  // x axis
+  s += `<text class="axis" x="${x0}" y="${H - 8}">${fmtDate(TIMELINE[0].date)}</text>
+        <text class="axis" x="${xN}" y="${H - 8}" text-anchor="end">${fmtDate(TIMELINE[n - 2].date)}</text>`;
+  $("#graph").innerHTML = s;
+}
+function graphIndexAt(e) {
+  const svg = $("#graph"), r = svg.getBoundingClientRect();
+  const sx = (e.clientX - r.left) * G.W / r.width;
+  const step = (G.W - G.padL - G.padR) / Math.max(G.n - 1, 1);
+  return Math.max(0, Math.min(G.n - 1, Math.round((sx - G.padL) / step)));
+}
+function graphSelect(i, pin) {
+  const h = DATA.player.history, tip = $("#tip");
+  $$("#graph .pt").forEach((c, k) => c.classList.toggle("hot", k === i));
+  const hl = $("#hl"); hl.setAttribute("x1", G.x(i)); hl.setAttribute("x2", G.x(i)); hl.classList.add("on");
+  if (i === 0) {
+    tip.innerHTML = `<div class="tdate">joined the ladder</div><div class="twho">Everyone starts here</div><div class="tline"><span class="d start">${h[0]}</span></div>`;
+  } else {
+    const m = TIMELINE[i - 1];
+    tip.innerHTML = `<div class="tdate">${fmtDate(m.date)} · ${m.type}</div>
+      <div class="twho">${m.result === "win" ? "beat" : "lost to"} ${esc(m.opponent)}${m.partner ? `<br><small>with ${esc(m.partner)}</small>` : ""}</div>
+      <div class="tline"><span class="d ${m.delta >= 0 ? "up" : "down"}">${m.delta >= 0 ? "+" : ""}${m.delta}</span><span>${m.before} → <b>${m.after}</b></span></div>`;
+  }
+  const fx = G.x(i) / G.W, fy = G.y(h[i]) / G.H;
+  tip.style.left = (fx * 100) + "%"; tip.style.top = (fy * 100) + "%";
+  tip.className = "tip show " + (fx < 0.3 ? "l" : fx > 0.62 ? "r" : "");
+  if (pin) G.pinned = true;
+  $("#gHint").textContent = i === 0 ? "start" : "match " + i + " of " + (G.n - 1);
+}
+function graphClear() {
+  if (G.pinned) return;
+  $("#tip").classList.remove("show"); $("#hl").classList.remove("on");
+  $$("#graph .pt").forEach(c => c.classList.remove("hot"));
+  $("#gHint").textContent = "tap a dot";
+}
+(() => {
+  const wrap = $("#graphWrap");
+  wrap.addEventListener("pointermove", e => { if (e.pointerType === "mouse" || e.buttons) graphSelect(graphIndexAt(e), false); });
+  wrap.addEventListener("pointerdown", e => { graphSelect(graphIndexAt(e), true); });
+  wrap.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") graphClear(); });
+  document.addEventListener("pointerdown", e => { if (!e.target.closest("#graphWrap") && !e.target.closest(".match")) { G.pinned = false; graphClear(); } });
+})();
 
 /* ---------- boot ---------- */
 $("#kHint").textContent = `Winner takes K · (1 − E). K = ${DATA.constants.kSingles} singles, ${DATA.constants.kDoubles} doubles. Everyone starts at ${DATA.constants.start}.`;
 renderBoard();
 renderPlayer();
-refreshWinners();
+setDoubles(false);
 const start = (location.hash || "#/home").replace(/^#\/?/, "");
 go(["home", "record", "player"].includes(start) ? start : "home");
 </script>
