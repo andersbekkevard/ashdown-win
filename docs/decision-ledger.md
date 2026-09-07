@@ -29,3 +29,5 @@ conversation, unless a later date is given.
 | 18 | Mobile first, works on desktop. | Matches are recorded standing at the table. | Never. |
 | 19 | Pool or other game ladders are possible later, one match log per game. | The domain and repo name were chosen to allow it. | When table tennis has proven the pattern. |
 | 20 | A "who is at the table now" indicator is out of scope. | Needs presence, which needs identity. | After the social layer, if ever. |
+| 21 | Doubles entry may use either a pill toggle or the Playtomic seat model (a dashed "add partner" slot per side, no mode switch). Decided 2026-09-07 after the mobile-pattern research in `design/research/mobile-patterns.md`. | The seat model removes a mode switch; the toggle was liked in mockups. Both acceptable until a style is chosen. | A style is chosen. |
+| 22 | Primary actions sit in a bottom bar on mobile. No tab bar, no floating plus button. | Found in mockup review and confirmed by the research. | Never for version one. |
