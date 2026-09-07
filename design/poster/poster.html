@@ -319,6 +319,22 @@
   .url .big { font-size: 36pt; margin-top: 4mm; }
   .qr { width: 64mm; height: 64mm; }
   footer { margin-top: 0; }
+  .rule { grid-template-columns: 1fr; gap: 2mm; padding: 3mm 5mm 3.5mm; }
+  .rule .tag { justify-self: start; }
+  .rule .math { text-align: center; }
+  .rule math { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math", "TeX Gyre Termes Math", serif; font-size: 15pt; color: var(--paper); margin: 1mm 0; }
+  .rule math mi { font-style: italic; }
+  .rule .consts { display: flex; justify-content: center; gap: 5mm; font-size: 9.5pt; font-weight: 600; margin-top: 1.5mm; flex-wrap: wrap; }
+  .rule .consts b { color: var(--gold); }
+  .rule { padding: 2.5mm 5mm 3mm; gap: 1mm; }
+  .rule math { font-size: 13pt; margin: 0.5mm 0; }
+  .rule .consts { font-size: 9pt; margin-top: 1mm; gap: 4mm; }
+  .step { padding: 3.2mm 4mm 3.2mm 17mm; }
+  .step p { font-size: 9.2pt; }
+  .phone { height: 106mm; }
+  .url { margin-top: 0; }
+  .qr { width: 56mm; height: 56mm; }
+  .url { grid-template-columns: minmax(0,1fr) 56mm; }
   .sheet { gap: 4mm; padding-top: 12mm; }
   h1 { font-size: 44pt; }
   .mid { margin-top: 0; }
@@ -369,8 +385,9 @@
   <div class="rule">
     <div class="tag">The rule</div>
     <div class="math">
-      R′ = R + K · (S − E), where E = 1 / (1 + 10<sup>(R<sub>opp</sub> − R) / 400</sup>).
-      <b>K = 32</b> singles, <b>K = 16</b> doubles, everyone starts at <b>1000</b>. Same maths as chess.
+      <math display="block"><mrow><mi>R</mi><mo lspace="0" rspace="0.2em">′</mo><mo>=</mo><mi>R</mi><mo>+</mo><mi>K</mi><mo stretchy="false">(</mo><mi>S</mi><mo>−</mo><mi>E</mi><mo stretchy="false">)</mo></mrow></math>
+      <math display="block"><mrow><mi>E</mi><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mn>10</mn><mrow><mo stretchy="false">(</mo><msub><mi>R</mi><mi>opp</mi></msub><mo>−</mo><mi>R</mi><mo stretchy="false">)</mo><mo>/</mo><mn>400</mn></mrow></msup></mrow></mfrac></mrow></math>
+      <div class="consts"><span><b>K</b> = 32 singles</span><span><b>K</b> = 16 doubles</span><span>start <b>1000</b></span><span>S = 1 win, 0 loss</span></div>
     </div>
   </div>
 
