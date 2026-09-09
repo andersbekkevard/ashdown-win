@@ -21,6 +21,8 @@
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; }
+/* Keep focused or scrolled-to elements above the fixed dock. */
+html { scroll-padding-bottom: calc(var(--dock-h) + 16px + env(safe-area-inset-bottom)); }
 body {
   font-family: var(--body);
   font-weight: 500;
