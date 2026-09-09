@@ -18,7 +18,7 @@ export function ActivityCard({ activity }: { activity: Activity }) {
         </span>
         <span className="a-line">{line}</span>
       </span>
-      <span className="a-go" aria-hidden="true">Log ›</span>
+      <span className="a-chev" aria-hidden="true">›</span>
     </Link>
   );
 }
