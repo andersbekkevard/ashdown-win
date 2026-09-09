@@ -30,13 +30,6 @@ expected score comes from the two team averages as above, and both partners
 receive the same change, with $K = 16$, half the singles value, because a
 doubles result says less about any one player.
 
-## Nothing is stored, everything is replayed
-
-No rating is saved anywhere. The site keeps a log of matches, and every number
-you see is computed by replaying that log from the start with the rule above.
-That is why the log is public: anyone can check any rating by hand, and if the
-constants ever change, all of history changes consistently.
-
 ## Recording, deleting, restoring
 
 The log is append-only. Recording a match adds an entry. Deleting adds an
@@ -47,13 +40,5 @@ hidden.
 Each entry also stores a short anonymous label derived from a random cookie on
 the phone that made it. It identifies no one and holds no personal data; it
 only lets the log show when several actions came from the same phone.
-
-## Constants
-
-| | |
-|---|---|
-| Start rating | 1000 |
-| K, singles | 32 |
-| K, doubles | 16 |
 
 The code that implements this is open: github.com/andersbekkevard/ashdown-win.
