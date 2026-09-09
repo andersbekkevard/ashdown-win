@@ -39,3 +39,5 @@ conversation, unless a later date is given.
 | 28 | Migrations run from Europa after a forced export; the Vercel build migrates only when explicitly allowed; a daily export goes to a private backup repository. Decided 2026-09-09. [ADR 0006](adr/0006-append-only-log-as-growth-principle.md) | The log is the only irreplaceable data. | Never. |
 | 29 | Creating an opponent from the match form opens a sheet and keeps the half-filled match. Decided 2026-09-09. | The newcomer flow on poster night must not lose work. | Never. |
 | 30 | No game column yet. Decided 2026-09-09. | Additive migrations make it as cheap later. | Pool is wanted. |
+| 31 | A WhatsApp group (invite link in `design/poster/poster-whatsapp.html`) is the contact layer. No approval gate. The second-edition poster carries its QR as a pop-up more prominent than the site QR. Decided 2026-09-09. | Zero data collected by the site; one tap on a thing everyone has. | Never. |
+| 32 | The brand mark is the crown on a pink disc (`design/brand/icon.svg`), used as favicon, Apple touch icon, and the WhatsApp group image. Decided 2026-09-09. | One mark everywhere. | Never. |

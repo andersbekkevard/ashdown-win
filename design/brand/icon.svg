@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>ashdown.win</title>
+  <circle cx="32" cy="32" r="30" fill="#fb3aa3" stroke="#222126" stroke-width="4"/>
+  <path d="M15 43 L12 22 L23 31 L32 16 L41 31 L52 22 L49 43 Z" fill="#ffd046" stroke="#222126" stroke-width="3.5" stroke-linejoin="round"/>
+  <rect x="15" y="41" width="34" height="7" rx="3" fill="#ffffff" stroke="#222126" stroke-width="3.5"/>
+  <circle cx="32" cy="33" r="3.6" fill="#00b5fe" stroke="#222126" stroke-width="2.5"/>
+</svg>

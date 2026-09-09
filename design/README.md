@@ -91,4 +91,5 @@ exactly one page, background graphics on.
 | `explorations/` | Nine styles, each with brief, poster, and app mock; `index.html` links them |
 | `explorations/data.json` | The shared fake data every mock and the poster use |
 | `research/mobile-patterns.md` | 24 apps surveyed for mobile patterns, with recommendations |
-| `poster/` | Print-ready Fall Guys poster, HTML source and PDF |
+| `poster/` | Print-ready Fall Guys posters: `poster.html` (6B, A4), `poster-a3.html`, and `poster-whatsapp.html` (second edition with the WhatsApp group QR as a pop-up), each with a PDF |
+| `brand/` | The crown mark: `icon.svg` source, PNG sizes, and the WhatsApp group image |
