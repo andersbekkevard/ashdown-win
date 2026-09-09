@@ -22,24 +22,36 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; }
 /* Keep focused or scrolled-to elements above the fixed dock. */
-html { scroll-padding-bottom: calc(var(--dock-h) + 16px + env(safe-area-inset-bottom)); }
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 body {
   font-family: var(--body);
   font-weight: 500;
   color: var(--ink);
   background: var(--blue);
   background-image: repeating-radial-gradient(circle at 50% 18%, rgba(255,255,255,0.14) 0 28px, rgba(255,255,255,0) 28px 72px);
-  background-attachment: fixed;
-  min-height: 100dvh;
-  overflow-x: hidden;
+  position: fixed;
+  inset: 0;
 }
 a { color: inherit; text-decoration: none; }
+/* The frame never scrolls; only <main> does, so iOS has nothing to bounce
+   and the top bar stays put. */
 .phone {
   max-width: 430px;
   margin: 0 auto;
-  min-height: 100dvh;
-  padding: 0 14px calc(var(--dock-h) + 8px + env(safe-area-inset-bottom));
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
   position: relative;
+}
+.topbar { flex: none; padding-left: 18px; padding-right: 18px; }
+.phone > main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 14px calc(var(--dock-h) + 8px + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(var(--dock-h) + 16px + env(safe-area-inset-bottom));
 }
 @media (min-width: 700px) { .phone { padding-top: 12px; } }
 
@@ -49,7 +61,9 @@ a { color: inherit; text-decoration: none; }
   color: var(--paper);
   -webkit-text-stroke: 0.12em var(--pink);
   paint-order: stroke fill;
-  text-shadow: 0.05em 0.08em 0 var(--ink);
+  /* A filter shadows the finished glyphs including the stroke; text-shadow
+     on stroked text is drawn per glyph in WebKit and comes out broken on iOS. */
+  filter: drop-shadow(0.05em 0.08em 0 var(--ink));
   text-transform: uppercase;
   line-height: 0.95;
   letter-spacing: 0.01em;
