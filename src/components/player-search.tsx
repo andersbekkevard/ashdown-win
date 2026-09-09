@@ -46,7 +46,8 @@ export function PlayerSearch({
 }) {
   const inputId = useId();
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
+  // The autofocused first field gets no focus event, so start open there.
+  const [open, setOpen] = useState(autoFocus);
   const [creating, setCreating] = useState<string | null>(null);
 
   if (value) {
@@ -91,7 +92,13 @@ export function PlayerSearch({
           setOpen(true);
         }}
         onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onClick={() => setOpen(true)}
+        onBlur={(e) => {
+          const el = e.currentTarget;
+          setTimeout(() => {
+            if (document.activeElement !== el) setOpen(false);
+          }, 150);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter" && shown.length > 0) {
             e.preventDefault();
@@ -110,13 +117,13 @@ export function PlayerSearch({
         <div className="sugg pop-in" role="listbox">
           {!q && shown.length > 0 && <div className="hint">Recently at the table</div>}
           {shown.map((h) => (
-            <button key={h.id} type="button" role="option" aria-selected={false} onMouseDown={(e) => e.preventDefault()} onClick={() => pick(h)}>
+            <button key={h.id} type="button" role="option" aria-selected={false} onPointerDown={(e) => { e.preventDefault(); pick(h); }} onClick={() => pick(h)}>
               {h.name}
             </button>
           ))}
           {hits.length > SHOWN && <div className="hint">{hits.length - SHOWN} more, keep typing</div>}
           {q && !exact && trimmed && (
-            <button type="button" className="create" onMouseDown={(e) => e.preventDefault()} onClick={() => setCreating(trimmed)}>
+            <button type="button" className="create" onPointerDown={(e) => { e.preventDefault(); setCreating(trimmed); }} onClick={() => setCreating(trimmed)}>
               <span>{shown.length ? "Not them?" : `No one called “${trimmed}”`}</span>
               <b>Create &ldquo;{trimmed}&rdquo;</b>
             </button>

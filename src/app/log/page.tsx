@@ -38,10 +38,12 @@ function Device({ label }: { label: string | null }) {
 
 export default async function LogPage() {
   const entries = await matchLog();
-  const live = entries.length ? liveness(entries[0].at) : null;
-  const latestClass = (i: number) => (i === 0 && live ? ` latest ${live.motion}` : "");
+  // Only a match carries the liveness; a deletion or restore is bookkeeping.
+  const latestIndex = entries.findIndex((e) => e.kind === "match");
+  const live = latestIndex >= 0 ? liveness(entries[latestIndex].at) : null;
+  const latestClass = (i: number) => (i === latestIndex && live ? ` latest ${live.motion}` : "");
   const latestStyle = (i: number) =>
-    i === 0 && live ? ({ "--fb": live.border.toFixed(3), "--fd": live.dot.toFixed(3) } as React.CSSProperties) : undefined;
+    i === latestIndex && live ? ({ "--fb": live.border.toFixed(3), "--fd": live.dot.toFixed(3) } as React.CSSProperties) : undefined;
   return (
     <>
       <h1 className="shout">The log</h1>
@@ -61,7 +63,7 @@ export default async function LogPage() {
               <div key={`m${e.match.id}`} className={`log-row${latestClass(i)}`} style={latestStyle(i)}>
                 <div>
                   <div className={`what${e.match.deleted ? " gone" : ""}`}>
-                    {i === 0 && <span className="d" aria-hidden="true" />}
+                    {i === latestIndex && <span className="d" aria-hidden="true" />}
                     <span><MatchLine match={e.match} /></span>
                   </div>
                   <div className="when">
@@ -74,7 +76,6 @@ export default async function LogPage() {
               <div key={`${e.kind[0]}${e.id}`} className={`log-row${latestClass(i)}`} style={latestStyle(i)}>
                 <div>
                   <div className="what">
-                    {i === 0 && <span className="d" aria-hidden="true" />}
                     <span>{e.kind === "deletion" ? "Deleted" : "Restored"} #{e.match.id}: <MatchLine match={e.match} /></span>
                   </div>
                   <div className="when">

@@ -17,6 +17,8 @@ import { effectiveDeletions } from "@/lib/log";
 import { hasVisibleContent, normalizeName } from "@/lib/names";
 import {
   findPlayerByName,
+  loadLog,
+  replayLog,
   searchPlayers as searchPlayersQuery,
   type PlayerHit,
 } from "@/lib/queries";
@@ -97,7 +99,13 @@ export async function createPlayer(rawName: unknown): Promise<ActionResult<Playe
   }
 }
 
-export async function recordMatch(input: unknown): Promise<ActionResult<{ id: number }>> {
+export interface Recorded {
+  id: number;
+  /** Rating change for side A; side B moves by exactly the opposite. */
+  deltaA: number;
+}
+
+export async function recordMatch(input: unknown): Promise<ActionResult<Recorded>> {
   const parsed = matchSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid match." };
@@ -117,7 +125,15 @@ export async function recordMatch(input: unknown): Promise<ActionResult<{ id: nu
       .values({ a1: a[0], a2: a[1] ?? null, b1: b[0], b2: b[1] ?? null, winner, device })
       .returning({ id: matches.id });
     revalidateAll();
-    return { ok: true, value: row };
+    // Replay to report what the match did to the ratings.
+    let deltaA = 0;
+    try {
+      const { history } = replayLog(await loadLog());
+      deltaA = history.get(a[0])?.find((h) => h.matchId === row.id)?.delta ?? 0;
+    } catch {
+      deltaA = 0;
+    }
+    return { ok: true, value: { id: row.id, deltaA } };
   } catch {
     return { ok: false, error: DB_ERROR };
   }
