@@ -41,7 +41,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <Link href="/algorithm" className="chip">How?</Link>
               <a href={WHATSAPP_GROUP_URL} className="chip wa" target="_blank" rel="noopener" aria-label="Join the WhatsApp group">
                 <WhatsAppGlyph className="wa-mini" />
-                WhatsApp
+                Chat
               </a>
             </nav>
           </header>

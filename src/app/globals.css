@@ -387,7 +387,13 @@ h2.shout { font-size: 26px; margin: 0; }
 .status { display: block; max-width: 180px; text-align: right; font-size: 12px; font-weight: 700; color: var(--ink); background: var(--cream); border: 2px solid var(--ink); border-radius: 12px; padding: 5px 8px; }
 
 /* WhatsApp chip in the top bar */
-.chip.wa { background: #25d366; color: var(--ink); padding: 8px 12px 8px 9px; gap: 6px; }
+.chip.wa {
+  background: #25d366; color: var(--ink); padding: 6px 12px 6px 9px; gap: 6px;
+  border: 3px solid var(--paper); box-shadow: 0 4px 0 var(--ink);
+  transform: rotate(2deg); /* opposite to the logo's tilt */
+  transition: transform 80ms, box-shadow 80ms;
+}
+.chip.wa:active { transform: rotate(2deg) translateY(3px); box-shadow: 0 1px 0 var(--ink); }
 .chip.wa .wa-mini { width: 16px; height: 16px; color: var(--paper); flex: none; }
 
 /* activity card: the live indicator, links to the log */
