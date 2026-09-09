@@ -101,3 +101,84 @@ escapes its own bounds, which is a liability in a 4 px-of-slack row.
 One consequence to accept with any of them: the "Log" chip loses its word. The destination
 is unchanged, but the top bar stops naming it. If that is unacceptable, the fallback is to
 take the logo from 22 px to 18 px, which buys about 29 px and lets all three coexist.
+
+---
+
+# Round 2 — the recording button
+
+Anders reviewed round 1 and asked for a different direction: **recording-button grammar**. A dot
+*and* a short word encoding recent activity — LIVE, REC, NOW or ON, never "Log". His reference:
+a red filled circle inside a ring beside the word REC
+(`https://thumbs.dreamstime.com/b/recording-sign-button-red-app-panel-rec-vector-symbol-isolated-white-background-201660247.jpg`,
+verified 200 `image/jpeg`).
+
+Four options are in `rec.html`. `index.html` is unchanged.
+
+## Research: how recording and live status are signalled with a dot and a word
+
+| Application / object | Grammar — shape, colour, motion, wording, how time is expressed | Image URL (HEAD-verified 200) |
+|---|---|---|
+| **Anders' reference** | Filled red disc centred inside a thin ring, the word `REC` beside it in the same red. The ring is the record button's bezel; the disc is the button. No motion in the still, but the convention it depicts blinks. | https://thumbs.dreamstime.com/b/recording-sign-button-red-app-panel-rec-vector-symbol-isolated-white-background-201660247.jpg |
+| **iPhone privacy indicators** | The smallest recording signal Apple ships: a solid **orange** dot means the microphone is in use, a solid **green** dot means the camera. Never both at once. Wordless, no motion, and — the detail worth stealing — with *Differentiate Without Color* enabled the orange dot becomes an orange **square**. Apple encodes the state in the silhouette, not the hue. | https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/IPhone_14_Pro_DI_Vector.svg/960px-IPhone_14_Pro_DI_Vector.svg.png |
+| **iPhone screen recording, pre-Island** | The status bar itself becomes the indicator: the clock turns into a solid red capsule and stays there while recording, visible in every app. The container is the message; there is no separate badge and no word beyond the time it is already showing. | https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Bauer_Bosch_VCC_836_-_CRT_viewfinder-49315.jpg/960px-Bauer_Bosch_VCC_836_-_CRT_viewfinder-49315.jpg |
+| **Dynamic Island recording state** | The Island expands for a 3-2-1 countdown, then settles as a **pulsing red circle** in the black cutout, expanding to a red pill when tapped. The black carrier never changes colour; only the small red element inside it does, and the motion is a size change rather than a blink. | https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/IPhone_14_Pro_DI_Vector.svg/960px-IPhone_14_Pro_DI_Vector.svg.png |
+| **Camcorder viewfinder OSD** | A hard-cornered box in the corner of the frame, white or red `REC` with a dot that blinks at roughly one beat a second. Square corners, monospaced-feeling type, no animation on the word. Elapsed time sits beside it as a running counter, so time is a number, not a state. | https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Sharp_VL-N1S_-_viewfinder-0311.jpg/960px-Sharp_VL-N1S_-_viewfinder-0311.jpg |
+| **Consumer camcorder body** | Same grammar in hardware: a physical red lamp beside the lens, on solidly while rolling. The dot came before the badge; the on-screen badge is a picture of the lamp. | https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Sony_DVD_DCR-PC7E_camcorder-CnAM_43799-IMG_5360-black.jpg/960px-Sony_DVD_DCR-PC7E_camcorder-CnAM_43799-IMG_5360-black.jpg |
+| **Broadcast tally light** | A lamp above the lens: **red** for on air, **green** for preview (about to be), **orange** for ISO recording. Three degrees of liveness in one object, distinguished by colour and by nothing else — which is exactly the ladder's three states, and exactly the reason to add a shape difference on top. | https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Small_tally_light_on_camera.jpg/960px-Small_tally_light_on_camera.jpg |
+| **Studio ON AIR sign** | The maximal version: a lit word, no dot, binary. Useful only as the reminder that the word alone is enough once it is lit — the dot is what makes it legible when it is *not*. | https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Radio_WWOZ_Studios_New_Orleans_June_2021_-_On_Air_Sign.jpg/960px-Radio_WWOZ_Studios_New_Orleans_June_2021_-_On_Air_Sign.jpg |
+| **Vintage recording lamp** | An animated red lamp, the ancestor of the CSS blink. One hertz, hard on/off, no easing — the cadence that reads as "machine running" rather than "app notifying". | https://upload.wikimedia.org/wikipedia/commons/6/68/Recording-light.gif |
+| **Twitch** | Dot-plus-word in its modern form: a red rounded badge reading `LIVE`, pinned to a thumbnail corner, with the avatar taking a red ring. Absence of the badge is the off state. | https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Twitch_Glitch_Logo_Purple.svg/960px-Twitch_Glitch_Logo_Purple.svg.png |
+| **YouTube** | The same red pill placed where the video duration normally sits, so it literally replaces the timestamp; afterwards the metadata reads "Streamed 2 hours ago". One slot carrying live, recent and old. | https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Logo_of_YouTube_%282015-2017%29.svg/960px-Logo_of_YouTube_%282015-2017%29.svg.png |
+| **Instagram Live** | Dot-plus-word wrapped around an avatar: a pink/purple ring with a small `LIVE` tab at its foot. Shows that the word can hang off an existing object instead of occupying its own slot. | https://upload.wikimedia.org/wikipedia/commons/3/3a/Instagram_screenshot.png |
+
+All URLs re-checked with `curl -sIL`; every one returns 200 with an `image/*` content type. Note that
+only pre-generated Wikimedia thumbnail sizes resolve — one candidate passed on first check and later
+returned 400 once its cached thumbnail was evicted, and was replaced.
+
+## The four options
+
+Same width budget as round 1 — the indicator takes the "Log" chip's slot, leaving roughly 48 px —
+and each option carries a `min-width` so its three states are identical in width and the chips
+never shift when the state changes. Widths below are measured in the page at runtime.
+
+| # | Option | Grammar from | Shape | Motion | Words | Recommended colour | Measured |
+|---|---|---|---|---|---|---|---|
+| A | Viewfinder badge | Camcorder OSD, tally light | Hard-cornered rounded rectangle, filled | Dot blinks at 1 Hz on a true square wave (`steps(1)`), word fixed | `REC` / `2H` / `OFF` | **Mint** | 47 px, 3 px spare |
+| B | Status-bar pill | Apple screen recording | Full pill, filled, white rim | The whole pill throws a hard rim every 1.7 s | `ON` / `2H` / `OFF` | **Gold** | 43 px, 7 px spare |
+| C | Dot in a ring | The record button itself | No container — ring with a dot inside, word beside on the blue | Dot breathes to 60% and back every 1.4 s | `LIVE` / `2H` / `OFF` | **REC red** | 44 px, 6 px spare |
+| D | Island capsule | Dynamic Island recording state | Ink capsule matching the existing chips, fixed 46 px | The dot stretches into a slab and the word fades up on it, 4.6 s cycle | `NOW` / `2H` / `–` | **REC red** | 46 px, 4 px spare |
+
+### Why the recommended colours differ
+
+The top bar already holds a hot pink logo on a saturated blue field. That decides the colour
+question almost by itself: **red is safe in proportion to how little of it there is.** A and B are
+filled objects roughly 45 px wide, so in red they put a third hot hue eight pixels from the logo and
+the row starts to vibrate; they take mint and gold, which sit calmly on blue and keep dark ink text.
+C and D spend their colour on a 7–9 px element inside a white ring or an ink capsule, and at that
+size true REC red reads as a lamp rather than as a second brand colour — so they get the red, and
+with it the citation.
+
+## Recommendation
+
+**Ship option C in REC red.**
+
+It is the reference image, unmodified in structure: a filled red dot inside a ring with the word
+beside it. Everything good about that drawing survives the translation. The red is confined to a
+7 px disc, which is the only place in this top bar where true recording red can go without arguing
+with the pink logo, and at that size it reads unambiguously as a lamp — the thing the whole grammar
+is built on. It has no container, so it adds no new filled object to a bar that already carries a
+pink pill, a black chip and a blue field; it is the lightest of the four on the eye while being the
+most literal about what it means. The motion is the record button at rest, a 1.4 s breath rather
+than a strobe, which is legible without being irritating on the fifth visit. And the state ladder is
+borrowed from the broadcast tally light and then improved on Apple's own principle of encoding state
+in silhouette: **filled** dot for live, **hollow** dot for recent, **empty** ring for quiet. Those
+three read apart in greyscale, under colour blindness, and on a phone in direct sun, which none of
+the purely chromatic ladders do.
+
+Two caveats, both cheap. Because C has no background its tap target is only as tall as its content,
+so it needs an invisible hit area padded out to 44 px before it ships. And it is the quietest of the
+four — if the point of the indicator is to *pull* someone into recording a match rather than merely
+to inform them, **option D in red** is the runner-up: same small-red-element discipline, but a solid
+ink capsule that matches the existing chips exactly, an obvious hit area, and a morph that is much
+harder to ignore. Option A in mint is the most fun and the most "equipment", and it is also the
+tightest fit at 3 px of spare width, so it is the one most likely to break on a narrower phone.

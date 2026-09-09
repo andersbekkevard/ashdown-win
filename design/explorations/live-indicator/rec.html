@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live indicator, round 2 — the recording button — ashdown.win</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Titan+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#fb3aa3; --raspberry:#c81c74; --blue:#00b5fe; --deep:#0866d7;
+  --banana:#fcc601; --gold:#ffd046; --mint:#5eeac0; --mint-deep:#17a97a;
+  --lilac:#7c7be8; --ink:#222126; --paper:#ffffff; --cream:#fff6d5;
+  --muted:#6b7080; --faint:#8a8fa3;
+  --rec:#f42a2a; --rec-deep:#9e1414;
+  --display:"Titan One","Arial Rounded MT Bold","Fredoka",system-ui,sans-serif;
+  --body:"Fredoka","Arial Rounded MT Bold",system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body); font-weight:500; color:var(--ink);
+  background:var(--blue);
+  background-image:repeating-radial-gradient(circle at 50% 6%, rgba(255,255,255,.14) 0 28px, rgba(255,255,255,0) 28px 72px);
+  background-attachment:fixed; min-height:100dvh; overflow-x:hidden;
+  padding:0 10px 60px;
+}
+.wrap{max-width:1180px;margin:0 auto}
+.shout{
+  font-family:var(--display); font-weight:400; color:var(--paper);
+  -webkit-text-stroke:.12em var(--rec); paint-order:stroke fill;
+  text-shadow:.05em .08em 0 var(--ink); text-transform:uppercase;
+  line-height:.95; letter-spacing:.01em;
+}
+header.page{padding:30px 4px 6px}
+header.page h1{font-size:clamp(25px,5.4vw,42px);margin:0 0 14px;transform:rotate(-1.5deg)}
+.lede{background:var(--paper);border:4px solid var(--paper);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:16px 18px;font-size:15px;line-height:1.5}
+.lede p{margin:0 0 10px} .lede p:last-child{margin:0}
+.lede code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--cream);padding:1px 6px;border-radius:6px;border:1.5px solid #e6dfba}
+.budget{background:var(--cream);border:3px dashed var(--ink);border-radius:16px;padding:11px 13px;margin:12px 0 0;font-size:14px;line-height:1.45;font-weight:600}
+
+/* the reference Anders sent, redrawn so the page stays self-contained */
+.refcard{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:#f4f6fb;border:3px solid var(--ink);border-radius:18px;padding:14px 16px;margin:12px 0 0}
+.refart{display:inline-flex;align-items:center;gap:9px;background:var(--paper);border-radius:12px;padding:10px 14px;flex:none}
+.refart .rring{width:34px;height:34px;border-radius:50%;border:3px solid #d2d6e2;display:grid;place-items:center}
+.refart .rdot{width:20px;height:20px;border-radius:50%;background:#e01b1b}
+.refart .rw{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:19px;color:#e01b1b;letter-spacing:.02em}
+.refcard .rtext{font-size:13.5px;line-height:1.45;font-weight:600;color:#3b3a44;min-width:200px;flex:1}
+.refcard .rtext a{color:var(--deep);word-break:break-all;font-weight:600}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 4px 20px}
+.tgl{display:inline-flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);font-family:var(--body);font-weight:700;font-size:13px;padding:9px 15px;border-radius:999px;border:3px solid var(--paper);box-shadow:0 4px 0 rgba(0,0,0,.35);cursor:pointer;user-select:none}
+.tgl input{appearance:none;width:34px;height:19px;border-radius:999px;background:#5a5e70;position:relative;margin:0;cursor:pointer;flex:none;transition:background 140ms}
+.tgl input::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--paper);transition:transform 160ms cubic-bezier(.3,1.5,.5,1)}
+.tgl input:checked{background:var(--mint)}
+.tgl input:checked::after{transform:translateX(15px)}
+
+section.card{background:var(--paper);border:4px solid var(--paper);border-radius:26px;box-shadow:0 7px 0 var(--ink);padding:18px 18px 20px;margin-bottom:20px;overflow:hidden}
+section.card>h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 4px;text-transform:uppercase;line-height:1.15}
+section.card>.sublede{font-size:14px;line-height:1.5;color:#3b3a44;margin:0 0 16px}
+
+/* ── the 4 x 4 matrix ── */
+.colhead{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 8px}
+.colhead span{font-family:var(--display);font-weight:400;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);text-align:center;line-height:1.2}
+.opt{border-top:3px dashed #e6e9f2;padding-top:14px;margin-top:14px}
+.opt:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.opt h3{font-family:var(--display);font-weight:400;font-size:16px;margin:0;text-transform:uppercase;display:flex;align-items:center;gap:9px}
+.opt h3 .tag{display:inline-grid;place-items:center;width:26px;height:26px;flex:none;font-size:13px;color:var(--paper);background:var(--lilac);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.opt .from{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:4px 0 10px 35px}
+.row4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sw{
+  background:var(--blue);
+  background-image:repeating-radial-gradient(circle at 50% 30%, rgba(255,255,255,.16) 0 14px, rgba(255,255,255,0) 14px 36px);
+  border:3px solid var(--ink);border-radius:14px;box-shadow:0 3px 0 var(--ink);
+  min-height:56px;display:grid;place-items:center;padding:10px 4px;
+}
+.sw.pick{box-shadow:0 3px 0 var(--ink),0 0 0 3px var(--gold)}
+.pickrow{display:flex;gap:8px;align-items:stretch;margin-top:10px;flex-wrap:wrap}
+.pickrow .lbl{
+  flex:1 1 130px;min-width:120px;display:flex;flex-direction:column;justify-content:center;
+  background:var(--cream);border:3px solid var(--ink);border-radius:14px;padding:8px 11px;
+  font-size:11.5px;font-weight:600;line-height:1.3;color:#3b3a44;
+}
+.pickrow .lbl b{font-family:var(--display);font-weight:400;font-size:12px;text-transform:uppercase;display:block;margin-bottom:2px}
+.pickrow .sw{flex:1 1 96px;min-width:88px}
+.cn{font-size:10.5px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;text-align:center;margin:5px 0 0;line-height:1.2}
+
+/* ── per-option write-up + in-context mock ── */
+.grid2{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));align-items:start}
+.why{font-size:14.5px;line-height:1.5;margin:0 0 16px;color:#3b3a44}
+.sub{font-family:var(--display);font-weight:400;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin:0 0 9px}
+.mockwrap{overflow-x:auto;padding-bottom:4px}
+.bezel{width:396px;max-width:100%;border:3px solid var(--ink);border-radius:22px;overflow:hidden;box-shadow:0 5px 0 rgba(34,33,38,.35);margin:0 auto}
+.screen{width:390px;background:var(--blue);background-image:repeating-radial-gradient(circle at 50% 18%, rgba(255,255,255,.14) 0 28px, rgba(255,255,255,0) 28px 72px);padding-bottom:10px}
+.phone{padding:0 14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 4px 10px;gap:8px}
+.logo{display:inline-flex;align-items:center;gap:8px;background:var(--pink);color:var(--paper);font-family:var(--display);font-size:22px;padding:8px 18px 8px 12px;border-radius:999px;border:3px solid var(--paper);box-shadow:0 5px 0 var(--ink);transform:rotate(-2deg);text-shadow:0 2px 0 var(--raspberry);white-space:nowrap;flex:none}
+.logo svg{width:28px;height:22px;flex:none}
+.chips{display:flex;gap:6px;align-items:center;flex:none}
+.chip{background:var(--ink);color:var(--paper);font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;border:0;font-family:var(--body);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.strip{height:52px;margin:2px 14px 0;border-radius:16px;background:rgba(255,255,255,.85);border:3px solid var(--paper);box-shadow:0 4px 0 rgba(34,33,38,.5);display:flex;align-items:center;padding:0 12px;gap:10px}
+.strip .fake-hex{width:26px;height:26px;background:var(--gold);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);flex:none}
+.strip .fake-l{height:9px;border-radius:5px;background:#dfe3ef}
+.strip .fake-l.a{width:96px}
+.strip .fake-l.b{width:54px;margin-left:auto;background:var(--cream);border:2px solid #e0d7ad;height:20px;border-radius:999px}
+.fit{font-size:12.5px;font-weight:600;color:var(--muted);line-height:1.45;margin:9px 2px 0;text-align:center}
+.fit b{color:var(--ink)} .fit .ok{color:var(--mint-deep);font-weight:700} .fit .no{color:var(--raspberry);font-weight:700}
+
+/* ═══ the four colourways ═══ */
+.c-red  {--c:#f42a2a;--cd:#9e1414;--ct:#ffffff;--dot:#ffffff}
+.c-pink {--c:#fb3aa3;--cd:#c81c74;--ct:#ffffff;--dot:#ffffff}
+.c-mint {--c:#5eeac0;--cd:transparent;--ct:#222126;--dot:#222126}
+.c-gold {--c:#ffd046;--cd:transparent;--ct:#222126;--dot:#222126}
+
+/* ═══ A — viewfinder REC badge (camera OSD): rounded rectangle, 1 Hz square-wave blink ═══ */
+.vf{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;height:31px;min-width:46px;
+  padding:0 5.5px;border-radius:9px;border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);
+  background:var(--c);color:var(--ct);font-family:var(--display);font-weight:400;font-size:10px;
+  letter-spacing:.04em;text-shadow:0 1.5px 0 var(--cd);cursor:pointer;white-space:nowrap;flex:none;
+}
+.vf .d{width:7px;height:7px;border-radius:50%;background:var(--dot);flex:none}
+.vf.live .d{animation:sq1hz 1s steps(1,end) infinite}
+@keyframes sq1hz{0%,49.99%{opacity:1}50%,100%{opacity:.15}}
+.vf.recent{background:var(--paper);color:var(--ink);text-shadow:none}
+.vf.recent .d{background:var(--c)}
+.vf.quiet{background:#dfe3ef;color:#7a7f90;text-shadow:none;border-color:#8b8f9c;box-shadow:0 3px 0 #8b8f9c}
+.vf.quiet .d{background:#8b8f9c}
+
+/* ═══ B — status-bar pill (Apple screen recording): white rim, whole pill pulses ═══ */
+.sb{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;height:31px;min-width:41px;
+  padding:0 6px;border-radius:999px;border:2.5px solid var(--paper);box-shadow:0 3px 0 var(--ink);
+  background:var(--c);color:var(--ct);font-family:var(--display);font-weight:400;font-size:10px;
+  letter-spacing:.04em;text-shadow:0 1.5px 0 var(--cd);cursor:pointer;white-space:nowrap;flex:none;
+}
+.sb .d{width:7px;height:7px;border-radius:50%;background:var(--dot);flex:none}
+.sb.live{animation:sbpulse 1.7s ease-in-out infinite}
+@keyframes sbpulse{
+  0%,100%{box-shadow:0 3px 0 var(--ink)}
+  50%{box-shadow:0 3px 0 var(--ink),0 0 0 3.5px rgba(255,255,255,.55)}
+}
+.sb.recent{background:var(--paper);color:var(--ink);text-shadow:none;border-color:var(--ink)}
+.sb.recent .d{background:var(--c)}
+.sb.quiet{background:rgba(255,255,255,.28);color:var(--paper);text-shadow:0 1.5px 0 rgba(34,33,38,.5);border-color:rgba(255,255,255,.75)}
+.sb.quiet .d{background:rgba(255,255,255,.75)}
+
+/* ═══ C — dot inside a ring, word beside it (Anders' reference / the record button) ═══ */
+.rb{display:inline-flex;align-items:center;justify-content:flex-start;gap:4px;height:31px;min-width:44px;padding:0 1px;cursor:pointer;white-space:nowrap;flex:none}
+.rb .ring{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--ink);background:var(--paper);box-shadow:0 2px 0 var(--ink);display:grid;place-items:center;flex:none;box-sizing:border-box}
+.rb .d{width:7px;height:7px;border-radius:50%;background:var(--c)}
+.rb.live .d{animation:recbreath 1.4s ease-in-out infinite}
+@keyframes recbreath{0%,100%{transform:scale(1)}50%{transform:scale(.6)}}
+.rb .w{font-family:var(--display);font-weight:400;font-size:9.5px;letter-spacing:.02em;color:var(--paper);text-shadow:0 2px 0 var(--ink)}
+/* armed but not rolling: the dot becomes a hollow ring, so state survives greyscale */
+.rb.recent .d{background:transparent;border:2.5px solid var(--c);width:9px;height:9px;box-sizing:border-box}
+.rb.quiet .ring{border-color:#5f6478;background:rgba(255,255,255,.45)}
+.rb.quiet .d{background:transparent}
+.rb.quiet .w{color:rgba(255,255,255,.85)}
+
+/* ═══ D — Dynamic Island capsule: the dot expands into the word ═══ */
+.di{
+  position:relative;width:46px;height:31px;border-radius:999px;background:var(--ink);
+  display:grid;place-items:center;overflow:hidden;cursor:pointer;flex:none;padding:0;border:0;
+}
+.di .fill{position:absolute;left:5px;top:50%;width:9px;height:9px;border-radius:50%;background:var(--c);transform:translateY(-50%);z-index:1}
+.di .w{position:relative;z-index:2;font-family:var(--display);font-weight:400;font-size:10px;letter-spacing:.04em;color:var(--ct);text-shadow:0 1.5px 0 var(--cd);opacity:0}
+.di.live .fill{animation:dimorph 4.6s cubic-bezier(.3,1.2,.4,1) -1.6s infinite}
+.di.live .w{animation:diword 4.6s ease -1.6s infinite}
+@keyframes dimorph{
+  0%,10%{width:9px;height:9px;border-radius:50%}
+  22%,88%{width:36px;height:21px;border-radius:999px}
+  97%,100%{width:9px;height:9px;border-radius:50%}
+}
+@keyframes diword{0%,21%{opacity:0}25%,86%{opacity:1}90%,100%{opacity:0}}
+.di.recent .fill{width:9px;height:9px;border-radius:50%}
+.di.recent .w{opacity:1;color:var(--paper);text-shadow:none;margin-left:12px}
+.di.quiet .fill{width:9px;height:9px;border-radius:50%;background:#5f6478}
+.di.quiet .w{opacity:1;color:#9aa0b4;text-shadow:none;margin-left:12px}
+
+footer.page{margin:4px 4px 0;color:var(--paper);font-weight:600;font-size:14px;line-height:1.55;text-shadow:0 2px 0 rgba(34,33,38,.4)}
+footer.page code{background:rgba(255,255,255,.25);padding:1px 6px;border-radius:6px}
+
+@media (max-width:520px){
+  body{padding:0 6px 50px}
+  section.card{padding:16px 8px 18px;border-radius:22px}
+  .row4,.colhead{gap:5px}
+  .sw{border-radius:12px;padding:8px 2px;min-height:52px}
+  .cn{font-size:9px;letter-spacing:.02em}
+  .colhead span{font-size:9.5px;letter-spacing:.01em}
+  .opt .from{margin-left:0}
+  header.page{padding:22px 6px 6px}
+}
+
+/* Motion is decoration: every state is already carried by fill, shape and word. */
+@media (prefers-reduced-motion:reduce){
+  .vf.live .d,.sb.live,.rb.live .d,.di.live .fill,.di.live .w,.tgl input,.tgl input::after{animation:none!important;transition:none!important}
+  .sb.live{box-shadow:0 3px 0 var(--ink),0 0 0 3.5px rgba(255,255,255,.55)}
+  .di.live .fill{width:36px;height:21px;border-radius:999px}
+  .di.live .w{opacity:1}
+}
+body.stillness .vf.live .d,
+body.stillness .sb.live,
+body.stillness .rb.live .d,
+body.stillness .di.live .fill,
+body.stillness .di.live .w{animation:none!important}
+body.stillness .sb.live{box-shadow:0 3px 0 var(--ink),0 0 0 3.5px rgba(255,255,255,.55)}
+body.stillness .di.live .fill{width:36px;height:21px;border-radius:999px}
+body.stillness .di.live .w{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <h1 class="shout">Round 2 — the recording button</h1>
+  <div class="lede">
+    <p>Four takes on one grammar: <b>a dot plus a short word</b>, the thing every camera, every screen recorder
+    and every live feed uses to say "this is happening right now". Each is drawn in the Fall Guys language —
+    Titan One, ink <code>#222126</code> outlines, hard unblurred shadows — and each is shown in the four
+    requested colours so the hue can be judged separately from the shape.</p>
+    <p>States throughout: <b>live</b>, a match inside the last 30 minutes; <b>recent</b>, within the last few
+    hours; <b>quiet</b>, nothing today. All four go to the match log page and none is labelled "Log".</p>
+
+    <div class="refcard">
+      <div class="refart">
+        <span class="rring"><span class="rdot"></span></span><span class="rw">REC</span>
+      </div>
+      <p class="rtext"><b>The reference</b>, redrawn here in CSS so this page stays self-contained — a filled red
+      circle inside a ring, with the word beside it. Option C is the direct descendant.<br>
+      <a href="https://thumbs.dreamstime.com/b/recording-sign-button-red-app-panel-rec-vector-symbol-isolated-white-background-201660247.jpg">thumbs.dreamstime.com/…/201660247.jpg</a></p>
+    </div>
+
+    <div class="budget">
+      <b>The width budget, unchanged from round 1.</b> At 390&nbsp;px the top bar has 354&nbsp;px of usable width
+      and the current contents already spend 355.9 of it (logo 232.9 + chips 115.0 + an 8&nbsp;px gap). The
+      indicator therefore takes the "Log" chip's slot — it goes to the same page — which leaves roughly
+      <b>48&nbsp;px</b>. Every mock below measures itself at runtime and prints the result. Each option also carries
+      a <code>min-width</code> so its three states are all the same width and the chips never shift when the state
+      changes.
+    </div>
+  </div>
+  <div class="toolbar">
+    <label class="tgl"><input type="checkbox" id="still"> Hold everything still (preview reduced motion)</label>
+  </div>
+</header>
+
+<!-- ══════════════ the 4 × 4 ══════════════ -->
+<section class="card">
+  <h2>Sixteen indicators</h2>
+  <p class="sublede">Four options down, four colours across, every one showing its <b>live</b> state. The gold
+  outline marks the colour recommended for that option. Under each, the same option in that colour showing
+  <b>recent</b> and <b>quiet</b>.</p>
+
+  <div class="colhead"><span>REC red<br>#f42a2a</span><span>Pink<br>#fb3aa3</span><span>Mint<br>#5eeac0</span><span>Gold<br>#ffd046</span></div>
+
+  <!-- A -->
+  <div class="opt">
+    <h3><span class="tag">A</span>Viewfinder badge</h3>
+    <p class="from">Camera OSD &amp; tally light — dot blinks at 1 Hz, word fixed</p>
+    <div class="row4">
+      <div><div class="sw"><span class="vf live c-red"><span class="d"></span>REC</span></div><p class="cn">red</p></div>
+      <div><div class="sw"><span class="vf live c-pink"><span class="d"></span>REC</span></div><p class="cn">pink</p></div>
+      <div><div class="sw pick"><span class="vf live c-mint"><span class="d"></span>REC</span></div><p class="cn">mint ★</p></div>
+      <div><div class="sw"><span class="vf live c-gold"><span class="d"></span>REC</span></div><p class="cn">gold</p></div>
+    </div>
+    <div class="pickrow">
+      <div class="lbl"><b>In mint</b>The other two states. Fill drains to white, then to grey; the dot stops blinking.</div>
+      <div><div class="sw"><span class="vf recent c-mint"><span class="d"></span>2H</span></div><p class="cn">recent</p></div>
+      <div><div class="sw"><span class="vf quiet c-mint"><span class="d"></span>OFF</span></div><p class="cn">quiet</p></div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="opt">
+    <h3><span class="tag">B</span>Status-bar pill</h3>
+    <p class="from">Apple screen recording — solid capsule, white rim, whole pill pulses</p>
+    <div class="row4">
+      <div><div class="sw"><span class="sb live c-red"><span class="d"></span>ON</span></div><p class="cn">red</p></div>
+      <div><div class="sw"><span class="sb live c-pink"><span class="d"></span>ON</span></div><p class="cn">pink</p></div>
+      <div><div class="sw"><span class="sb live c-mint"><span class="d"></span>ON</span></div><p class="cn">mint</p></div>
+      <div><div class="sw pick"><span class="sb live c-gold"><span class="d"></span>ON</span></div><p class="cn">gold ★</p></div>
+    </div>
+    <div class="pickrow">
+      <div class="lbl"><b>In gold</b>The other two states. The pill inverts to white, then hollows out to a glass outline.</div>
+      <div><div class="sw"><span class="sb recent c-gold"><span class="d"></span>2H</span></div><p class="cn">recent</p></div>
+      <div><div class="sw"><span class="sb quiet c-gold"><span class="d"></span>OFF</span></div><p class="cn">quiet</p></div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="opt">
+    <h3><span class="tag">C</span>Dot in a ring</h3>
+    <p class="from">The record button itself — dot breathes inside a fixed ring, word beside it</p>
+    <div class="row4">
+      <div><div class="sw pick"><span class="rb live c-red"><span class="ring"><span class="d"></span></span><span class="w">LIVE</span></span></div><p class="cn">red ★</p></div>
+      <div><div class="sw"><span class="rb live c-pink"><span class="ring"><span class="d"></span></span><span class="w">LIVE</span></span></div><p class="cn">pink</p></div>
+      <div><div class="sw"><span class="rb live c-mint"><span class="ring"><span class="d"></span></span><span class="w">LIVE</span></span></div><p class="cn">mint</p></div>
+      <div><div class="sw"><span class="rb live c-gold"><span class="ring"><span class="d"></span></span><span class="w">LIVE</span></span></div><p class="cn">gold</p></div>
+    </div>
+    <div class="pickrow">
+      <div class="lbl"><b>In red</b>The other two states. The dot hollows to a ring, then empties completely.</div>
+      <div><div class="sw"><span class="rb recent c-red"><span class="ring"><span class="d"></span></span><span class="w">2H</span></span></div><p class="cn">recent</p></div>
+      <div><div class="sw"><span class="rb quiet c-red"><span class="ring"><span class="d"></span></span><span class="w">OFF</span></span></div><p class="cn">quiet</p></div>
+    </div>
+  </div>
+
+  <!-- D -->
+  <div class="opt">
+    <h3><span class="tag">D</span>Island capsule</h3>
+    <p class="from">Dynamic Island recording state — the dot expands into the word</p>
+    <div class="row4">
+      <div><div class="sw pick"><span class="di live c-red"><span class="fill"></span><span class="w">NOW</span></span></div><p class="cn">red ★</p></div>
+      <div><div class="sw"><span class="di live c-pink"><span class="fill"></span><span class="w">NOW</span></span></div><p class="cn">pink</p></div>
+      <div><div class="sw"><span class="di live c-mint"><span class="fill"></span><span class="w">NOW</span></span></div><p class="cn">mint</p></div>
+      <div><div class="sw"><span class="di live c-gold"><span class="fill"></span><span class="w">NOW</span></span></div><p class="cn">gold</p></div>
+    </div>
+    <div class="pickrow">
+      <div class="lbl"><b>In red</b>The other two states. The capsule stops morphing and settles into a plain dot plus label.</div>
+      <div><div class="sw"><span class="di recent c-red"><span class="fill"></span><span class="w">2H</span></span></div><p class="cn">recent</p></div>
+      <div><div class="sw"><span class="di quiet c-red"><span class="fill"></span><span class="w">&ndash;</span></span></div><p class="cn">quiet</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ in context ══════════════ -->
+<div class="grid2">
+
+<section class="card">
+  <h2>A — Viewfinder badge, mint</h2>
+  <p class="why">The one shape here that is not a pill. A camcorder puts <b>REC</b> in a hard-cornered box in the
+    corner of the frame and blinks the dot at about one beat a second, and that squareness is most of why it reads
+    as equipment rather than as a button. The blink is a true square wave — <code>steps(1)</code>, no easing — so
+    it snaps on and off instead of breathing, which is the difference between a camera and a notification. The
+    word never moves; only the dot does. Mint rather than red because this option carries the largest area of
+    flat colour of the four, and a 46&nbsp;px slab of red sitting 8&nbsp;px from a pink logo on a blue field is
+    three hot hues arguing; mint is the one Fall Guys colour not already spoken for in this bar and it keeps the
+    dark ink text.</p>
+  <p class="sub">In the real top bar — 390 px</p>
+  <div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">
+    <header class="topbar" data-bar>
+      <a class="logo" data-logo href="#"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>ashdown.win</a>
+      <nav class="chips" data-chips><a class="chip" href="#">How?</a><a class="vf live c-mint" data-ind href="#" aria-label="A match was recorded 6 minutes ago — see the matches"><span class="d"></span>REC</a></nav>
+    </header>
+    <div class="strip"><span class="fake-hex"></span><span class="fake-l a"></span><span class="fake-l b"></span></div>
+  </div></div></div></div>
+  <p class="fit" data-fit>measuring…</p>
+</section>
+
+<section class="card">
+  <h2>B — Status-bar pill, gold</h2>
+  <p class="why">When an iPhone without a Dynamic Island is recording the screen, the clock turns into a solid red
+    capsule — the status bar itself becomes the indicator. That is the borrowed move here: a filled pill with a
+    white rim, the same rim the logo already wears, so it reads as system furniture rather than as content. The
+    motion is a slow hard-edged rim that grows and fades every 1.7&nbsp;s, no blur, matching the way Fall Guys
+    buttons throw a rim on press. Gold rather than red for the same reason as A — this is a filled pill and red
+    fills fight the logo — and gold has the advantage that it already means "the good stuff" in this app without
+    meaning "first place", which is the crown's job. <b>ON</b> and <b>OFF</b> are the shortest true pair in the
+    language and they keep the pill narrow.</p>
+  <p class="sub">In the real top bar — 390 px</p>
+  <div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">
+    <header class="topbar" data-bar>
+      <a class="logo" data-logo href="#"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>ashdown.win</a>
+      <nav class="chips" data-chips><a class="chip" href="#">How?</a><a class="sb live c-gold" data-ind href="#" aria-label="A match was recorded 6 minutes ago — see the matches"><span class="d"></span>ON</a></nav>
+    </header>
+    <div class="strip"><span class="fake-hex"></span><span class="fake-l a"></span><span class="fake-l b"></span></div>
+  </div></div></div></div>
+  <p class="fit" data-fit>measuring…</p>
+</section>
+
+<section class="card">
+  <h2>C — Dot in a ring, REC red</h2>
+  <p class="why">The reference image, straight. A filled dot inside a ring with the word beside it, and no
+    container around any of it — so nothing new is added to a bar that already holds a pink pill, a black chip and
+    a blue field. Because the red is only a 7&nbsp;px dot sitting inside a white ring, it is the one option where
+    true REC red is safe: the eye reads it as a lamp, not as a second brand colour, and it cannot fight the logo
+    at that size. The dot breathes down to 60% and back every 1.4&nbsp;s, which is the record button at rest
+    rather than a strobe. The state ladder is borrowed from a broadcast tally light, where red means on air and a
+    different lamp means merely armed: <b>filled</b> dot for live, <b>hollow</b> dot for recent, <b>empty</b> ring
+    for quiet — so the three states are told apart by the shape inside the ring and survive greyscale, colour
+    blindness and a phone in bright sun.</p>
+  <p class="sub">In the real top bar — 390 px</p>
+  <div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">
+    <header class="topbar" data-bar>
+      <a class="logo" data-logo href="#"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>ashdown.win</a>
+      <nav class="chips" data-chips><a class="chip" href="#">How?</a><a class="rb live c-red" data-ind href="#" aria-label="A match was recorded 6 minutes ago — see the matches"><span class="ring"><span class="d"></span></span><span class="w">LIVE</span></a></nav>
+    </header>
+    <div class="strip"><span class="fake-hex"></span><span class="fake-l a"></span><span class="fake-l b"></span></div>
+  </div></div></div></div>
+  <p class="fit" data-fit>measuring…</p>
+</section>
+
+<section class="card">
+  <h2>D — Island capsule, REC red</h2>
+  <p class="why">On a modern iPhone the recording indicator is a black capsule with a red dot that swells open
+    into a label and shrinks back. This is that, at chip scale: an ink capsule identical in height and colour to
+    the existing "How?" chip, inside which a red dot stretches into a rounded slab and the word <b>NOW</b> fades
+    up on top of it, then collapses back to a dot. The capsule's own width never changes, so nothing in the top
+    bar shifts while it animates — the morph happens entirely inside a fixed 46&nbsp;px box. Like C it spends its
+    red on a small area, but unlike C it is a solid tappable object with an obvious hit area. The 4.6&nbsp;s cycle
+    is deliberately slow; a top-bar element that morphs every second would be unbearable by the third visit.</p>
+  <p class="sub">In the real top bar — 390 px</p>
+  <div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">
+    <header class="topbar" data-bar>
+      <a class="logo" data-logo href="#"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>ashdown.win</a>
+      <nav class="chips" data-chips><a class="chip" href="#">How?</a><a class="di live c-red" data-ind href="#" aria-label="A match was recorded 6 minutes ago — see the matches"><span class="fill"></span><span class="w">NOW</span></a></nav>
+    </header>
+    <div class="strip"><span class="fake-hex"></span><span class="fake-l a"></span><span class="fake-l b"></span></div>
+  </div></div></div></div>
+  <p class="fit" data-fit>measuring…</p>
+</section>
+
+</div>
+
+<footer class="page">
+  <p>Every state is told apart by fill and word with all motion switched off, so
+  <code>prefers-reduced-motion: reduce</code> freezes the live state in its emphasised pose rather than hiding
+  it — use the toggle at the top to check. Recommendation and the round-2 research table are in <b>brief.md</b>
+  beside this file. Round 1's four grammars are still in <b>index.html</b>.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var still = document.getElementById("still");
+  still.addEventListener("change", function () {
+    document.body.classList.toggle("stillness", still.checked);
+  });
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    still.checked = true;
+    document.body.classList.add("stillness");
+  }
+
+  // Measure each 390px mock. offsetWidth, not getBoundingClientRect: several live states
+  // animate transforms or box-shadows and a transform must not be read as layout width.
+  function measure() {
+    document.querySelectorAll("[data-bar]").forEach(function (bar) {
+      var logo = bar.querySelector("[data-logo]");
+      var chips = bar.querySelector("[data-chips]");
+      var ind = bar.querySelector("[data-ind]");
+      var out = bar.closest("section").querySelector("[data-fit]");
+      if (!logo || !chips || !ind || !out) return;
+
+      var cs = getComputedStyle(bar);
+      var inner = bar.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var gap = parseFloat(cs.columnGap) || 0;
+      var w = function (el) { return el.offsetWidth; };
+      var used = w(logo) + gap + w(chips);
+      var slack = inner - used;
+      var r1 = function (n) { return Math.round(n * 10) / 10; };
+
+      out.innerHTML =
+        "Indicator <b>" + r1(w(ind)) + " px</b> wide &middot; row uses <b>" + r1(used) +
+        " px</b> of " + r1(inner) + " px &middot; " +
+        (slack >= 0
+          ? '<span class="ok">' + r1(slack) + " px to spare</span>"
+          : '<span class="no">overflows by ' + r1(-slack) + " px</span>");
+    });
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { measure(); setTimeout(measure, 250); });
+  } else {
+    window.addEventListener("load", measure);
+  }
+  window.addEventListener("resize", measure);
+})();
+</script>
+</body>
+</html>
