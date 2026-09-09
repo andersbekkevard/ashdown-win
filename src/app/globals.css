@@ -327,7 +327,7 @@ h2.shout { font-size: 26px; margin: 0; }
 .prose-card { padding: 18px; font-size: 15px; line-height: 1.5; }
 .prose-card h1 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0 0 12px; }
 .prose-card h2 { font-family: var(--display); font-weight: 400; font-size: 18px; margin: 22px 0 8px; }
-.prose-card a { color: var(--deep); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: var(--blue); }
+.prose-card a { color: var(--deep); font-weight: 700; white-space: nowrap; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: var(--blue); }
 .prose-card a::after { content: " ›"; }
 .prose-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 18px; }
 .prose-actions .btn { font-size: 15px; padding: 13px 8px; gap: 8px; }
