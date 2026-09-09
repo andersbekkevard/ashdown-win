@@ -17,10 +17,16 @@ Done on 2026-09-09: name normalisation, delete confirmation with restore,
 anonymous device labels, error handling that keeps form input, creating an
 opponent from inside the match form, and log backups.
 
-- The live activity indicator in the top bar, borrowed from recording-status
-  grammar, linking to the log. In design.
-- A WhatsApp group link as a chip in the top bar and on the page after
-  creating a player. Waiting on the invite link.
+Also done, 2026-09-10: the live indicator pill in the top bar, the Chat chip
+to the WhatsApp group, How it works in the lead sentence, the instant player
+picker, and the second-edition poster with the group QR.
+
+- A success moment after recording a match: the mock's tilted "Recorded"
+  banner with confetti and the two rating deltas. The app currently returns
+  to the board without ceremony.
+- Remember who I am on this phone and prefill me as one side of the match.
+- "Rematch" on a player page and in the log that prefills both names, and
+  "record another" after a match that keeps the players.
 - A short "what's new" strip, keyed by a version number and dismissed per
   device, so features can be announced without accounts.
 

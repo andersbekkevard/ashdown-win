@@ -74,6 +74,16 @@ leaderboard with the mock names from `explorations/data.json`, and the
 open-source line at the foot. Print source and PDF: `poster/`. A4 portrait,
 exactly one page, background graphics on.
 
+## Current top bar and indicator
+
+Logo, a white indicator pill (dot plus time since the last match, cooling
+through the day on the curves in `src/lib/activity.ts`), and a green Chat
+chip to the WhatsApp group with the logo's rim-and-shadow treatment tilted
+the other way. How it works is a link at the end of the home lead. The
+explorations that led here are `explorations/live-indicator/`,
+`explorations/affordances/`, `explorations/continuity/`, and
+`explorations/topbar/`; `live-indicator.md` records the decisions.
+
 ## Open items
 
 - The record-match success moment. The mock ends in a tilted "RECORDED!"
