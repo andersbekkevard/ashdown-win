@@ -45,8 +45,8 @@ export default async function LogPage() {
           Every match <span>newest first</span>
         </h3>
         <p className="hint" style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600, margin: "0 0 8px" }}>
-          Nothing is ever edited. A deletion is a new entry that voids a match, a restore is a
-          new entry that cancels a deletion, and all of them stay in the log.
+          You can delete anything and undo anything. The log shows both, so everyone can see
+          who did what.
         </p>
         {entries.length === 0 ? (
           <p className="empty">Nothing recorded yet.</p>
