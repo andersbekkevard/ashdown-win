@@ -75,7 +75,10 @@ export function CreatePlayerForm({
             type="text"
             name="name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (state && !state.ok) setState(null);
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -91,6 +94,11 @@ export function CreatePlayerForm({
             placeholder="Full name"
           />
         </div>
+        {name.length >= MAX_NAME_LENGTH - 15 && (
+          <p className={`counter${name.length >= MAX_NAME_LENGTH ? " full" : ""}`}>
+            {name.length} of {MAX_NAME_LENGTH} characters
+          </p>
+        )}
         <p className="hint">
           Once is enough. You start at 1000, and anyone can record a match against you by
           finding this name.

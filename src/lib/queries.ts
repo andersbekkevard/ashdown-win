@@ -78,6 +78,30 @@ export interface PlayerHit {
   name: string;
 }
 
+export interface RosterEntry extends PlayerHit {
+  /** Time of the player's latest match, or creation when they have none. */
+  lastActive: Date;
+}
+
+/**
+ * Every player, most recently active first, for the match form's instant
+ * picker. Small enough at residence scale to ship whole to the client.
+ */
+export async function playerRoster(): Promise<RosterEntry[]> {
+  const log = await loadLog();
+  const last = new Map<number, Date>();
+  for (const m of log.matches) {
+    for (const id of [m.a1, m.a2, m.b1, m.b2]) {
+      if (id === null) continue;
+      const cur = last.get(id);
+      if (!cur || m.createdAt > cur) last.set(id, m.createdAt);
+    }
+  }
+  return log.players
+    .map((p) => ({ id: p.id, name: p.name, lastActive: last.get(p.id) ?? p.createdAt }))
+    .sort((x, y) => y.lastActive.getTime() - x.lastActive.getTime() || x.name.localeCompare(y.name));
+}
+
 /** Case-insensitive substring search on name. */
 export async function searchPlayers(
   query: string,

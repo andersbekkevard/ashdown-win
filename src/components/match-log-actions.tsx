@@ -12,24 +12,35 @@ export function MatchLogActions({ matchId, deleted }: { matchId: number; deleted
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
-  function run(action: () => Promise<{ ok: boolean; error?: string }>) {
+  function run(action: () => Promise<{ ok: boolean; error?: string }>, done: string) {
     setError(null);
+    setStatus(null);
     start(async () => {
       const result = await action();
       if (!result.ok) setError(result.error ?? "Something went wrong.");
+      else setStatus(done);
       setConfirming(false);
       router.refresh();
     });
   }
 
+  const note = status && <span className="status pop-in" role="status">{status}</span>;
+
   if (deleted) {
     return (
       <div className="actions">
-        <button type="button" className="mini restore" disabled={pending} onClick={() => run(() => restoreMatch(matchId))}>
+        <button
+          type="button"
+          className="mini restore"
+          disabled={pending}
+          onClick={() => run(() => restoreMatch(matchId), `Match #${matchId} counts again. Ratings recomputed.`)}
+        >
           {pending ? "…" : "Restore"}
         </button>
+        {note}
         {error && <span className="mini-error" role="alert">{error}</span>}
       </div>
     );
@@ -41,6 +52,7 @@ export function MatchLogActions({ matchId, deleted }: { matchId: number; deleted
         <button type="button" className="mini" onClick={() => setConfirming(true)}>
           Delete
         </button>
+        {note}
         {error && <span className="mini-error" role="alert">{error}</span>}
       </div>
     );
@@ -49,7 +61,7 @@ export function MatchLogActions({ matchId, deleted }: { matchId: number; deleted
   return (
     <div className="actions confirm pop-in">
       <span>Delete this match?</span>
-      <button type="button" className="mini danger" disabled={pending} onClick={() => run(() => deleteMatch(matchId))}>
+      <button type="button" className="mini danger" disabled={pending} onClick={() => run(() => deleteMatch(matchId), `Match #${matchId} is void. Ratings recomputed. Restore is right here if that was a mistake.`)}>
         {pending ? "…" : "Yes, delete"}
       </button>
       <button type="button" className="mini" disabled={pending} onClick={() => setConfirming(false)}>

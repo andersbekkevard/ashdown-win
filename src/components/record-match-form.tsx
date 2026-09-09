@@ -10,10 +10,11 @@ import { PlayerSearch, type Selected } from "./player-search";
 
 type Side = "a" | "b";
 
-export function RecordMatchForm() {
+export function RecordMatchForm({ roster }: { roster: Selected[] }) {
   const router = useRouter();
   const [doubles, setDoubles] = useState(false);
   const [a1, setA1] = useState<Selected | null>(null);
+  const [known, setKnown] = useState<Selected[]>(roster);
   const [a2, setA2] = useState<Selected | null>(null);
   const [b1, setB1] = useState<Selected | null>(null);
   const [b2, setB2] = useState<Selected | null>(null);
@@ -22,6 +23,11 @@ export function RecordMatchForm() {
   const [pending, startTransition] = useTransition();
 
   const chosen = [a1, a2, b1, b2].filter((p): p is Selected => p !== null);
+  // A player created from inside the form joins the roster for the other slots.
+  const adopt = (setter: (p: Selected | null) => void) => (p: Selected | null) => {
+    if (p && !known.some((k) => k.id === p.id)) setKnown([p, ...known]);
+    setter(p);
+  };
   const exclude = chosen.map((p) => p.id);
 
   const sideA = doubles ? [a1, a2] : [a1];
@@ -106,17 +112,17 @@ export function RecordMatchForm() {
 
       <div className="side a slab">
         <div className="label">Side A</div>
-        <PlayerSearch placeholder="Player" value={a1} onChange={setA1} exclude={exclude} autoFocus />
+        <PlayerSearch placeholder="Player" value={a1} onChange={adopt(setA1)} exclude={exclude} roster={known} autoFocus />
         {doubles && (
-          <PlayerSearch placeholder="Partner" value={a2} onChange={setA2} exclude={exclude} />
+          <PlayerSearch placeholder="Partner" value={a2} onChange={adopt(setA2)} exclude={exclude} roster={known} />
         )}
       </div>
       <div className="vs">VS</div>
       <div className="side b slab">
         <div className="label">Side B</div>
-        <PlayerSearch placeholder="Player" value={b1} onChange={setB1} exclude={exclude} />
+        <PlayerSearch placeholder="Player" value={b1} onChange={adopt(setB1)} exclude={exclude} roster={known} />
         {doubles && (
-          <PlayerSearch placeholder="Partner" value={b2} onChange={setB2} exclude={exclude} />
+          <PlayerSearch placeholder="Partner" value={b2} onChange={adopt(setB2)} exclude={exclude} roster={known} />
         )}
       </div>
 

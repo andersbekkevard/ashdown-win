@@ -12,6 +12,9 @@ export default async function HomePage() {
   const rows = await leaderboard();
   return (
     <>
+      <p className="lead">
+        The table tennis ladder for Ashdown House. Add your name, record who won, climb.
+      </p>
       <div className="board slab pop-in">
         <div className="board-head">
           <h1 className="shout">Leaderboard</h1>

@@ -1,9 +1,9 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { createPortal } from "react-dom";
-import { searchPlayers } from "@/app/actions";
 import { MAX_NAME_LENGTH } from "@/lib/config";
+import { normalizeName } from "@/lib/names";
 import { CreatePlayerForm } from "./create-player-form";
 
 export interface Selected {
@@ -20,15 +20,20 @@ function PaddleIcon() {
   );
 }
 
+const SHOWN = 8;
+
 /**
- * One search box. Type a substring, pick a hit. A query that matches nobody
- * offers a link to create that player; it never creates one itself.
+ * One picker. The whole roster is already on the client, most recently
+ * active first, so the list opens the moment the box is focused and filters
+ * as you type with no round trip. A name that matches nobody offers to
+ * create that player in a sheet; it never creates one silently.
  */
 export function PlayerSearch({
   placeholder,
   value,
   onChange,
   exclude,
+  roster,
   autoFocus = false,
 }: {
   placeholder: string;
@@ -36,43 +41,13 @@ export function PlayerSearch({
   onChange: (next: Selected | null) => void;
   /** Ids already used elsewhere in the match; hidden from results. */
   exclude: number[];
+  roster: Selected[];
   autoFocus?: boolean;
 }) {
   const inputId = useId();
   const [query, setQuery] = useState("");
-  const [hits, setHits] = useState<Selected[] | null>(null);
-  const [searching, setSearching] = useState(false);
+  const [open, setOpen] = useState(false);
   const [creating, setCreating] = useState<string | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const requestId = useRef(0);
-
-  function reset() {
-    if (timer.current) clearTimeout(timer.current);
-    requestId.current += 1;
-    setQuery("");
-    setHits(null);
-    setSearching(false);
-  }
-
-  function onQueryChange(next: string) {
-    setQuery(next);
-    if (timer.current) clearTimeout(timer.current);
-    const id = ++requestId.current;
-    const q = next.trim();
-    if (!q) {
-      setHits(null);
-      setSearching(false);
-      return;
-    }
-    setSearching(true);
-    timer.current = setTimeout(async () => {
-      const result = await searchPlayers(q);
-      if (id === requestId.current) {
-        setHits(result);
-        setSearching(false);
-      }
-    }, 150);
-  }
 
   if (value) {
     return (
@@ -82,7 +57,7 @@ export function PlayerSearch({
           type="button"
           onClick={() => {
             onChange(null);
-            reset();
+            setQuery("");
           }}
         >
           change
@@ -91,8 +66,18 @@ export function PlayerSearch({
     );
   }
 
-  const visible = hits?.filter((h) => !exclude.includes(h.id)) ?? null;
-  const trimmed = query.trim();
+  const q = normalizeName(query).toLowerCase();
+  const available = roster.filter((p) => !exclude.includes(p.id));
+  const hits = q ? available.filter((p) => p.name.toLowerCase().includes(q)) : available;
+  const shown = hits.slice(0, SHOWN);
+  const exact = q && available.some((p) => p.name.toLowerCase() === q);
+  const trimmed = normalizeName(query);
+
+  function pick(p: Selected) {
+    onChange(p);
+    setQuery("");
+    setOpen(false);
+  }
 
   return (
     <div className="field">
@@ -101,7 +86,18 @@ export function PlayerSearch({
         id={inputId}
         type="search"
         value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && shown.length > 0) {
+            e.preventDefault();
+            pick(shown[0]);
+          }
+        }}
         maxLength={MAX_NAME_LENGTH}
         placeholder={placeholder}
         autoComplete="off"
@@ -110,22 +106,22 @@ export function PlayerSearch({
         autoFocus={autoFocus}
         aria-label={placeholder}
       />
-      {trimmed && (
-        <div className="sugg pop-in">
-          {searching && visible === null ? (
-            <div className="hint">Searching…</div>
-          ) : visible && visible.length > 0 ? (
-            visible.map((h) => (
-              <button key={h.id} type="button" onClick={() => onChange(h)}>
-                {h.name}
-              </button>
-            ))
-          ) : visible ? (
-            <button type="button" className="create" onClick={() => setCreating(trimmed)}>
-              <span>No one called &ldquo;{trimmed}&rdquo;</span>
-              <b>Create</b>
+      {open && (
+        <div className="sugg pop-in" role="listbox">
+          {!q && shown.length > 0 && <div className="hint">Recently at the table</div>}
+          {shown.map((h) => (
+            <button key={h.id} type="button" role="option" aria-selected={false} onMouseDown={(e) => e.preventDefault()} onClick={() => pick(h)}>
+              {h.name}
             </button>
-          ) : null}
+          ))}
+          {hits.length > SHOWN && <div className="hint">{hits.length - SHOWN} more, keep typing</div>}
+          {q && !exact && trimmed && (
+            <button type="button" className="create" onMouseDown={(e) => e.preventDefault()} onClick={() => setCreating(trimmed)}>
+              <span>{shown.length ? "Not them?" : `No one called “${trimmed}”`}</span>
+              <b>Create &ldquo;{trimmed}&rdquo;</b>
+            </button>
+          )}
+          {!q && available.length === 0 && <div className="hint">No other players yet. Type a name to create one.</div>}
         </div>
       )}
       {creating !== null &&
@@ -137,8 +133,7 @@ export function PlayerSearch({
                 variant="sheet"
                 onCreated={(p) => {
                   setCreating(null);
-                  reset();
-                  onChange(p);
+                  pick(p);
                 }}
                 onCancel={() => setCreating(null)}
               />
