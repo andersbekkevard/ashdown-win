@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 const COLOURS = ["#fb3aa3", "#00b5fe", "#ffd046", "#5eeac0", "#7c7be8", "#ffffff", "#c81c74"];
 const N = 70;
@@ -15,6 +15,13 @@ const jitter = (i: number, k: number) => ((i * 9301 + k * 49297 + 233) % 233280)
 export function RecordedFlash() {
   const router = useRouter();
   const [gone, setGone] = useState(false);
+  // Pieces carry inline custom properties; render them only after hydration
+  // so the server HTML and the client tree never disagree.
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -30,9 +37,9 @@ export function RecordedFlash() {
     const angle = jitter(i, 1) * Math.PI * 2;
     const speed = 160 + jitter(i, 2) * 260;
     return {
-      dx: `${Math.cos(angle) * speed}px`,
-      dy: `${Math.sin(angle) * speed * 0.6 - 120}px`,
-      fall: `${260 + jitter(i, 5) * 200}px`,
+      dx: `${Math.round(Math.cos(angle) * speed)}px`,
+      dy: `${Math.round(Math.sin(angle) * speed * 0.6 - 120)}px`,
+      fall: `${Math.round(260 + jitter(i, 5) * 200)}px`,
       r: `${Math.round(jitter(i, 3) * 900 - 450)}deg`,
       delay: `${Math.round(jitter(i, 4) * 140)}ms`,
       colour: COLOURS[i % COLOURS.length],
@@ -44,7 +51,7 @@ export function RecordedFlash() {
   return (
     <div className="flash" aria-live="polite" role="status">
       <div className="flash-confetti" aria-hidden="true">
-        {pieces.map((p, i) => (
+        {mounted && pieces.map((p, i) => (
           <i
             key={i}
             className={p.round ? "round" : ""}
