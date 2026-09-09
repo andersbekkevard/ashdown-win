@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { createPortal } from "react-dom";
-import { recordMatch, type Recorded } from "@/app/actions";
-import { RecordedBanner } from "./recorded-banner";
+import { recordMatch } from "@/app/actions";
 import { Crown } from "./crown";
 import { Dock } from "./dock";
 import { PlayerSearch, type Selected } from "./player-search";
@@ -22,7 +20,6 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
   const [b2, setB2] = useState<Selected | null>(null);
   const [winner, setWinner] = useState<Side | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<{ result: Recorded; a: Selected[]; b: Selected[]; winner: Side } | null>(null);
   const [pending, startTransition] = useTransition();
 
   const chosen = [a1, a2, b1, b2].filter((p): p is Selected => p !== null);
@@ -61,7 +58,7 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
     startTransition(async () => {
       const result = await recordMatch({ a: toIds(sideA), b: toIds(sideB), winner });
       if (result.ok) {
-        setDone({ result: result.value, a: sideA as Selected[], b: sideB as Selected[], winner });
+        router.push("/?recorded=1");
         router.refresh();
       } else {
         setError(result.error);
@@ -145,27 +142,6 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
         </p>
       )}
 
-      {done &&
-        createPortal(
-          <RecordedBanner
-            a={done.a}
-            b={done.b}
-            winner={done.winner}
-            deltaA={done.result.deltaA}
-            onBoard={() => {
-              router.push("/");
-            }}
-            onAgain={() => {
-              setDone(null);
-              setA1(null);
-              setA2(null);
-              setB1(null);
-              setB2(null);
-              setWinner(null);
-            }}
-          />,
-          document.body,
-        )}
       <Dock>
         <Link href="/" className="btn ghost">
           Cancel

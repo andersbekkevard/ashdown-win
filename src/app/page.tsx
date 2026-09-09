@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Crown } from "@/components/crown";
 import { Dock } from "@/components/dock";
+import { RecordedFlash } from "@/components/recorded-flash";
 import { formatRating } from "@/lib/format";
 import { leaderboard } from "@/lib/queries";
 
@@ -8,10 +9,15 @@ export const dynamic = "force-dynamic";
 
 const hexClass = ["gold", "silver", "bronze"];
 
-export default async function HomePage() {
-  const rows = await leaderboard();
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ recorded?: string }>;
+}) {
+  const [rows, { recorded }] = await Promise.all([leaderboard(), searchParams]);
   return (
     <>
+      {recorded !== undefined && <RecordedFlash />}
       <p className="lead">
         The table tennis ladder for Ashdown House. Add your name, record who won, climb.{" "}
         <Link href="/algorithm" className="howlink">
