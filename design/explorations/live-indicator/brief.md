@@ -182,3 +182,100 @@ to inform them, **option D in red** is the runner-up: same small-red-element dis
 ink capsule that matches the existing chips exactly, an obvious hit area, and a morph that is much
 harder to ignore. Option A in mint is the most fun and the most "equipment", and it is also the
 tightest fit at 3 px of spare width, so it is the one most likely to break on a narrower phone.
+
+---
+
+# Round 3 — eight contained pills
+
+Anders reviewed `rec.html` and moved the brief again. Round 3 is in `live3.html`; `index.html` and
+`rec.html` are unchanged.
+
+What changed, in his terms: **it must be obviously tappable**, so every option is a pill or capsule
+and the bare dot-in-a-ring from round 2 is dead. **Colour narrows to pink or red**, because the
+indicator lands beside the brand pink logo and nothing else is in play. **The dot stays and pulses
+under about ten minutes.** **Wording opens up** — new words, and a serious test of whether a relative
+timestamp beats a word. **At least eight options**, distinct in shape, motion and label strategy.
+
+## Pink or red, judged against the logo
+
+The page opens with one identical pill rendered six ways in the real top bar, so the hue is judged
+eight pixels from the wordmark rather than in isolation.
+
+| Treatment | Verdict |
+|---|---|
+| Brand pink `#fb3aa3` fill | Matches the logo exactly, and that is the problem. Two pink pills in one row read as a single interrupted object, and the indicator borrows authority from the wordmark that it has not earned. |
+| REC red `#e8232a` fill | The true recording red, and legible — but as a *filled pill* it sits a short hop from the logo's magenta and the pair vibrates. Red is safe in proportion to how little of it there is. |
+| Crimson `#b8102e` fill | Dark enough to read as a decision rather than a near-miss. The best of the filled reds against pink. |
+| Vermilion `#f4501e` fill | Pushed toward orange, so it separates from the pink cleanly — but it starts to argue with the crown's gold. |
+| **Ink pill, REC red dot** | Red confined to eight pixels. Nothing competes with the logo and the pill is already a member of the chip family. |
+| **White pill, REC red dot** | Same discipline, louder container. The white slab is the app's own card, so it reads as a control at a glance. |
+
+The conclusion the strip makes visible: **the colour question is really a question about area.** Any
+red works at dot scale; almost none works as a 47 px filled pill next to that logo. Pink fails not
+because it clashes but because it duplicates.
+
+## The eight
+
+Every option shows its full life cycle in the 390 px top bar — under ten minutes with the pulse
+running, ten to sixty minutes, a few hours, nothing today, and the live state again frozen under
+reduced motion — with the logo and the How? chip present in all of them.
+
+| # | Option | Label strategy | Colour | Shape | Motion | Widest state |
+|---|---|---|---|---|---|---|
+| 1 | REC card | A word while hot, a time after — `REC` `24m` `3h` `OFF` | White slab, vermilion dot | Rounded slab, 9 px corners; the only non-pill | Dot pulses in scale, ~1.1 Hz | 48 px, 2 spare |
+| 2 | Timecode | Elapsed clock — `0:04` `0:37` `3:12` `–:–` | Crimson pill, ink screen | Pill wrapping a recessed dark screen | The colon blinks, hard 1 Hz | 47 px, 3 spare |
+| 3 | Chip minutes | Bare compact time — `4m` `24m` `3h` `–` | Ink pill, REC red dot | The existing How? chip exactly | A hard halo contracts onto the dot | 47 px, 3 spare |
+| 4 | Heat pill | Temperature, no numbers — `HOT` `WARM` `COOL` `COLD` | Brand pink, white rim | Pill wearing the logo's own rim | A hard white rim grows and fades | 47 px, 3 spare |
+| 5 | Numeral capsule | Time with the digit large, unit small | Vermilion lamp well + ink body | Two-tone capsule; the most distinctive silhouette | The lamp well washes darker | 46 px, 4 spare |
+| 6 | Collapsing pill | A label only when there is news; a bare lamp when there is none | Crimson pill, white dot | Pill that shrinks to a 31 px coin when quiet | A gloss sweeps across, 2.6 s | 46 px, 4 spare |
+| 7 | Long phrase | A real sentence — `just now` `18 min` `2 hours` `quiet` | White pill, REC red dot | Wide pill, body type, sentence case | The whole pill breathes, 2.3 s | 74 px, 15 spare — logo 22→18 px |
+| 8 | Ago pill | Relative time with the *ago* spelled out — `4m ago` `24m ago` `3h ago` `none` | Ink pill, vermilion dot | Full pill, chip-native | The dot blinks hard, 1 Hz square wave | 67 px, 12 spare — logo 22→19 px |
+
+## The finding that decides it
+
+Building these produced a result I did not expect and would not have got from arithmetic alone.
+
+**The compact options are the fragile ones.** Options 1 to 6 all fit, but they fit by 2 to 4 pixels.
+They are wedged into whatever the current layout happens to leave over, and that margin is thinner
+than the difference between Titan One and its fallback, thinner than a 375 px iPhone SE, and thinner
+than any future change to the wordmark. Every one of them is one small decision away from breaking.
+
+**The verbose options are the robust ones.** Options 7 and 8 look like they cost more and in fact
+cost less. Taking the logo from 22 px to 19 px frees about 29 px while the extra label costs about
+20, so option 8 ends up with **12 px of spare width — three times the headroom of any compact
+option** — and option 7 with 15. Buying space once, deliberately, from the element that has it,
+leaves a layout with slack in it. Squeezing into the leftovers does not.
+
+That inverts the trade-off. Anders' hunch that a time is a higher signal than a word is right, and
+it turns out the honest version of a time is also the safer one to build.
+
+## Recommendation
+
+**Ship option 8, the Ago pill: an ink pill with a vermilion dot, labelled `4m ago`.**
+
+It answers every part of the brief without a compromise anywhere. It is a filled pill identical in
+ink, radius and height to the existing How? chip, so it is unmistakably a control and it joins a
+family rather than founding one. Its only colour is an eight-pixel dot, which the comparison strip
+shows is the one place any red is safe beside that logo — so the pink-versus-red question is
+answered by not making the indicator a coloured object at all. The dot blinks on a hard square wave
+while the last match is under ten minutes old, which is the camera cadence and reads as a machine
+running rather than an app notifying, and it goes solid, then dark, then grey as the day ages.
+
+And the label is the thing worth arguing for. `4m` is ambiguous — it could be a duration, a score, a
+court number. `4m ago` can only be a time, nobody has to be taught it, and it costs fourteen pixels.
+Those fourteen pixels are bought from three points of wordmark, and the mock shows the logo at 19 px
+looking entirely intact. The result has more slack than any of the tightly-packed alternatives.
+
+Two refinements to fold in at build time, both free. Borrow option 7's wording for the freshest
+state: `just now` measures the same as `24m ago`, so the ladder can read *just now → 24m ago → 3h
+ago → none* at no extra width. And if the canonical recording red is wanted over the vermilion, swap
+the dot to `#e8232a`; at eight pixels the strip shows both are safe.
+
+**Runner-up:** option 7 if a whole sentence is worth four points of wordmark rather than three — it
+is warmer and needs no decoding at all, in the app's own white slab. **If the logo must stay at
+22 px**, option 3, Chip minutes, is the pick: the same ink-pill-and-red-dot discipline, `4m` as the
+label, and the smallest footprint of the eight. It is the safe answer rather than the good one.
+
+**Not recommended:** option 4 is the clearest illustration of why pink fails — the mock shows two
+pink pills reading as one broken object. Option 6 is charming but changes the row's width when the
+first match of the day lands, which shifts the How? chip; only worth it if empty days are the norm.

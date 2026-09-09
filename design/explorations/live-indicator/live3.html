@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live indicator, round 3 — eight contained pills — ashdown.win</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Titan+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#fb3aa3; --raspberry:#c81c74; --blue:#00b5fe; --deep:#0866d7;
+  --gold:#ffd046; --lilac:#7c7be8; --ink:#222126; --paper:#ffffff; --cream:#fff6d5;
+  --muted:#6b7080; --faint:#8a8fa3;
+  /* round 3 palette: brand pink, and three reds pushed away from it */
+  --brand:#fb3aa3;
+  --rec:#e8232a;        /* true REC red */
+  --crimson:#b8102e;    /* deeper, darker */
+  --vermilion:#f4501e;  /* pushed toward orange */
+  --display:"Titan One","Arial Rounded MT Bold","Fredoka",system-ui,sans-serif;
+  --body:"Fredoka","Arial Rounded MT Bold",system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body);font-weight:500;color:var(--ink);background:var(--blue);
+  background-image:repeating-radial-gradient(circle at 50% 4%, rgba(255,255,255,.14) 0 28px, rgba(255,255,255,0) 28px 72px);
+  background-attachment:fixed;min-height:100dvh;overflow-x:hidden;padding:0 10px 60px;
+}
+.wrap{max-width:1180px;margin:0 auto}
+.shout{font-family:var(--display);font-weight:400;color:var(--paper);-webkit-text-stroke:.12em var(--rec);paint-order:stroke fill;text-shadow:.05em .08em 0 var(--ink);text-transform:uppercase;line-height:.95}
+header.page{padding:30px 4px 6px}
+header.page h1{font-size:clamp(24px,5.2vw,40px);margin:0 0 14px;transform:rotate(-1.5deg)}
+.lede{background:var(--paper);border:4px solid var(--paper);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:16px 18px;font-size:15px;line-height:1.5}
+.lede p{margin:0 0 10px} .lede p:last-child{margin:0}
+.lede code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--cream);padding:1px 6px;border-radius:6px;border:1.5px solid #e6dfba}
+.budget{background:var(--cream);border:3px dashed var(--ink);border-radius:16px;padding:11px 13px;margin:12px 0 0;font-size:14px;line-height:1.45;font-weight:600}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 4px 20px}
+.tgl{display:inline-flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);font-family:var(--body);font-weight:700;font-size:13px;padding:9px 15px;border-radius:999px;border:3px solid var(--paper);box-shadow:0 4px 0 rgba(0,0,0,.35);cursor:pointer;user-select:none}
+.tgl input{appearance:none;width:34px;height:19px;border-radius:999px;background:#5a5e70;position:relative;margin:0;cursor:pointer;flex:none;transition:background 140ms}
+.tgl input::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--paper);transition:transform 160ms cubic-bezier(.3,1.5,.5,1)}
+.tgl input:checked{background:#5eeac0}
+.tgl input:checked::after{transform:translateX(15px)}
+
+section.card{background:var(--paper);border:4px solid var(--paper);border-radius:26px;box-shadow:0 7px 0 var(--ink);padding:18px 18px 20px;margin-bottom:20px;overflow:hidden}
+section.card>h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0 0 4px;text-transform:uppercase;line-height:1.2;display:flex;align-items:center;gap:10px}
+.hexn{display:inline-grid;place-items:center;width:28px;height:28px;flex:none;font-family:var(--display);font-size:14px;color:var(--paper);background:var(--lilac);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.meta{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:0 0 10px;line-height:1.5}
+.meta b{color:var(--ink)}
+.why{font-size:14.5px;line-height:1.5;margin:0 0 16px;color:#3b3a44}
+.sub{font-family:var(--display);font-weight:400;font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin:0 0 9px}
+.grid2{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));align-items:start}
+
+/* ── faithful 390 px top bar ── */
+.lane{margin-bottom:12px}
+.lanecap{font-size:12px;font-weight:700;color:var(--muted);margin:0 0 5px 4px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#cmp .lanecap{justify-content:center;margin-left:0}
+.lanecap .pipfx{font-family:var(--display);font-weight:400;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--paper);background:var(--rec);padding:2px 7px;border-radius:999px}
+.lanecap .pipfx.calm{background:var(--faint)}
+.lanecap .pipfx.rm{background:var(--lilac)}
+.mockwrap{overflow-x:auto;padding-bottom:3px}
+.bezel{width:396px;max-width:100%;border:3px solid var(--ink);border-radius:20px;overflow:hidden;box-shadow:0 4px 0 rgba(34,33,38,.35);margin:0 auto}
+.screen{width:390px;background:var(--blue);background-image:repeating-radial-gradient(circle at 50% 22%, rgba(255,255,255,.14) 0 28px, rgba(255,255,255,0) 28px 72px);padding-bottom:8px}
+.phone{padding:0 14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 4px 10px;gap:8px}
+.logo{display:inline-flex;align-items:center;gap:8px;background:var(--pink);color:var(--paper);font-family:var(--display);font-size:22px;padding:8px 18px 8px 12px;border-radius:999px;border:3px solid var(--paper);box-shadow:0 5px 0 var(--ink);transform:rotate(-2deg);text-shadow:0 2px 0 var(--raspberry);white-space:nowrap;flex:none}
+.logo.md{font-size:19px;padding:8px 15px 8px 11px}
+.logo.sm{font-size:18px;padding:7px 14px 7px 10px}
+.logo svg{width:28px;height:22px;flex:none}
+.logo.md svg,.logo.sm svg{width:24px;height:19px}
+.chips{display:flex;gap:6px;align-items:center;flex:none}
+.chip{background:var(--ink);color:var(--paper);font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;border:0;font-family:var(--body);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.strip{height:44px;margin:2px 14px 0;border-radius:14px;background:rgba(255,255,255,.85);border:3px solid var(--paper);box-shadow:0 3px 0 rgba(34,33,38,.5);display:flex;align-items:center;padding:0 11px;gap:9px}
+.strip .fh{width:22px;height:22px;background:var(--gold);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);flex:none}
+.strip .fl{height:8px;border-radius:5px;background:#dfe3ef;width:88px}
+.strip .fb{width:48px;margin-left:auto;background:var(--cream);border:2px solid #e0d7ad;height:18px;border-radius:999px}
+.fit{font-size:12.5px;font-weight:600;color:var(--muted);line-height:1.5;margin:6px 2px 0;text-align:center}
+.fit b{color:var(--ink)} .fit .ok{color:#12855f;font-weight:700} .fit .no{color:var(--raspberry);font-weight:700}
+.cost{display:block;margin-top:2px;font-size:11.5px;color:var(--raspberry);font-weight:700}
+
+/* ══════════ shared indicator base ══════════
+   One variable gates every animation. Frozen, the duration collapses to nothing and
+   `both` fill leaves each element on its 100% keyframe — which every keyframe below
+   authors as the emphasised pose, so reduced motion freezes loud rather than blank. */
+.ind{
+  --dur:1.15s; --dur-slow:2.3s; --iter:infinite;
+  display:inline-flex;align-items:center;height:31px;flex:none;white-space:nowrap;
+  cursor:pointer;font-family:var(--display);font-weight:400;justify-content:center;position:relative;
+}
+.rm-demo .ind, body.stillness .ind{--dur:.001s;--dur-slow:.001s;--iter:1}
+@media (prefers-reduced-motion:reduce){ .ind{--dur:.001s;--dur-slow:.001s;--iter:1} }
+@keyframes pScale{0%,100%{transform:scale(1);opacity:1}52%{transform:scale(.48);opacity:.35}}
+@keyframes blinkHard{0%,100%{opacity:1}50%{opacity:.14}}
+@keyframes rimFlash{0%,100%{box-shadow:0 3px 0 var(--ink),0 0 0 3px rgba(255,255,255,.9)}55%{box-shadow:0 3px 0 var(--ink),0 0 0 0 rgba(255,255,255,0)}}
+@keyframes wash{0%,100%{filter:none}50%{filter:brightness(.55)}}
+@keyframes breathe{0%,100%{transform:scale(1.035)}50%{transform:scale(1)}}
+
+/* ── 1. REC card — rounded slab, white, ink outline, vermilion dot ── */
+.o1{border-radius:9px;background:var(--paper);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);color:var(--ink);padding:0 5px;gap:4px;font-size:10px;letter-spacing:.03em;min-width:48px}
+.o1 .dot{width:7px;height:7px;border-radius:50%;background:var(--vermilion);flex:none}
+.o1.s-live .dot{animation:pScale var(--dur) ease-in-out var(--iter) both}
+.o1.s-hours{background:#f1f3f9}
+.o1.s-quiet{background:#e4e7f0;border-color:#8b8f9c;box-shadow:0 3px 0 #8b8f9c;color:#7a7f90}
+.o1.s-quiet .dot{background:#a8adbd}
+
+/* ── 2. Timecode — crimson pill wrapping an ink screen, colon blinks ── */
+.o2{border-radius:999px;background:var(--crimson);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);padding:0 3px;min-width:46px}
+.o2 .lcd{display:inline-flex;align-items:center;gap:2px;background:var(--ink);border-radius:999px;padding:2px 4px;flex:none}
+.o2 .dot{width:5px;height:5px;border-radius:50%;background:#ff6a5c;flex:none}
+.o2 .tc{font-size:9px;color:#ffdad6;letter-spacing:.01em}
+.o2.s-live .cln{animation:blinkHard var(--dur) steps(1,end) var(--iter) both}
+.o2.s-hours{background:#8d1026}
+.o2.s-quiet{background:#7d8091;border-color:#5f6272;box-shadow:0 3px 0 #5f6272}
+.o2.s-quiet .dot{background:#9aa0b4} .o2.s-quiet .tc{color:#c9cddb}
+
+/* ── 3. Chip minutes — ink pill, chip-native, red dot with a contained halo ── */
+.o3{border-radius:999px;background:var(--ink);color:var(--paper);padding:0 7px;gap:5px;font-family:var(--body);font-weight:700;font-size:10.5px;min-width:44px}
+.o3 .dot{width:8px;height:8px;border-radius:50%;background:var(--rec);flex:none;position:relative}
+.o3 .dot::after{content:"";position:absolute;inset:-2.5px;border-radius:50%;border:2px solid var(--rec);opacity:0}
+.o3.s-live .dot::after{animation:haloOut var(--dur) ease-out var(--iter) both}
+@keyframes haloOut{0%{transform:scale(1.9);opacity:0}100%{transform:scale(1);opacity:.85}}
+.o3.s-hours .dot{background:#8e2a2e}
+.o3.s-quiet{background:#4a4e5e;color:#b9bece}
+.o3.s-quiet .dot{background:#787e92}
+
+/* ── 4. Heat pill — brand pink, white rim, temperature word ── */
+.o4{border-radius:999px;background:var(--brand);border:2.5px solid var(--paper);box-shadow:0 3px 0 var(--ink);color:var(--paper);text-shadow:0 1.5px 0 var(--raspberry);padding:0 3px;gap:3px;font-size:8px;letter-spacing:.03em;min-width:46px}
+.o4 .dot{width:7px;height:7px;border-radius:50%;background:var(--paper);flex:none}
+.o4.s-live{animation:rimFlash var(--dur) ease-in-out var(--iter) both}
+.o4.s-hours{background:#ff9ad2;color:var(--ink);text-shadow:none}
+.o4.s-hours .dot{background:var(--ink)}
+.o4.s-quiet{background:rgba(255,255,255,.3);border-color:rgba(255,255,255,.85);color:var(--paper);text-shadow:0 1.5px 0 rgba(34,33,38,.5)}
+.o4.s-quiet .dot{background:rgba(255,255,255,.85)}
+
+/* ── 5. Numeral capsule — vermilion lamp well fused to an ink readout ── */
+.o5{border-radius:999px;background:var(--ink);color:var(--paper);padding:0;overflow:hidden;min-width:44px;font-family:var(--body)}
+.o5 .cap{width:16px;align-self:stretch;background:var(--vermilion);display:grid;place-items:center;flex:none}
+.o5 .cap i{width:7px;height:7px;border-radius:50%;background:var(--paper);display:block}
+.o5 .val{display:inline-flex;align-items:baseline;gap:1px;padding:0 4px}
+.o5 .n{font-family:var(--display);font-size:12px;line-height:1}
+.o5 .u{font-family:var(--body);font-weight:700;font-size:8px;opacity:.75}
+.o5.s-live .cap{animation:wash var(--dur) ease-in-out var(--iter) both}
+.o5.s-hours .cap{background:#9c3b1a}
+.o5.s-quiet{background:#4a4e5e;color:#b9bece}
+.o5.s-quiet .cap{background:#787e92}
+
+/* ── 6. Collapsing pill — crimson, gloss sweep, drops its label when there is no news ── */
+.o6{border-radius:999px;background:var(--crimson);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);color:var(--paper);padding:0 6px;gap:4px;font-family:var(--body);font-weight:700;font-size:10px;min-width:44px;overflow:hidden}
+.o6 .dot{width:7px;height:7px;border-radius:50%;background:var(--paper);flex:none}
+.o6.s-live::after{content:"";position:absolute;top:0;bottom:0;left:-20px;width:15px;transform:skewX(-18deg);background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.6),rgba(255,255,255,0));animation:gloss 2.6s ease-in-out infinite}
+@keyframes gloss{0%{left:-20px}55%,100%{left:110%}}
+.rm-demo .o6.s-live::after, body.stillness .o6.s-live::after{display:none}
+@media (prefers-reduced-motion:reduce){ .o6.s-live::after{display:none} }
+.o6.s-hours{background:#8d1026}
+.o6.s-quiet{min-width:31px;width:31px;padding:0;gap:0;background:var(--ink);border-color:var(--ink);box-shadow:0 3px 0 rgba(34,33,38,.55)}
+.o6.s-quiet .dot{background:#787e92}
+
+/* ── 7. Long phrase — white pill, ink outline, red dot, a real sentence ── */
+.o7{border-radius:999px;background:var(--paper);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);color:var(--ink);padding:0 8px 0 7px;gap:5px;font-family:var(--body);font-weight:600;font-size:10.5px;min-width:74px}
+.o7 .dot{width:7px;height:7px;border-radius:50%;background:var(--rec);flex:none}
+.o7.s-live{animation:breathe var(--dur-slow) ease-in-out var(--iter) both}
+.o7.s-hours{background:#f1f3f9;color:#5c6070}
+.o7.s-hours .dot{background:#c07f82}
+.o7.s-quiet{background:#e4e7f0;border-color:#8b8f9c;box-shadow:0 3px 0 #8b8f9c;color:#7a7f90}
+.o7.s-quiet .dot{background:#a8adbd}
+
+/* ── 8. Ago pill — ink pill, vermilion dot blinking hard, the "ago" spelled out ── */
+.o8{border-radius:999px;background:var(--ink);color:var(--paper);padding:0 8px;gap:5px;font-family:var(--body);font-weight:700;font-size:10px;min-width:62px}
+.o8 .dot{width:8px;height:8px;border-radius:50%;background:var(--vermilion);flex:none}
+.o8.s-live .dot{animation:blinkHard var(--dur) steps(1,end) var(--iter) both}
+.o8.s-hours .dot{background:#9c4a2c}
+.o8.s-quiet{background:#4a4e5e;color:#b9bece}
+.o8.s-quiet .dot{background:#787e92}
+
+/* ── the pink-versus-red comparison strip ── */
+.cmp{border-radius:999px;border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);padding:0 8px;gap:5px;font-family:var(--body);font-weight:700;font-size:11px;min-width:46px;background:var(--fill);color:var(--paper)}
+.cmp .dot{width:8px;height:8px;border-radius:50%;background:var(--paper);flex:none}
+.cmp.dotonly{background:var(--carrier);color:var(--ctext)}
+.cmp.dotonly .dot{background:var(--fill)}
+.verdict{font-size:13px;line-height:1.5;font-weight:600;color:#3b3a44;margin:6px 2px 0;text-align:center}
+.verdict b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:12px}
+.sw-chip{display:inline-block;width:11px;height:11px;border-radius:3px;border:2px solid var(--ink);vertical-align:-1px;margin-right:4px}
+
+footer.page{margin:4px 4px 0;color:var(--paper);font-weight:600;font-size:14px;line-height:1.55;text-shadow:0 2px 0 rgba(34,33,38,.4)}
+footer.page code{background:rgba(255,255,255,.25);padding:1px 6px;border-radius:6px}
+
+@media (max-width:520px){
+  body{padding:0 6px 50px}
+  section.card{padding:15px 7px 17px;border-radius:22px}
+  header.page{padding:22px 6px 6px}
+  .why,.meta,.sub{padding:0 4px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <h1 class="shout">Round 3 — eight contained pills</h1>
+  <div class="lede">
+    <p>Everything here is a <b>pill or capsule with a dot and a label</b>. Nothing floats on the blue, so
+    every option reads as a control you can press rather than as decoration — that was the fault in round 2's
+    bare ring, and it is gone.</p>
+    <p>The dot <b>pulses only while a match is under ten minutes old</b>. After that it goes solid, then calm,
+    then grey. Colour is restricted to the brand pink and three reds pushed away from it —
+    <span class="sw-chip" style="background:#fb3aa3"></span>pink <code>#fb3aa3</code>,
+    <span class="sw-chip" style="background:#e8232a"></span>REC red <code>#e8232a</code>,
+    <span class="sw-chip" style="background:#b8102e"></span>crimson <code>#b8102e</code>,
+    <span class="sw-chip" style="background:#f4501e"></span>vermilion <code>#f4501e</code> — plus the two
+    treatments where the red lives only in the dot and the pill itself is ink or white.</p>
+    <p>Every option shows its whole life cycle in the real top bar: under ten minutes with the pulse running,
+    ten to sixty minutes, a few hours, nothing today, and the live state again under reduced motion.</p>
+    <div class="budget">
+      <b>The width budget, still binding.</b> At 390&nbsp;px the top bar has 354&nbsp;px of usable width and the
+      current contents already spend 355.9. The indicator takes the "Log" chip's slot, leaving about
+      <b>48&nbsp;px</b>. That is roughly a dot plus three characters — which is the whole reason options 7 and 8
+      below have to buy their space from the logo. Each option is measured at runtime across all four states and
+      reports its widest.
+    </div>
+  </div>
+  <div class="toolbar">
+    <label class="tgl"><input type="checkbox" id="still"> Hold everything still (preview reduced motion)</label>
+  </div>
+</header>
+
+<section class="card" id="cmp-card">
+  <h2><span class="hexn">?</span>Pink or red?</h2>
+  <p class="why">The indicator lands eight pixels from the logo, so the hue has to be judged against that pink and
+    not on its own. Below, one identical pill in four fills, then the same information with the colour confined to
+    the dot. Same label, same shape, same dot — only the colour treatment changes.</p>
+  <div id="cmp"></div>
+</section>
+
+<div class="grid2" id="opts"></div>
+
+<footer class="page">
+  <p>Every state is legible from fill, dot and label with all motion stopped, so
+  <code>prefers-reduced-motion: reduce</code> freezes each live state in its emphasised pose rather than blanking
+  it — the fifth mock in every option is that frozen rendering, and the toggle at the top applies it to the whole
+  page. Recommendation and the round-3 notes are in <b>brief.md</b>. Rounds 1 and 2 are in <b>index.html</b> and
+  <b>rec.html</b>.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var CROWN = '<svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>';
+
+  function bar(indicatorHTML, logoClass, withHow) {
+    return '<div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">' +
+      '<header class="topbar" data-bar>' +
+        '<a class="logo ' + (logoClass || '') + '" data-logo href="#">' + CROWN + 'ashdown.win</a>' +
+        '<nav class="chips" data-chips>' +
+          (withHow === false ? '' : '<a class="chip" href="#">How?</a>') +
+          indicatorHTML +
+        '</nav>' +
+      '</header>' +
+      '<div class="strip"><span class="fh"></span><span class="fl"></span><span class="fl fb"></span></div>' +
+    '</div></div></div></div>';
+  }
+
+  // ── indicator builders, one per option ────────────────────────────────────
+  // Each returns the markup for one state. `data-ind` marks the measured element.
+  function pill(cls, state, inner, extra) {
+    return '<a class="ind ' + cls + ' s-' + state + '" data-ind href="#" aria-label="' +
+      (extra || '') + '">' + inner + '</a>';
+  }
+  var DOT = '<span class="dot"></span>';
+
+  var BUILD = {
+    o1: function (s, l) { return pill('o1', s, DOT + l, 'Match activity — see the matches'); },
+    o2: function (s, l) {
+      var parts = l.split(":");
+      return pill('o2', s,
+        '<span class="lcd"><span class="dot"></span><span class="tc">' + parts[0] +
+        '<span class="cln">:</span>' + parts[1] + '</span></span>', 'Time since the last match');
+    },
+    o3: function (s, l) { return pill('o3', s, DOT + l, 'Time since the last match'); },
+    o4: function (s, l) { return pill('o4', s, DOT + l, 'How busy the table is'); },
+    o5: function (s, l) {
+      var m = /^(\D*\d*)(\D*)$/.exec(l) || [0, l, ""];
+      return pill('o5', s,
+        '<span class="cap"><i></i></span><span class="val"><span class="n">' + m[1] +
+        '</span><span class="u">' + m[2] + '</span></span>', 'Time since the last match');
+    },
+    o6: function (s, l) { return pill('o6', s, DOT + (l ? l : ''), 'Time since the last match'); },
+    o7: function (s, l) { return pill('o7', s, DOT + l, 'Time since the last match'); },
+    o8: function (s, l) { return pill('o8', s, DOT + l, 'Time since the last match'); }
+  };
+
+  var OPTIONS = [
+    {
+      k: "o1", n: 1, title: "REC card",
+      label: "A word while it is hot, a time afterwards",
+      colour: "White slab, ink outline, vermilion dot",
+      motion: "Dot pulses in scale, ~1.1 Hz",
+      shape: "Rounded slab, 9 px corners — the only non-pill",
+      why: "The REC card feel, kept. A camcorder writes REC in a hard-cornered box while it is rolling and a " +
+           "timestamp once it has stopped, and that is exactly the ladder's three degrees in one slot. The white " +
+           "fill with an ink outline and a hard shadow is the app's own slab, so it is unmistakably a control; " +
+           "the only colour in it is a seven-pixel vermilion dot, which is far enough from the logo's magenta " +
+           "that the two never read as the same thing. Square corners do the rest of the work — beside three " +
+           "capsules the slab reads as equipment.",
+      states: ["REC", "24m", "3h", "OFF"], logo: ""
+    },
+    {
+      k: "o2", n: 2, title: "Timecode",
+      label: "Elapsed clock, mm:ss, with a blinking colon",
+      colour: "Crimson pill wrapping an ink screen",
+      motion: "The colon blinks on a hard 1 Hz square wave",
+      shape: "Pill with a recessed dark screen inside it",
+      why: "Cameras count up, and a running clock is the most information you can put in four characters. The " +
+           "crimson pill holds an ink screen the way a camera body holds an LCD, and the dot sits inside the " +
+           "screen with the numerals so the whole readout is one object. Only the colon animates, which is what " +
+           "a real timecode does and which costs almost no attention. Crimson rather than REC red because it is " +
+           "dark enough to be unmistakably a different colour from the logo rather than a near-miss.",
+      states: ["0:04", "0:37", "3:12", "\u2013:\u2013"], logo: ""
+    },
+    {
+      k: "o3", n: 3, title: "Chip minutes",
+      label: "Bare compact time — the shortest true answer",
+      colour: "Ink pill, REC red dot",
+      motion: "A hard halo contracts onto the dot",
+      shape: "Full pill, identical to the existing How? chip",
+      why: "The most restrained of the eight and the one that costs the top bar nothing. The pill is the " +
+           "existing chip — same ink, same radius, same height — so it joins a family instead of founding one, " +
+           "and the only new colour on the whole bar is an eight-pixel dot of true REC red, which at that size " +
+           "reads as a lamp rather than as a second brand colour. The label is a time and nothing else, which is " +
+           "the shortest honest answer to the question and the only length that comfortably fits the budget. The " +
+           "halo contracts inward onto the dot rather than radiating outward, so the motion stays inside the pill.",
+      states: ["4m", "24m", "3h", "–"], logo: ""
+    },
+    {
+      k: "o4", n: 4, title: "Heat pill",
+      label: "Temperature word — no numbers at all",
+      colour: "Brand pink, white rim, white dot",
+      motion: "A hard white rim grows and fades on the whole pill",
+      shape: "Full pill with the logo's own white rim",
+      why: "The pink case, argued properly. If the indicator is going to be pink it should look like it belongs " +
+           "to the logo rather than competing with it, so this one wears the same white rim the logo wears and " +
+           "flashes that rim rather than anything inside it. The label drops numbers entirely: a table is hot, " +
+           "warm, cool or cold, which is what somebody at the top of the stairs actually wants to know and which " +
+           "needs no unit and no arithmetic. The risk is real and visible in the mock — two pink pills in one " +
+           "row, and the indicator borrowing authority it has not earned.",
+      states: ["HOT", "WARM", "COOL", "COLD"], logo: ""
+    },
+    {
+      k: "o5", n: 5, title: "Numeral capsule",
+      label: "Time with the number set large and the unit small",
+      colour: "Vermilion lamp well fused to an ink body",
+      motion: "The lamp well washes darker and back",
+      shape: "Two-tone capsule, coloured cap fused to an ink readout",
+      why: "A split capsule: a vermilion well on the left holding the lamp, an ink readout on the right holding " +
+           "the number. It is the tally light and the counter welded into one object, and the two-tone body is " +
+           "the most distinctive silhouette here — you can tell it apart from the How? chip at a glance without " +
+           "reading it. Setting the numeral in Titan One at 13 px and the unit in small Fredoka means the digit " +
+           "is legible at arm's length while the unit stays out of the way, which buys the readout more presence " +
+           "than its width deserves.",
+      states: ["4m", "24m", "3h", "–"], logo: ""
+    },
+    {
+      k: "o6", n: 6, title: "Collapsing pill",
+      label: "A label only when there is news; a bare lamp when there is none",
+      colour: "Crimson pill, white dot",
+      motion: "A gloss sweeps across the pill every 2.6 s",
+      shape: "Full pill that shrinks to a round coin when quiet",
+      why: "The only option whose shape carries the state. While anything has happened today it is a crimson " +
+           "pill with a time in it; when nothing has, it drops the label entirely and contracts to a 31 px ink " +
+           "coin with a dead lamp — no words for no news. That is honest and it is the calmest possible quiet " +
+           "state, but it has a cost the others do not: the row is a different width in the quiet state, so the " +
+           "How? chip shifts once a day when the first match lands. Worth it only if the empty state is common.",
+      states: ["4m", "24m", "3h", ""], logo: ""
+    },
+    {
+      k: "o7", n: 7, title: "Long phrase",
+      label: "A real sentence — just now, 18 min, 2 hours",
+      colour: "White pill, ink outline, REC red dot",
+      motion: "The whole pill breathes slowly, 2.3 s",
+      shape: "Wide pill, body type, sentence case",
+      why: "The strongest test of the hypothesis that a time beats a word. Nobody has to decode \"just now\"; it " +
+           "is the phrase every messaging app already uses and it is unambiguous in a way that 4m is not. The " +
+           "problem is arithmetic, not taste: at 10.5 px this pill is around 75 px wide against a 48 px budget, " +
+           "so it only fits if the logo comes down from 22 px to 18 px. That mock below is drawn honestly with " +
+           "the smaller logo. Whether a sentence is worth four points of wordmark is the actual decision here, " +
+           "and it is a decision about the brand, not about the indicator.",
+      states: ["just now", "18 min", "2 hours", "quiet"], logo: "sm"
+    },
+    {
+      k: "o8", n: 8, title: "Ago pill",
+      label: "Relative time with the ago spelled out",
+      colour: "Ink pill, vermilion dot",
+      motion: "The dot blinks hard on a 1 Hz square wave",
+      shape: "Full pill, chip-native, wider than the budget",
+      why: "The middle position between a bare number and a sentence. Adding the word ago costs about fourteen " +
+           "pixels and removes the last ambiguity — 4m could be a duration, a score or a court number, while " +
+           "4m ago can only be a time. It stays chip-native in ink so it does not add a colour to the bar, and " +
+           "the dot blinks on a hard square wave rather than easing, which is the camera cadence and reads as a " +
+           "machine rather than a notification. It needs the logo at 19 px, which is a smaller bill than option " +
+           "7 pays for a smaller gain.",
+      states: ["4m ago", "24m ago", "3h ago", "none"], logo: "md"
+    }
+  ];
+
+  var LANES = [
+    { s: "live",  cap: "Under 10 minutes",   pip: "pulsing",        cls: "" },
+    { s: "mid",   cap: "10 to 60 minutes",   pip: "steady",         cls: "calm" },
+    { s: "hours", cap: "A few hours",        pip: "calm",           cls: "calm" },
+    { s: "quiet", cap: "Nothing today",      pip: "off",            cls: "calm" },
+    { s: "live",  cap: "Under 10 minutes",   pip: "reduced motion", cls: "rm", rm: true }
+  ];
+
+  // ── build the pink-versus-red strip ───────────────────────────────────────
+  var CMP = [
+    { t: "Brand pink fill", v: "--fill:#fb3aa3", note: "Matches the logo exactly — and that is the problem. Two pink pills in one row read as one interrupted object, and the indicator borrows the wordmark's weight." },
+    { t: "REC red fill", v: "--fill:#e8232a", note: "The true recording red. Legible, but as a filled pill it sits a short hop from the logo's magenta and the pair vibrates." },
+    { t: "Crimson fill", v: "--fill:#b8102e", note: "Dark enough to read as a decision rather than a near-miss. The best of the filled reds against pink." },
+    { t: "Vermilion fill", v: "--fill:#f4501e", note: "Pushed toward orange, so it separates from the pink cleanly — but it also starts to argue with the crown's gold." },
+    { t: "Ink pill, REC red dot", v: "--fill:#e8232a;--carrier:#222126;--ctext:#ffffff", dotonly: true, note: "Red confined to 8 px. Nothing competes with the logo, and the pill is already a member of the chip family." },
+    { t: "White pill, REC red dot", v: "--fill:#e8232a;--carrier:#ffffff;--ctext:#222126", dotonly: true, note: "Same discipline, louder container. The white slab is the app's own card, so it reads as a control at a glance." }
+  ];
+
+  document.getElementById("cmp").innerHTML = CMP.map(function (c) {
+    var ind = '<a class="ind cmp' + (c.dotonly ? " dotonly" : "") + '" data-ind href="#" style="' + c.v +
+      (c.dotonly ? "" : ";border-color:#222126") + '">' + DOT + '4m</a>';
+    return '<div class="lane"><p class="lanecap">' + c.t + '</p>' + bar(ind, "") +
+      '<p class="verdict">' + c.note + '</p></div>';
+  }).join("");
+
+  // ── build the eight option cards ──────────────────────────────────────────
+  document.getElementById("opts").innerHTML = OPTIONS.map(function (o) {
+    var lanes = LANES.map(function (L, i) {
+      var label = o.states[i === 4 ? 0 : i];
+      var ind = BUILD[o.k](L.s, label);
+      return '<div class="lane' + (L.rm ? " rm-demo" : "") + '">' +
+        '<p class="lanecap">' + L.cap + '<span class="pipfx ' + L.cls + '">' + L.pip + '</span></p>' +
+        bar(ind, o.logo) + '</div>';
+    }).join("");
+
+    return '<section class="card" data-opt="' + o.k + '">' +
+      '<h2><span class="hexn">' + o.n + '</span>' + o.title + '</h2>' +
+      '<p class="meta"><b>Label</b> ' + o.label + '<br><b>Colour</b> ' + o.colour +
+        '<br><b>Shape</b> ' + o.shape + '<br><b>Motion</b> ' + o.motion + '</p>' +
+      '<p class="why">' + o.why + '</p>' +
+      '<p class="sub">The whole life cycle, in the real top bar at 390 px</p>' +
+      lanes +
+      '<p class="fit" data-fit>measuring…</p>' +
+    '</section>';
+  }).join("");
+
+  // ── reduced-motion preview switch ─────────────────────────────────────────
+  var still = document.getElementById("still");
+  still.addEventListener("change", function () {
+    document.body.classList.toggle("stillness", still.checked);
+  });
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    still.checked = true;
+    document.body.classList.add("stillness");
+  }
+
+  // ── measurement ───────────────────────────────────────────────────────────
+  // offsetWidth, never getBoundingClientRect: several live states animate scale()
+  // and a transform must not be read as layout width. Reported per option as the
+  // widest of its four states, because that is what has to fit.
+  function measure() {
+    document.querySelectorAll("section.card[data-opt]").forEach(function (card) {
+      var out = card.querySelector("[data-fit]");
+      if (!out) return;
+      var worst = null;
+
+      card.querySelectorAll("[data-bar]").forEach(function (b) {
+        var logo = b.querySelector("[data-logo]");
+        var chips = b.querySelector("[data-chips]");
+        var ind = b.querySelector("[data-ind]");
+        if (!logo || !chips || !ind) return;
+        var cs = getComputedStyle(b);
+        var inner = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        var gap = parseFloat(cs.columnGap) || 0;
+        var used = logo.offsetWidth + gap + chips.offsetWidth;
+        if (!worst || used > worst.used) {
+          worst = { used: used, inner: inner, ind: ind.offsetWidth, logo: logo.offsetWidth };
+        }
+      });
+      if (!worst) return;
+
+      var slack = worst.inner - worst.used;
+      var r = function (n) { return Math.round(n * 10) / 10; };
+      var cost = "";
+      var lg = card.querySelector("[data-logo]");
+      if (lg && lg.className.indexOf("sm") > -1) {
+        cost = '<span class="cost">Costs the wordmark: logo reduced 22 px → 18 px (' + r(worst.logo) + ' px wide).</span>';
+      } else if (lg && lg.className.indexOf("md") > -1) {
+        cost = '<span class="cost">Costs the wordmark: logo reduced 22 px → 19 px (' + r(worst.logo) + ' px wide).</span>';
+      }
+
+      out.innerHTML =
+        "Widest state <b>" + r(worst.ind) + " px</b> &middot; row uses <b>" + r(worst.used) +
+        " px</b> of " + r(worst.inner) + " px &middot; " +
+        (slack >= 0
+          ? '<span class="ok">' + r(slack) + " px to spare</span>"
+          : '<span class="no">overflows by ' + r(-slack) + " px</span>") + cost;
+    });
+
+    // the comparison strip shares one treatment, so report it once on the card
+    var c = document.getElementById("cmp-card");
+    var b0 = c.querySelector("[data-bar]");
+    if (b0) {
+      var cs = getComputedStyle(b0);
+      var inner = b0.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var used = b0.querySelector("[data-logo]").offsetWidth + (parseFloat(cs.columnGap) || 0) +
+                 b0.querySelector("[data-chips]").offsetWidth;
+      var p = c.querySelector(".cmp-fit") || (function () {
+        var el = document.createElement("p"); el.className = "fit cmp-fit"; c.appendChild(el); return el;
+      })();
+      p.innerHTML = "All six use the same pill: <b>" + Math.round(b0.querySelector("[data-ind]").offsetWidth) +
+        " px</b> &middot; row uses <b>" + Math.round(used) + " px</b> of " + Math.round(inner) + " px.";
+    }
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { measure(); setTimeout(measure, 300); });
+  } else {
+    window.addEventListener("load", measure);
+  }
+  window.addEventListener("resize", measure);
+})();
+</script>
+</body>
+</html>
