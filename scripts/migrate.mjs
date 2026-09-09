@@ -1,10 +1,15 @@
-// Run pending migrations before a production build when a database is
-// configured. Vercel sets DATABASE_URL through the Neon integration; local
-// builds without one skip this step so `next build` still works offline.
+// Migration gate for the build. By default the build never migrates: the
+// sanctioned path is scripts/migrate-prod.sh from Europa, which exports the
+// log first. Setting ALLOW_BUILD_MIGRATIONS=1 in the Vercel environment turns
+// build-time migration back on for a deliberate deploy.
 import { spawnSync } from "node:child_process";
 
 if (!process.env.DATABASE_URL) {
   console.log("migrate: DATABASE_URL not set, skipping");
+  process.exit(0);
+}
+if (process.env.ALLOW_BUILD_MIGRATIONS !== "1") {
+  console.log("migrate: skipped; production migrations run from Europa via scripts/migrate-prod.sh (set ALLOW_BUILD_MIGRATIONS=1 to override)");
   process.exit(0);
 }
 if (process.env.NEON_LOCAL_HTTP_ENDPOINT) {

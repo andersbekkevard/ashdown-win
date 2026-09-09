@@ -24,3 +24,4 @@ Status is one of Proposed, Accepted, Superseded by NNNN, or Scoped by NNNN.
 | [0003](0003-single-rating-derived-from-log.md) | Accepted | One rating per player, recomputed from the log. Standard Elo, doubles by team average, K 32 and 16, start 1000. |
 | [0004](0004-vercel-and-neon.md) | Accepted | Vercel hosting with Neon Postgres, on free tiers. |
 | [0005](0005-ashdown-win-house-identity.md) | Accepted | The name is ashdown.win and it belongs to the house, not to table tennis or to a person. |
+| [0006](0006-append-only-log-as-growth-principle.md) | Accepted | The append-only log is the growth principle: undo is an entry, features are additive, migrations never touch rows. |

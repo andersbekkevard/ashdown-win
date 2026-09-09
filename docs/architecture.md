@@ -38,7 +38,11 @@ Two kinds of thing exist.
 - A **player** is a name and a creation time.
 - A **match** is a creation time, one or two player names per side, and which
   side won. A **deletion** is a later entry that points at a match and marks it
-  void.
+  void. A **restore** is a later entry that cancels one deletion.
+
+Every entry also carries an anonymous device label (a truncated hash of a
+random cookie), so the log can show when several actions came from one phone
+without identifying anyone.
 
 That is the whole schema. There are no stored ratings.
 
@@ -60,10 +64,11 @@ does, a cached snapshot keyed on the log's length is the obvious fix.
 
 ## Trust model
 
-There is no login. Anyone can create players, record matches, and delete
-matches. The only guard is that everything is visible: the log shows who was
-filed against whom and when, and a deletion is as public as the match it
-voids. The house is small enough that social pressure does the rest, and a
+There is no login. Anyone can create players, record matches, delete
+matches, and restore them. Deleting asks for a confirming tap; restoring undoes
+it. The only guard is that everything is visible: the log shows who was filed
+against whom and when, a deletion is as public as the match it voids, and the
+anonymous device label shows when a burst of actions came from one phone. The house is small enough that social pressure does the rest, and a
 cheater who cares enough to game a dorm ladder has already proven the ladder
 matters. See ADR 0001.
 
@@ -72,6 +77,26 @@ matters. See ADR 0001.
 A player is a name. Nothing else is collected. Contact information, "find me a
 match" features, and any login are deliberately out of scope for the first
 version. The table itself is the meeting place. See ADR 0002.
+
+## Names
+
+Names are normalised before they are stored or compared: Unicode NFKC, all
+invisible and control characters removed, whitespace collapsed. Two strings
+that render the same are therefore the same name, and a name must contain at
+least one letter or digit. Uniqueness is case-insensitive.
+
+## Protecting the log
+
+The match log is the only irreplaceable data. Three rules protect it:
+
+- Migrations are additive: they add tables and nullable columns and never
+  rename or drop data. They are applied from Europa with
+  `scripts/migrate-prod.sh`, which exports the whole log first and refuses to
+  continue if the export fails. The Vercel build only applies migrations when
+  `ALLOW_BUILD_MIGRATIONS=1` is set, so a push cannot migrate by accident.
+- A daily export of every table lands in the private repository
+  `andersbekkevard/ashdown-win-backups` from a timer on Europa.
+- Neon's own point-in-time restore covers the hours between exports.
 
 ## Hosting
 

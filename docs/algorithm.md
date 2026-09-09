@@ -68,3 +68,15 @@ and stability, which stops one lucky win from rearranging the board.
 Chess federations reduce $K$ for experienced players. This ladder uses a fixed
 $K$ deliberately, to keep the rule explainable in one line. See the decision
 ledger for the condition under which that changes.
+
+## Recording, deleting, restoring
+
+The log is append-only. Recording a match adds a row. Deleting a match adds a
+deletion row that points at it, and the match stops counting. Restoring adds a
+row that cancels a specific deletion, and the match counts again. A match may
+go through that cycle more than once; its latest deletion decides. Every row
+stays visible in the public log.
+
+Each row also stores a short anonymous label derived from a random cookie on
+the phone that wrote it. The label identifies no one and carries no personal
+data; it only lets the log show when several actions came from the same phone.

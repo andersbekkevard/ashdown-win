@@ -8,6 +8,13 @@
       "when": 1788749085196,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788916605600,
+      "tag": "0001_restores_and_device",
+      "breakpoints": true
     }
   ]
 }

@@ -2,7 +2,9 @@
 
 | Script | What it does |
 |---|---|
-| `migrate.mjs` | Runs pending Drizzle migrations before `next build` when `DATABASE_URL` is set. Vercel runs it on every deploy. |
+| `migrate.mjs` | Build-time migration gate. Skips unless `ALLOW_BUILD_MIGRATIONS=1`; the sanctioned path is `migrate-prod.sh`. |
+| `export-log.sh` | Exports every table as JSON into the private backup repo and pushes. Daily timer on Europa; also the first step of `migrate-prod.sh`. |
+| `migrate-prod.sh` | Exports the log, then applies pending migrations to production. The only sanctioned way to migrate. |
 | `db.sh` | `psql` against the production Neon database using `.env.production.local`. Interactive, `-c "sql"`, or stdin. |
 | `delete-player.sh "Name"` | Owner cleanup: hard-deletes a player with their matches and related deletions. Not a site feature. |
 

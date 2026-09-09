@@ -1,7 +1,8 @@
 /**
  * The whole schema. Append-only: rows in these tables are inserted and never
  * updated or deleted. A match is voided by inserting a deletion that points at
- * it. There are no stored ratings; see docs/architecture.md.
+ * it, and a deletion is cancelled by inserting a restore. There are no stored
+ * ratings; see docs/architecture.md.
  */
 import { sql } from "drizzle-orm";
 import {
@@ -25,6 +26,8 @@ export const players = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    /** Anonymous device label of the writer; see src/lib/device.ts. */
+    device: text("device"),
   },
   (t) => [uniqueIndex("players_name_lower_idx").on(sql`lower(${t.name})`)],
 );
@@ -45,6 +48,7 @@ export const matches = pgTable(
       .references(() => players.id),
     b2: integer("b2").references(() => players.id),
     winner: sideEnum("winner").notNull(),
+    device: text("device"),
   },
   (t) => [
     // Singles has a2 and b2 both null; doubles has both set.
@@ -60,17 +64,35 @@ export const matches = pgTable(
   ],
 );
 
+/**
+ * A deletion voids a match. A match may be deleted more than once over its
+ * life (delete, restore, delete again); the latest deletion decides.
+ */
 export const deletions = pgTable("deletions", {
   id: serial("id").primaryKey(),
   matchId: integer("match_id")
     .notNull()
-    .unique()
     .references(() => matches.id),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+  device: text("device"),
+});
+
+/** A restore cancels one deletion. The match counts again. */
+export const restores = pgTable("restores", {
+  id: serial("id").primaryKey(),
+  deletionId: integer("deletion_id")
+    .notNull()
+    .unique()
+    .references(() => deletions.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  device: text("device"),
 });
 
 export type PlayerRow = typeof players.$inferSelect;
 export type MatchRow = typeof matches.$inferSelect;
 export type DeletionRow = typeof deletions.$inferSelect;
+export type RestoreRow = typeof restores.$inferSelect;

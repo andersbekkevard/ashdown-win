@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { searchPlayers } from "@/app/actions";
 import { MAX_NAME_LENGTH } from "@/lib/config";
+import { CreatePlayerForm } from "./create-player-form";
 
 export interface Selected {
   id: number;
@@ -41,6 +42,7 @@ export function PlayerSearch({
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Selected[] | null>(null);
   const [searching, setSearching] = useState(false);
+  const [creating, setCreating] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestId = useRef(0);
 
@@ -119,13 +121,31 @@ export function PlayerSearch({
               </button>
             ))
           ) : visible ? (
-            <Link href={`/players/new?name=${encodeURIComponent(trimmed)}`} className="create">
+            <button type="button" className="create" onClick={() => setCreating(trimmed)}>
               <span>No one called &ldquo;{trimmed}&rdquo;</span>
               <b>Create</b>
-            </Link>
+            </button>
           ) : null}
         </div>
       )}
+      {creating !== null &&
+        createPortal(
+          <div className="sheet-wrap" role="dialog" aria-modal="true" aria-label="Create player">
+            <div className="sheet pop-in">
+              <CreatePlayerForm
+                initialName={creating}
+                variant="sheet"
+                onCreated={(p) => {
+                  setCreating(null);
+                  reset();
+                  onChange(p);
+                }}
+                onCancel={() => setCreating(null)}
+              />
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { DeleteMatchButton } from "@/components/delete-match-button";
 import { Dock } from "@/components/dock";
+import { MatchLogActions } from "@/components/match-log-actions";
 import { formatDate } from "@/lib/format";
 import { matchLog, type MatchView, type Participant } from "@/lib/queries";
 
@@ -30,6 +30,11 @@ function MatchLine({ match }: { match: MatchView }) {
   );
 }
 
+function Device({ label }: { label: string | null }) {
+  if (!label) return null;
+  return <span className="device" title="Anonymous label of the phone that did this">phone {label.slice(0, 4)}</span>;
+}
+
 export default async function LogPage() {
   const entries = await matchLog();
   return (
@@ -40,8 +45,8 @@ export default async function LogPage() {
           Every match <span>newest first</span>
         </h3>
         <p className="hint" style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600, margin: "0 0 8px" }}>
-          Nothing is ever edited. A deletion is a new entry that voids an earlier match, and it
-          stays in the log too.
+          Nothing is ever edited. A deletion is a new entry that voids a match, a restore is a
+          new entry that cancels a deletion, and all of them stay in the log.
         </p>
         {entries.length === 0 ? (
           <p className="empty">Nothing recorded yet.</p>
@@ -54,22 +59,20 @@ export default async function LogPage() {
                     <MatchLine match={e.match} />
                   </div>
                   <div className="when">
-                    #{e.match.id} · {formatDate(e.at)}
+                    #{e.match.id} · {formatDate(e.at)} <Device label={e.match.device} />
                   </div>
                 </div>
-                {e.match.deleted ? (
-                  <span className="mini" style={{ color: "var(--faint)", boxShadow: "none" }}>deleted</span>
-                ) : (
-                  <DeleteMatchButton matchId={e.match.id} />
-                )}
+                <MatchLogActions matchId={e.match.id} deleted={e.match.deleted} />
               </div>
             ) : (
-              <div key={`d${e.id}`} className="log-row">
+              <div key={`${e.kind[0]}${e.id}`} className="log-row">
                 <div>
                   <div className="what">
-                    Deleted #{e.match.id}: <MatchLine match={e.match} />
+                    {e.kind === "deletion" ? "Deleted" : "Restored"} #{e.match.id}: <MatchLine match={e.match} />
                   </div>
-                  <div className="when">deletion · {formatDate(e.at)}</div>
+                  <div className="when">
+                    {e.kind} · {formatDate(e.at)} <Device label={e.device} />
+                  </div>
                 </div>
               </div>
             ),

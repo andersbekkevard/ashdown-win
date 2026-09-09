@@ -8,11 +8,14 @@ import {
   deletions,
   matches,
   players,
+  restores,
   type DeletionRow,
   type MatchRow,
   type PlayerRow,
+  type RestoreRow,
 } from "@/db/schema";
 import { START_RATING } from "./config";
+import { deletedMatchIds, effectiveDeletions, type MatchState } from "./log";
 import {
   compareByCreation,
   isDoubles,
@@ -26,23 +29,25 @@ export interface Log {
   players: PlayerRow[];
   matches: MatchRow[];
   deletions: DeletionRow[];
+  restores: RestoreRow[];
+  /** Current deletion state per match id; absent means never deleted. */
+  states: Map<number, MatchState>;
 }
 
 export async function loadLog(): Promise<Log> {
   const db = getDb();
-  const [p, m, d] = await Promise.all([
+  const [p, m, d, r] = await Promise.all([
     db.select().from(players).orderBy(asc(players.createdAt), asc(players.id)),
     db.select().from(matches).orderBy(asc(matches.createdAt), asc(matches.id)),
-    db
-      .select()
-      .from(deletions)
-      .orderBy(asc(deletions.createdAt), asc(deletions.id)),
+    db.select().from(deletions).orderBy(asc(deletions.createdAt), asc(deletions.id)),
+    db.select().from(restores).orderBy(asc(restores.createdAt), asc(restores.id)),
   ]);
-  return { players: p, matches: m, deletions: d };
+  return { players: p, matches: m, deletions: d, restores: r, states: effectiveDeletions(d, r) };
 }
 
 export function replayLog(log: Log): ReplayResult {
-  return replay(log.players, log.matches, log.deletions);
+  const deleted = deletedMatchIds(log.states).map((matchId) => ({ matchId }));
+  return replay(log.players, log.matches, deleted);
 }
 
 export interface LeaderboardRow {
@@ -117,6 +122,8 @@ export interface MatchView {
   winner: Side;
   deleted: boolean;
   deletedAt: Date | null;
+  /** Anonymous device label of whoever recorded it, when known. */
+  device: string | null;
 }
 
 export interface PlayerMatch extends MatchView {
@@ -148,7 +155,7 @@ function nameOf(byId: Map<number, PlayerRow>, id: number): Participant {
 function toMatchView(
   m: MatchRow,
   byId: Map<number, PlayerRow>,
-  deletedAt: Map<number, Date>,
+  states: Map<number, MatchState>,
 ): MatchView {
   const a = [m.a1, ...(m.a2 === null ? [] : [m.a2])].map((id) =>
     nameOf(byId, id),
@@ -156,7 +163,7 @@ function toMatchView(
   const b = [m.b1, ...(m.b2 === null ? [] : [m.b2])].map((id) =>
     nameOf(byId, id),
   );
-  const del = deletedAt.get(m.id) ?? null;
+  const state = states.get(m.id);
   return {
     id: m.id,
     createdAt: m.createdAt,
@@ -164,8 +171,9 @@ function toMatchView(
     a,
     b,
     winner: m.winner,
-    deleted: del !== null,
-    deletedAt: del,
+    deleted: state?.deleted ?? false,
+    deletedAt: state?.deletedAt ?? null,
+    device: m.device,
   };
 }
 
@@ -176,7 +184,6 @@ export async function playerPage(id: number): Promise<PlayerPage | null> {
 
   const { ratings, history } = replayLog(log);
   const byId = new Map(log.players.map((p) => [p.id, p]));
-  const deletedAt = new Map(log.deletions.map((d) => [d.matchId, d.createdAt]));
   const own = history.get(id) ?? [];
   const byMatch = new Map(own.map((h) => [h.matchId, h]));
 
@@ -184,7 +191,7 @@ export async function playerPage(id: number): Promise<PlayerPage | null> {
     .filter((m) => [m.a1, m.a2, m.b1, m.b2].includes(id))
     .sort((x, y) => compareByCreation(y, x))
     .map((m): PlayerMatch => {
-      const view = toMatchView(m, byId, deletedAt);
+      const view = toMatchView(m, byId, log.states);
       const side: Side = m.a1 === id || m.a2 === id ? "a" : "b";
       const h = byMatch.get(m.id);
       return {
@@ -208,16 +215,15 @@ export async function playerPage(id: number): Promise<PlayerPage | null> {
 
 export type LogEntry =
   | { kind: "match"; at: Date; match: MatchView }
-  | { kind: "deletion"; at: Date; id: number; match: MatchView };
+  | { kind: "deletion"; at: Date; id: number; match: MatchView; device: string | null }
+  | { kind: "restore"; at: Date; id: number; match: MatchView; device: string | null };
 
-/** All matches and deletions as one list, newest first. */
+/** All matches, deletions, and restores as one list, newest first. */
 export async function matchLog(): Promise<LogEntry[]> {
   const log = await loadLog();
   const byId = new Map(log.players.map((p) => [p.id, p]));
-  const deletedAt = new Map(log.deletions.map((d) => [d.matchId, d.createdAt]));
-  const views = new Map(
-    log.matches.map((m) => [m.id, toMatchView(m, byId, deletedAt)]),
-  );
+  const views = new Map(log.matches.map((m) => [m.id, toMatchView(m, byId, log.states)]));
+  const deletionMatch = new Map(log.deletions.map((d) => [d.id, d.matchId]));
 
   const entries: LogEntry[] = [];
   for (const m of log.matches) {
@@ -225,7 +231,12 @@ export async function matchLog(): Promise<LogEntry[]> {
   }
   for (const d of log.deletions) {
     const match = views.get(d.matchId);
-    if (match) entries.push({ kind: "deletion", at: d.createdAt, id: d.id, match });
+    if (match) entries.push({ kind: "deletion", at: d.createdAt, id: d.id, match, device: d.device });
+  }
+  for (const r of log.restores) {
+    const matchId = deletionMatch.get(r.deletionId);
+    const match = matchId === undefined ? undefined : views.get(matchId);
+    if (match) entries.push({ kind: "restore", at: r.createdAt, id: r.id, match, device: r.device });
   }
   return entries.sort(
     (x, y) =>
