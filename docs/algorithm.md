@@ -1,12 +1,11 @@
 # How the rating works
 
-**In short.** Everyone starts at 1000. When you beat someone, you take points
+Everyone starts at 1000. When you beat someone, you take points
 from them; how many depends on how surprising the result was. Beating a
-stronger player earns more than beating a weaker one, and losing to a weaker
-player costs more than losing to a stronger one. There are no accounts, every
+stronger player earns more than beating a weaker one. There are no accounts, every
 match is public, and a mistake can be undone.
 
-## The rule
+## Update
 
 The expected score of a player rated $R_a$ against one rated $R_b$ is
 
