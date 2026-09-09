@@ -313,7 +313,9 @@ h2.shout { font-size: 26px; margin: 0; }
 .prose-card h1 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0 0 12px; }
 .prose-card h2 { font-family: var(--display); font-weight: 400; font-size: 18px; text-transform: uppercase; margin: 22px 0 8px; }
 .prose-card p { margin: 0 0 12px; }
-.prose-card .katex-display { margin: 12px 0; overflow-x: auto; }
+.prose-card .katex-display { margin: 12px 0; overflow: visible; padding: 2px 0; }
+.prose-card .katex-display > .katex { white-space: normal; }
+.prose-card .katex { font-size: 1.12em; }
 
 /* dock */
 .dock {
