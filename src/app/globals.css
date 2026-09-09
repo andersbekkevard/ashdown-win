@@ -440,7 +440,7 @@ h2.shout { font-size: 26px; margin: 0; }
 .log-row.latest {
   border: 3px solid color-mix(in oklab, #e8232a calc(var(--fb, 0) * 100%), #e9ecf4);
   background: color-mix(in oklab, #ffe1e3 calc(var(--fb, 0) * 70%), #fff);
-  border-radius: 14px; padding: 10px 12px; margin: 0 -4px 6px; border-bottom-width: 3px;
+  border-radius: 14px; padding: 10px 12px; margin: 0 -15px 6px; border-bottom-width: 3px;
 }
 .log-row.latest .what { display: flex; align-items: center; gap: 8px; }
 .log-row.latest .d { width: 10px; height: 10px; border-radius: 50%; flex: none; background: color-mix(in oklab, #e8232a calc(var(--fd, 0) * 100%), #b9bdcc); }
