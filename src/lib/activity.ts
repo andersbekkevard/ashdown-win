@@ -1,41 +1,45 @@
-import type { LogEntry, Participant } from "./queries";
+/**
+ * Liveness of the table from the time of the latest match. One function so
+ * the indicator's colour, motion, and label agree everywhere.
+ */
+export type Motion = "hot" | "warm" | "cool" | "still" | "cold";
 
-const HOT_MS = 10 * 60 * 1000;
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-export type ActivityState = "hot" | "warm" | "quiet";
-
-export interface Activity {
-  state: ActivityState;
-  /** Human time since the latest entry, empty when there is none. */
-  when: string;
-  /** One line about the latest entry. */
-  line: string;
+export interface Liveness {
+  motion: Motion;
+  /** Border and title redness, 0 to 1. Cools fast: 3 h reads like a quarter. */
+  border: number;
+  /** Dot redness, 0 to 1. Cools slower than the border. */
+  dot: number;
+  /** Short label such as "4m", "3h", "1d". Empty when there is no match. */
+  short: string;
+  /** Longer label such as "4m ago", "yesterday". */
+  long: string;
 }
 
-function ago(ms: number): string {
-  if (ms < 2 * 60 * 1000) return "just now";
-  if (ms < 60 * 60 * 1000) return `${Math.max(1, Math.round(ms / 60000))}m ago`;
-  if (ms < DAY_MS) return `${Math.round(ms / 3600000)}h ago`;
-  const d = Math.round(ms / DAY_MS);
-  return d === 1 ? "yesterday" : `${d} days ago`;
-}
+const H = 60 * 60 * 1000;
 
-const names = (m: Participant[]) => m.map((p) => p.name).join(" & ");
-
-/** Summarise the latest log entry for the activity card. Reads the clock. */
-export function activitySummary(latest: LogEntry | undefined, now = Date.now()): Activity {
-  if (!latest) return { state: "quiet", when: "", line: "No matches yet. Be the first." };
-  const since = now - latest.at.getTime();
-  const state: ActivityState = since < HOT_MS ? "hot" : since < DAY_MS ? "warm" : "quiet";
-  const m = latest.match;
-  let line: string;
-  if (latest.kind === "deletion") line = `Match #${m.id} was deleted`;
-  else if (latest.kind === "restore") line = `Match #${m.id} was restored`;
-  else {
-    const winners = m.winner === "a" ? m.a : m.b;
-    const losers = m.winner === "a" ? m.b : m.a;
-    line = `${names(winners)} beat ${names(losers)}`;
+export function liveness(lastMatchAt: Date | null, now = Date.now()): Liveness {
+  if (!lastMatchAt) return { motion: "cold", border: 0, dot: 0, short: "", long: "" };
+  const hours = Math.max(0, (now - lastMatchAt.getTime()) / H);
+  const base = Math.max(0, 1 - hours / 24);
+  const motion: Motion =
+    hours <= 0.5 ? "hot" : hours <= 1 ? "warm" : hours <= 6 ? "cool" : hours < 24 ? "still" : "cold";
+  const mins = Math.round(hours * 60);
+  let short: string;
+  let long: string;
+  if (mins < 2) {
+    short = "now";
+    long = "just now";
+  } else if (hours < 1) {
+    short = `${mins}m`;
+    long = `${mins}m ago`;
+  } else if (hours < 24) {
+    short = `${Math.round(hours)}h`;
+    long = `${Math.round(hours)}h ago`;
+  } else {
+    const d = Math.round(hours / 24);
+    short = `${d}d`;
+    long = d === 1 ? "yesterday" : `${d} days ago`;
   }
-  return { state, when: ago(since), line };
+  return { motion, border: Math.pow(base, 6.5), dot: Math.pow(base, 3), short, long };
 }

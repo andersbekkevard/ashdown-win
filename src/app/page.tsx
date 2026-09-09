@@ -1,24 +1,23 @@
 import Link from "next/link";
 import { Crown } from "@/components/crown";
 import { Dock } from "@/components/dock";
-import { ActivityCard } from "@/components/activity-card";
-import { activitySummary } from "@/lib/activity";
 import { formatRating } from "@/lib/format";
-import { leaderboard, matchLog } from "@/lib/queries";
+import { leaderboard } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 const hexClass = ["gold", "silver", "bronze"];
 
 export default async function HomePage() {
-  const [rows, log] = await Promise.all([leaderboard(), matchLog()]);
-  const activity = activitySummary(log[0]);
+  const rows = await leaderboard();
   return (
     <>
       <p className="lead">
-        The table tennis ladder for Ashdown House. Add your name, record who won, climb.
+        The table tennis ladder for Ashdown House. Add your name, record who won, climb.{" "}
+        <Link href="/algorithm" className="howlink">
+          How it works ›
+        </Link>
       </p>
-      <ActivityCard activity={activity} />
       <div className="board slab pop-in">
         <div className="board-head">
           <h1 className="shout">Leaderboard</h1>

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Dock } from "@/components/dock";
 import { renderAlgorithmDoc } from "@/lib/algorithm-doc";
 
-export const dynamic = "force-static";
+// Dynamic because the shared top bar reads the latest match time.
+export const dynamic = "force-dynamic";
 
 export default async function AlgorithmPage() {
   const html = await renderAlgorithmDoc();
