@@ -447,6 +447,15 @@ body { background: #0866d7; position: static; padding: 30px 20px 80px; }
 .wa-A10 .chip.wa { border: 3px solid #fff; box-shadow: 0 4px 0 #222126, 0 0 0 3px #128c7e; }
 .wa-A11 .chip.wa { border: 3px solid #fff; box-shadow: 0 4px 0 #222126; animation: wa-nudge 4s ease-in-out infinite; }
 @keyframes wa-nudge { 0%, 88%, 100% { transform: rotate(0); } 91% { transform: rotate(-4deg); } 94% { transform: rotate(4deg); } 97% { transform: rotate(-2deg); } }
+.wa-A13 .chip.wa { border: 3px solid #fff; box-shadow: 0 4px 0 #222126; padding: 6px; width: 36px; height: 36px; justify-content: center; font-size: 0; }
+.wa-A13 .chip.wa .wa-mini { width: 20px; height: 20px; }
+.wa-A14 .chip.wa { border: 3px solid #fff; box-shadow: 0 4px 0 #222126; }
+.wa-A14 .chip.wa .label { display: none; }
+.wa-A14 .chip.wa::after { content: "Chat"; }
+.wa-A15 .chip.wa { border: 3px solid #fff; box-shadow: 0 4px 0 #222126; }
+.wa-A15 .chip.wa .label { display: none; }
+.wa-A15 .chip.wa::after { content: "Join"; }
+.wa-A15 .chip:not(.wa) { display: none; }
 .wa-pressed .chip.wa { border: 3px solid #fff; box-shadow: 0 1px 0 #222126; transform: translateY(3px); }
 
 /* ---- B: activity card variants ---- */
@@ -510,14 +519,14 @@ body { background: #0866d7; position: static; padding: 30px 20px 80px; }
 </style></head>
 <body>
 <h1 class="x-title">Affordance explorations</h1>
-<p class="x-sub">Two questions in one page. Part A: how the WhatsApp chip in the top bar signals that it is a button. Part B: how the recent-activity card signals liveness and that it is a button. Every case sits in the real top bar at 390 px. Part B shows each option in three states: hot (last match under 10 minutes), warm (today), quiet (nothing today). Refer to cases by their number.</p>
+<p class="x-sub">Note on width: with the label “WhatsApp” the real top bar has zero spare pixels at 390 px, so every bordered variant (A2 to A11) overflows on a phone unless the label shortens or the logo shrinks. A13 to A15 are the variants that fit as drawn. Two questions in one page. Part A: how the WhatsApp chip in the top bar signals that it is a button. Part B: how the recent-activity card signals liveness and that it is a button. Every case sits in the real top bar at 390 px. Part B shows each option in three states: hot (last match under 10 minutes), warm (today), quiet (nothing today). Refer to cases by their number.</p>
 <div id="A"></div>
 <div id="B"></div>
 <script>
 const CROWN = `<svg viewBox="0 0 64 48" aria-hidden="true"><path d="M6 40 L2 12 L20 24 L32 4 L44 24 L62 12 L58 40 Z" fill="#FFD046" stroke="#222126" stroke-width="5" stroke-linejoin="round"/><rect x="6" y="38" width="52" height="8" rx="3" fill="#FFFFFF" stroke="#222126" stroke-width="5"/></svg>`;
 const GLYPH = `<svg class="wa-mini" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`;
 function bar(waClass) {
-  return `<header class="topbar"><a class="logo">${CROWN}ashdown.win</a><nav class="chips"><a class="chip">How?</a><a class="chip wa">${GLYPH}WhatsApp</a></nav></header>`;
+  return `<header class="topbar"><a class="logo">${CROWN}ashdown.win</a><nav class="chips"><a class="chip">How?</a><a class="chip wa">${GLYPH}<span class="label">WhatsApp</span></a></nav></header>`;
 }
 function board() {
   return `<div class="board slab mini-board"><div class="board-head"><h1 class="shout" style="font-size:24px">Leaderboard</h1><div class="count">16<small>players</small></div></div>
@@ -547,6 +556,9 @@ const A = [
   ['A9','Inverted: white chip, green glyph', 'wa-A9', 'Less green in the bar; the glyph carries the brand.'],
   ['A10','Double rim, white then dark green', 'wa-A10', 'A halo instead of a shadow; flatter but still framed.'],
   ['A11','A4 with a nudge every 4 s', 'wa-A11', 'A tiny wobble on a timer. Motion as the affordance. Possibly annoying.'],
+  ['A13','Glyph only, round, white rim + shadow', 'wa-A13', 'The label goes; the glyph is the whole button, 36 px like the How chip. Frees about 60 px of bar.'],
+  ['A14','Short label: Chat', 'wa-A14', 'A4 treatment with a four-letter label so the border fits at 390 px.'],
+  ['A15','Join, and How moves elsewhere', 'wa-A15', 'Only the WhatsApp chip in the corner; How would live in the footer or on the algorithm link in the board.'],
   ['A12','A4 pressed state', 'wa-pressed', 'What A4 looks like under the thumb: shadow collapses, chip drops 3 px.'],
 ];
 document.getElementById('A').innerHTML = `<h2 class="x-h">Part A · WhatsApp chip</h2><div class="x-row">` +
