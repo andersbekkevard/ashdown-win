@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live indicator — four borrowed grammars — ashdown.win</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Titan+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#fb3aa3; --raspberry:#c81c74; --blue:#00b5fe; --deep:#0866d7;
+  --banana:#fcc601; --gold:#ffd046; --mint:#5eeac0; --mint-deep:#17a97a;
+  --lilac:#7c7be8; --ink:#222126; --paper:#ffffff; --cream:#fff6d5;
+  --muted:#6b7080; --faint:#8a8fa3;
+  --display:"Titan One","Arial Rounded MT Bold","Fredoka",system-ui,sans-serif;
+  --body:"Fredoka","Arial Rounded MT Bold",system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body); font-weight:500; color:var(--ink);
+  background:var(--blue);
+  background-image:repeating-radial-gradient(circle at 50% 6%, rgba(255,255,255,.14) 0 28px, rgba(255,255,255,0) 28px 72px);
+  background-attachment:fixed; min-height:100dvh; overflow-x:hidden;
+  padding:0 10px 60px;
+}
+.wrap{max-width:1180px;margin:0 auto}
+
+.shout{
+  font-family:var(--display); font-weight:400; color:var(--paper);
+  -webkit-text-stroke:.12em var(--pink); paint-order:stroke fill;
+  text-shadow:.05em .08em 0 var(--ink); text-transform:uppercase;
+  line-height:.95; letter-spacing:.01em;
+}
+header.page{padding:30px 4px 6px}
+header.page h1{font-size:clamp(26px,5.6vw,42px);margin:0 0 14px;transform:rotate(-1.5deg)}
+.lede{
+  background:var(--paper); border:4px solid var(--paper); border-radius:24px;
+  box-shadow:0 6px 0 var(--ink); padding:16px 18px; font-size:15px; line-height:1.5; margin-bottom:8px;
+}
+.lede p{margin:0 0 10px} .lede p:last-child{margin:0}
+.lede b{font-weight:700}
+.lede code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--cream);padding:1px 6px;border-radius:6px;border:1.5px solid #e6dfba}
+.budget{background:var(--cream);border:3px dashed var(--ink);border-radius:16px;padding:11px 13px;margin:12px 0 0;font-size:14px;line-height:1.45;font-weight:600}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 4px 20px}
+.tgl{
+  display:inline-flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);
+  font-family:var(--body);font-weight:700;font-size:13px;padding:9px 15px;border-radius:999px;
+  border:3px solid var(--paper);box-shadow:0 4px 0 rgba(0,0,0,.35);cursor:pointer;user-select:none;
+}
+.tgl input{appearance:none;width:34px;height:19px;border-radius:999px;background:#5a5e70;position:relative;margin:0;cursor:pointer;flex:none;transition:background 140ms}
+.tgl input::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--paper);transition:transform 160ms cubic-bezier(.3,1.5,.5,1)}
+.tgl input:checked{background:var(--mint)}
+.tgl input:checked::after{transform:translateX(15px)}
+
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));align-items:start}
+
+section.card{
+  background:var(--paper); border:4px solid var(--paper); border-radius:26px;
+  box-shadow:0 7px 0 var(--ink); padding:18px 18px 20px; overflow:hidden;
+}
+section.card h2{font-family:var(--display);font-weight:400;font-size:21px;margin:0;line-height:1.15;text-transform:uppercase}
+.num{
+  display:inline-grid;place-items:center;width:34px;height:34px;flex:none;
+  font-family:var(--display);font-size:17px;color:var(--paper);background:var(--lilac);
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  text-shadow:0 2px 0 rgba(0,0,0,.3);
+}
+.head{display:flex;gap:12px;align-items:center;margin-bottom:4px}
+.src{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 10px 46px}
+.why{font-size:14.5px;line-height:1.5;margin:0 0 16px;color:#3b3a44}
+
+.sub{font-family:var(--display);font-weight:400;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin:0 0 9px}
+
+/* three-state strip: the indicator always sits on the blue it will live on */
+.states{display:flex;gap:9px;margin-bottom:18px}
+.st{flex:1 1 0;min-width:0;border:3px solid var(--ink);border-radius:18px;overflow:hidden;background:var(--paper);box-shadow:0 4px 0 var(--ink)}
+.st .swatch{
+  background:var(--blue);
+  background-image:repeating-radial-gradient(circle at 50% 30%, rgba(255,255,255,.16) 0 16px, rgba(255,255,255,0) 16px 40px);
+  min-height:62px;display:grid;place-items:center;padding:12px 6px;border-bottom:3px solid var(--ink);
+}
+.st .cap{padding:8px 9px 9px;text-align:center}
+.st .cap b{display:block;font-family:var(--display);font-weight:400;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.st .cap span{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin-top:2px;line-height:1.25}
+.st.s1 .cap b{color:var(--raspberry)} .st.s2 .cap b{color:var(--mint-deep)} .st.s3 .cap b{color:var(--faint)}
+
+/* faithful 390px top bar */
+.mockwrap{overflow-x:auto;padding-bottom:4px}
+.bezel{width:396px;max-width:100%;border:3px solid var(--ink);border-radius:22px;overflow:hidden;box-shadow:0 5px 0 rgba(34,33,38,.35);margin:0 auto}
+.screen{
+  width:390px;
+  background:var(--blue);
+  background-image:repeating-radial-gradient(circle at 50% 18%, rgba(255,255,255,.14) 0 28px, rgba(255,255,255,0) 28px 72px);
+  padding-bottom:10px;
+}
+.phone{padding:0 14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 4px 10px;gap:8px}
+.logo{
+  display:inline-flex;align-items:center;gap:8px;background:var(--pink);color:var(--paper);
+  font-family:var(--display);font-size:22px;padding:8px 18px 8px 12px;border-radius:999px;
+  border:3px solid var(--paper);box-shadow:0 5px 0 var(--ink);transform:rotate(-2deg);
+  text-shadow:0 2px 0 var(--raspberry);white-space:nowrap;flex:none;
+}
+.logo svg{width:28px;height:22px;flex:none}
+.chips{display:flex;gap:6px;align-items:center;flex:none}
+.chip{
+  background:var(--ink);color:var(--paper);font-weight:700;font-size:13px;
+  padding:8px 14px;border-radius:999px;border:0;font-family:var(--body);cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.strip{height:52px;margin:2px 14px 0;border-radius:16px;background:rgba(255,255,255,.85);border:3px solid var(--paper);box-shadow:0 4px 0 rgba(34,33,38,.5);display:flex;align-items:center;padding:0 12px;gap:10px}
+.strip .fake-hex{width:26px;height:26px;background:var(--gold);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);flex:none}
+.strip .fake-l{height:9px;border-radius:5px;background:#dfe3ef}
+.strip .fake-l.a{width:96px} .strip .fake-l.b{width:54px;margin-left:auto;background:var(--cream);border:2px solid #e0d7ad;height:20px;border-radius:999px}
+
+.fit{font-size:12.5px;font-weight:600;color:var(--muted);line-height:1.45;margin:9px 2px 0;text-align:center}
+.fit b{color:var(--ink)}
+.fit .ok{color:var(--mint-deep);font-weight:700}
+.fit .no{color:var(--raspberry);font-weight:700}
+
+/* ─────────── 1. YouTube / Twitch LIVE badge ─────────── */
+.ytlive{
+  display:inline-flex;align-items:center;justify-content:center;height:31px;padding:0 7.5px;
+  border-radius:999px;border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);
+  font-family:var(--display);font-weight:400;font-size:11px;letter-spacing:.03em;
+  color:var(--paper);background:var(--pink);text-shadow:0 1.5px 0 var(--raspberry);
+  cursor:pointer;white-space:nowrap;flex:none;
+}
+.ytlive.live{animation:ytbeat 1.5s ease-in-out infinite}
+@keyframes ytbeat{
+  0%,100%{transform:scale(1);box-shadow:0 3px 0 var(--ink)}
+  45%{transform:scale(1.07);box-shadow:0 3px 0 var(--ink),0 0 0 3px rgba(255,255,255,.75)}
+  70%{transform:scale(1);box-shadow:0 3px 0 var(--ink)}
+}
+.ytlive.recent{background:var(--banana);color:var(--ink);text-shadow:none}
+.ytlive.quiet{background:#dfe3ef;color:#7a7f90;text-shadow:none;border-color:#8b8f9c;box-shadow:0 3px 0 #8b8f9c}
+
+/* ─────────── 2. Slack / Discord / GitHub presence coin ─────────── */
+.coin{
+  width:32px;height:32px;border-radius:50%;background:var(--ink);border:0;padding:0;
+  display:inline-grid;place-items:center;cursor:pointer;flex:none;position:relative;
+}
+.coin .g{width:14px;height:14px;border-radius:50%;position:relative}
+.coin.live .g{background:var(--mint)}
+.coin.live{animation:coinbreath 1.9s ease-in-out infinite}
+@keyframes coinbreath{0%,100%{transform:scale(1)}50%{transform:scale(1.13)}}
+/* idle crescent: a bite out of the top-left, exactly Discord's moon */
+.coin.recent .g{background:var(--gold)}
+.coin.recent .g::after{content:"";position:absolute;top:-4px;left:-4px;width:13px;height:13px;border-radius:50%;background:var(--ink)}
+/* offline: hollow grey ring, exactly Slack's "away" */
+.coin.quiet .g{background:transparent;border:3px solid #6f7488}
+
+/* ─────────── 3. Google Maps popular-times bar ─────────── */
+.gbusy{
+  display:inline-flex;align-items:center;gap:4px;height:31px;padding:0 6.5px;
+  border-radius:999px;background:var(--ink);cursor:pointer;flex:none;
+}
+.gbusy .bars{display:flex;align-items:flex-end;gap:2.5px;height:17px}
+.gbusy .bars i{width:3.5px;border-radius:2px;background:#565a6c;display:block}
+.gbusy .n{font-family:var(--display);font-weight:400;font-size:12px;color:#7f8496;line-height:1}
+.gbusy.live .bars i:nth-child(1){height:6px} .gbusy.live .bars i:nth-child(2){height:10px}
+.gbusy.live .bars i:nth-child(3){height:8px}
+.gbusy.live .bars i:nth-child(4){height:17px;background:var(--banana);animation:gbar 1.6s ease-in-out infinite}
+.gbusy.live .n{color:var(--banana)}
+@keyframes gbar{0%,100%{height:17px}50%{height:11px}}
+.gbusy.recent .bars i:nth-child(1){height:6px} .gbusy.recent .bars i:nth-child(2){height:13px}
+.gbusy.recent .bars i:nth-child(3){height:9px}
+.gbusy.recent .bars i:nth-child(4){height:6px;background:var(--mint)}
+.gbusy.recent .n{color:var(--mint)}
+.gbusy.quiet .bars i{height:4px;background:#5f6478}
+.gbusy.quiet .n{color:#6b7080}
+
+/* ─────────── 4. Find My / Uber location beacon ─────────── */
+.beacon{display:inline-flex;align-items:center;gap:5px;height:31px;padding:0 1px;cursor:pointer;flex:none}
+.beacon .b{position:relative;width:15px;height:15px;flex:none;display:grid;place-items:center}
+.beacon .core{width:15px;height:15px;border-radius:50%;background:var(--mint);border:2.5px solid var(--ink);box-sizing:border-box;position:relative;z-index:2}
+.beacon .r{position:absolute;left:0;top:0;width:15px;height:15px;border-radius:50%;border:2.5px solid var(--paper);box-sizing:border-box;z-index:1}
+.beacon.live .r{animation:radar 2.4s cubic-bezier(.2,.6,.3,1) infinite;opacity:0}
+.beacon.live .r2{animation-delay:1.2s}
+@keyframes radar{0%{transform:scale(1);opacity:.95}100%{transform:scale(2.9);opacity:0}}
+.beacon .t{font-family:var(--body);font-weight:700;font-size:11.5px;color:var(--paper);text-shadow:0 1.5px 0 rgba(34,33,38,.55);line-height:1;white-space:nowrap;position:relative;z-index:3}
+.beacon.recent .core{background:var(--gold)}
+.beacon.recent .r{transform:scale(1.85);opacity:.5}
+.beacon.recent .r2{transform:scale(2.6);opacity:.28}
+.beacon.quiet .core{background:#b9c0d4;border-color:#5a5e70}
+.beacon.quiet .r{opacity:0}
+.beacon.quiet .t{color:rgba(255,255,255,.7)}
+
+/* accessible label for the wordless option */
+.vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+footer.page{margin:26px 4px 0;color:var(--paper);font-weight:600;font-size:14px;line-height:1.55;text-shadow:0 2px 0 rgba(34,33,38,.4)}
+footer.page a{color:var(--cream);text-decoration:underline}
+
+@media (max-width:520px){
+  body{padding:0 6px 50px}
+  section.card{padding:16px 8px 18px;border-radius:22px}
+  .src{margin-left:0} .why{padding:0 6px} .sub{padding:0 6px}
+  .states{gap:6px;padding:0 4px}
+  .st .cap span{font-size:10.5px}
+  header.page{padding:22px 6px 6px}
+}
+
+/* Motion is decoration here; every state is legible from shape and colour alone. */
+@media (prefers-reduced-motion:reduce){
+  .ytlive.live,.coin.live,.gbusy.live .bars i:nth-child(4),.beacon.live .r,.tgl input,.tgl input::after{animation:none!important;transition:none!important}
+  .ytlive.live{box-shadow:0 3px 0 var(--ink),0 0 0 3px rgba(255,255,255,.75)}
+  .beacon.live .r{opacity:.55;transform:scale(1.9)}
+  .beacon.live .r2{opacity:.3;transform:scale(2.6)}
+}
+body.stillness .ytlive.live,
+body.stillness .coin.live,
+body.stillness .gbusy.live .bars i:nth-child(4),
+body.stillness .beacon.live .r{animation:none!important}
+body.stillness .ytlive.live{box-shadow:0 3px 0 var(--ink),0 0 0 3px rgba(255,255,255,.75)}
+body.stillness .beacon.live .r{opacity:.55;transform:scale(1.9)}
+body.stillness .beacon.live .r2{opacity:.3;transform:scale(2.6)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <h1 class="shout">Is the table busy?</h1>
+  <div class="lede">
+    <p>Four takes on a tiny live-activity indicator for the <b>ashdown.win</b> top bar. Each one borrows its
+    visual grammar wholesale from an application people already read without being taught, then re-cuts it in
+    the Fall Guys language from <code>globals.css</code>: Titan One and Fredoka, <code>#222126</code> outlines,
+    hard unblurred shadows, pill shapes.</p>
+    <p>Three states throughout. <b>Live</b> — a match went in inside the last 30 minutes. <b>Recent</b> — a match
+    within the last few hours. <b>Quiet</b> — nothing today. All four tap through to the match log page, and none
+    of them uses the word "Log".</p>
+    <div class="budget" id="budget">
+      <b>The space problem, measured.</b> At 390&nbsp;px the top bar has 354&nbsp;px of usable width and the
+      current contents already spend all of it: logo 233&nbsp;px + chips 115&nbsp;px + an 8&nbsp;px gap = 356&nbsp;px.
+      Nothing can simply be added. So in every mock below the indicator takes the "Log" chip's slot — it goes to the
+      same page — which frees about 50&nbsp;px. Measured budget for the indicator: <b>≈48&nbsp;px</b>.
+    </div>
+  </div>
+  <div class="toolbar">
+    <label class="tgl"><input type="checkbox" id="still"> Hold everything still (preview reduced motion)</label>
+  </div>
+</header>
+
+<div class="grid">
+
+<!-- ══════════ 1 ══════════ -->
+<section class="card">
+  <div class="head"><span class="num">1</span><h2>The broadcast badge</h2></div>
+  <p class="src">Grammar from YouTube &amp; Twitch</p>
+  <p class="why">A saturated pill carrying one short uppercase word is the most literal live signal on the
+    internet, and it survives at any size because the word does all the work. YouTube's red LIVE pill and Twitch's
+    channel badge both drop the same shape onto a thumbnail; when the stream ends the badge does not disappear,
+    it becomes a relative timestamp. That is exactly the ladder's problem — three degrees of recency in one slot.
+    So: <b>LIVE</b> while the paddles are still out, <b>2H</b> once the badge is only reporting history, and a
+    drained grey <b>OFF</b> when nothing has happened today. The pill is the shape the app already uses everywhere,
+    so it needs no introduction; the live state beats once every 1.5&nbsp;s and throws a hard white rim, which is a
+    Fall Guys button press rather than a broadcast glow.</p>
+
+  <p class="sub">Three states</p>
+  <div class="states">
+    <div class="st s1"><div class="swatch"><a class="ytlive live" href="#">LIVE</a></div>
+      <div class="cap"><b>Live</b><span>match 6 min ago</span></div></div>
+    <div class="st s2"><div class="swatch"><a class="ytlive recent" href="#">2H</a></div>
+      <div class="cap"><b>Recent</b><span>last match 2 h ago</span></div></div>
+    <div class="st s3"><div class="swatch"><a class="ytlive quiet" href="#">OFF</a></div>
+      <div class="cap"><b>Quiet</b><span>nothing today</span></div></div>
+  </div>
+
+  <p class="sub">In the real top bar — 390 px</p>
+  <div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">
+    <header class="topbar" data-bar>
+      <a class="logo" data-logo href="#"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>ashdown.win</a>
+      <nav class="chips" data-chips><a class="chip" href="#">How?</a><a class="ytlive live" data-ind href="#">LIVE</a></nav>
+    </header>
+    <div class="strip"><span class="fake-hex"></span><span class="fake-l a"></span><span class="fake-l b"></span></div>
+  </div></div></div></div>
+  <p class="fit" data-fit>measuring…</p>
+</section>
+
+<!-- ══════════ 2 ══════════ -->
+<section class="card">
+  <div class="head"><span class="num">2</span><h2>The presence dot</h2></div>
+  <p class="src">Grammar from Slack, Discord &amp; GitHub</p>
+  <p class="why">Chat apps solved the smallest possible status display years ago and did it without a single word.
+    The state lives in the <em>shape</em> of the dot, not its colour: Slack fills it in when you are active and
+    hollows it out when you are away, Discord bites a crescent out of it for idle. That is the cheapest signal on
+    this page and the only one that costs nothing to internationalise, nothing to translate, and nothing in width.
+    Here the dot sits on an ink coin the same 32&nbsp;px as the existing chips, so it reads as one of the family
+    rather than as a new species. Filled mint means someone is at the table now, and the whole coin breathes about
+    six times a minute — slow enough to notice only if you look. Gold crescent means earlier today. Hollow grey ring
+    means nobody has played. Wordless, so the "Log" restriction never comes up, with the sentence carried in the
+    accessible label instead.</p>
+
+  <p class="sub">Three states</p>
+  <div class="states">
+    <div class="st s1"><div class="swatch"><a class="coin live" href="#" aria-label="Someone is playing right now — see the matches"><span class="g"></span></a></div>
+      <div class="cap"><b>Live</b><span>match 6 min ago</span></div></div>
+    <div class="st s2"><div class="swatch"><a class="coin recent" href="#" aria-label="Last match 2 hours ago — see the matches"><span class="g"></span></a></div>
+      <div class="cap"><b>Recent</b><span>last match 2 h ago</span></div></div>
+    <div class="st s3"><div class="swatch"><a class="coin quiet" href="#" aria-label="No matches today — see the matches"><span class="g"></span></a></div>
+      <div class="cap"><b>Quiet</b><span>nothing today</span></div></div>
+  </div>
+
+  <p class="sub">In the real top bar — 390 px</p>
+  <div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">
+    <header class="topbar" data-bar>
+      <a class="logo" data-logo href="#"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>ashdown.win</a>
+      <nav class="chips" data-chips><a class="chip" href="#">How?</a><a class="coin live" data-ind href="#" aria-label="Someone is playing right now — see the matches"><span class="g"></span></a></nav>
+    </header>
+    <div class="strip"><span class="fake-hex"></span><span class="fake-l a"></span><span class="fake-l b"></span></div>
+  </div></div></div></div>
+  <p class="fit" data-fit>measuring…</p>
+</section>
+
+<!-- ══════════ 3 ══════════ -->
+<section class="card">
+  <div class="head"><span class="num">3</span><h2>The busyness meter</h2></div>
+  <p class="src">Grammar from Google Maps popular times</p>
+  <p class="why">Google Maps answers "is it worth walking over?" with a histogram, and the live version simply
+    lights the bar for right now. It is a quantity, not an announcement, and that suits a ping-pong table better
+    than a broadcast badge does: what you actually want to know at the top of the stairs is whether today has been
+    busy and whether the last bar is still climbing. Four bars stand for the last four hours; the rightmost is the
+    hour you are in. It goes tall and banana-yellow and rises and falls when a match has just landed, drops to a
+    short mint stub for a couple of hours afterwards, and flattens to a grey floor when the day has been empty. The
+    numeral beside it is the day's match count, which is the same numeral the leaderboard already speaks in. The
+    ink pill matches the existing chips exactly, so the meter reads as data rather than as an alert.</p>
+
+  <p class="sub">Three states</p>
+  <div class="states">
+    <div class="st s1"><div class="swatch"><a class="gbusy live" href="#" aria-label="A match 6 minutes ago, 4 today — see the matches"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="n">4</span></a></div>
+      <div class="cap"><b>Live</b><span>match 6 min ago</span></div></div>
+    <div class="st s2"><div class="swatch"><a class="gbusy recent" href="#" aria-label="Last match 2 hours ago, 2 today — see the matches"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="n">2</span></a></div>
+      <div class="cap"><b>Recent</b><span>last match 2 h ago</span></div></div>
+    <div class="st s3"><div class="swatch"><a class="gbusy quiet" href="#" aria-label="No matches today — see the matches"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="n">0</span></a></div>
+      <div class="cap"><b>Quiet</b><span>nothing today</span></div></div>
+  </div>
+
+  <p class="sub">In the real top bar — 390 px</p>
+  <div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">
+    <header class="topbar" data-bar>
+      <a class="logo" data-logo href="#"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>ashdown.win</a>
+      <nav class="chips" data-chips><a class="chip" href="#">How?</a><a class="gbusy live" data-ind href="#" aria-label="A match 6 minutes ago, 4 today — see the matches"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="n">4</span></a></nav>
+    </header>
+    <div class="strip"><span class="fake-hex"></span><span class="fake-l a"></span><span class="fake-l b"></span></div>
+  </div></div></div></div>
+  <p class="fit" data-fit>measuring…</p>
+</section>
+
+<!-- ══════════ 4 ══════════ -->
+<section class="card">
+  <div class="head"><span class="num">4</span><h2>The location beacon</h2></div>
+  <p class="src">Grammar from Find My &amp; Uber</p>
+  <p class="why">Find My and Uber both say "this is a real thing happening in a real place" with the same object:
+    a solid dot throwing rings outward, with a lowercase relative timestamp beside it. The rings are the only
+    animation on this page that leaves its own bounds, which is why the live state carries further than the others
+    at a glance, and the wording stays in the register those apps use — <b>now</b>, <b>2h</b>, an em dash for no
+    signal. It has no pill around it, so it does not compete with the chips for the eye; it floats on the blue the
+    way a location dot floats on a map. When the last match is a couple of hours old the rings freeze in place at
+    half opacity, which is Find My's "last seen here" and reads as a memory of activity rather than activity. When
+    nothing has happened the core goes pale and the rings vanish entirely.</p>
+
+  <p class="sub">Three states</p>
+  <div class="states">
+    <div class="st s1"><div class="swatch"><a class="beacon live" href="#"><span class="b"><span class="r"></span><span class="r r2"></span><span class="core"></span></span><span class="t">now</span></a></div>
+      <div class="cap"><b>Live</b><span>match 6 min ago</span></div></div>
+    <div class="st s2"><div class="swatch"><a class="beacon recent" href="#"><span class="b"><span class="r"></span><span class="r r2"></span><span class="core"></span></span><span class="t">2h</span></a></div>
+      <div class="cap"><b>Recent</b><span>last match 2 h ago</span></div></div>
+    <div class="st s3"><div class="swatch"><a class="beacon quiet" href="#"><span class="b"><span class="r"></span><span class="r r2"></span><span class="core"></span></span><span class="t">—</span></a></div>
+      <div class="cap"><b>Quiet</b><span>nothing today</span></div></div>
+  </div>
+
+  <p class="sub">In the real top bar — 390 px</p>
+  <div class="mockwrap"><div class="bezel"><div class="screen"><div class="phone">
+    <header class="topbar" data-bar>
+      <a class="logo" data-logo href="#"><svg viewBox="0 0 28 22" aria-hidden="true"><path d="M2.5 19.5h23l1.8-15.4-6.6 4.7L14 1.6 7.3 8.8.7 4.1z" fill="#ffd046" stroke="#222126" stroke-width="2.2" stroke-linejoin="round"/></svg>ashdown.win</a>
+      <nav class="chips" data-chips><a class="chip" href="#">How?</a><a class="beacon live" data-ind href="#"><span class="b"><span class="r"></span><span class="r r2"></span><span class="core"></span></span><span class="t">now</span></a></nav>
+    </header>
+    <div class="strip"><span class="fake-hex"></span><span class="fake-l a"></span><span class="fake-l b"></span></div>
+  </div></div></div></div>
+  <p class="fit" data-fit>measuring…</p>
+</section>
+
+</div>
+
+<footer class="page">
+  <p>Every state is legible from shape and colour with all motion switched off, so
+  <code style="background:rgba(255,255,255,.25);padding:1px 6px;border-radius:6px">prefers-reduced-motion: reduce</code>
+  simply freezes the live state in its emphasised pose rather than hiding it. Use the toggle at the top to check.
+  Recommendation and the research table are in <b>brief.md</b> beside this file.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Preview switch for reduced motion, so the still states can be judged on a normal machine.
+  var still = document.getElementById("still");
+  still.addEventListener("change", function () {
+    document.body.classList.toggle("stillness", still.checked);
+  });
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    still.checked = true;
+    document.body.classList.add("stillness");
+  }
+
+  // Measure each 390px mock and report whether the row actually fits.
+  // The numbers are the whole point of the in-context mock, so they are computed, not asserted.
+  function measure() {
+    document.querySelectorAll("[data-bar]").forEach(function (bar) {
+      var logo = bar.querySelector("[data-logo]");
+      var chips = bar.querySelector("[data-chips]");
+      var ind = bar.querySelector("[data-ind]");
+      var out = bar.closest("section").querySelector("[data-fit]");
+      if (!logo || !chips || !ind || !out) return;
+
+      var cs = getComputedStyle(bar);
+      var inner = bar.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var gap = parseFloat(cs.columnGap) || 0;
+      // offsetWidth, not getBoundingClientRect: the live states animate scale(), and a
+      // transform must not be mistaken for layout width.
+      var w = function (el) { return el.offsetWidth; };
+      var used = w(logo) + gap + w(chips);
+      var slack = inner - used;
+      var r1 = function (n) { return Math.round(n * 10) / 10; };
+
+      out.innerHTML =
+        "Indicator <b>" + r1(w(ind)) + " px</b> wide &middot; row uses <b>" + r1(used) +
+        " px</b> of " + r1(inner) + " px &middot; " +
+        (slack >= 0
+          ? '<span class="ok">' + r1(slack) + " px to spare</span>"
+          : '<span class="no">overflows by ' + r1(-slack) + " px</span>");
+    });
+  }
+
+  // Titan One and Fredoka change every width here, so wait for them.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { measure(); setTimeout(measure, 250); });
+  } else {
+    window.addEventListener("load", measure);
+  }
+  window.addEventListener("resize", measure);
+})();
+</script>
+</body>
+</html>
