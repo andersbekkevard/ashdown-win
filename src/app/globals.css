@@ -492,6 +492,6 @@ h2.shout { font-size: 26px; margin: 0; }
 }
 @keyframes celebration-clear { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .celebration, .celebration-arrival, .celebration.confirmed .celebration-word { animation: none; }
+  .celebration.confirmed, .celebration-arrival, .celebration.confirmed .celebration-word { animation: none; }
   .celebration-confetti { display: none; }
 }

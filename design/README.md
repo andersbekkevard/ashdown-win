@@ -84,11 +84,14 @@ explorations that led here are `explorations/live-indicator/`,
 `explorations/affordances/`, `explorations/continuity/`, and
 `explorations/topbar/`; `live-indicator.md` records the decisions.
 
+## Celebrations
+
+Match recording and player creation share an immediate, centered temporary
+animation. Research, timings and the development replay page are documented
+in [research/celebration-motion.md](research/celebration-motion.md).
+
 ## Open items
 
-- The record-match success moment. The mock ends in a tilted "RECORDED!"
-  banner with confetti and the two rating deltas as pills; the app currently
-  just returns to the board.
 - The graph's date axis only becomes meaningful once real matches span days.
 - Desktop layout is a centred phone column and nothing more.
 - Swap the poster's drawn phone frame for a real screenshot once the live

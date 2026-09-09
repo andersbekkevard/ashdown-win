@@ -31,6 +31,13 @@ and the full list of matches with opponents and outcomes.
 A separate **algorithm** page, reachable from a small link, presents the
 rating maths as a short paper. Its source is [algorithm.md](algorithm.md).
 
+Recording a match or creating a player starts a viewport-centered animation
+on submission. The root `CelebrationProvider` keeps it alive across route
+changes: pending copy appears immediately, then confirmed saves produce
+Recorded! or Welcome! with confetti. Failures cancel it and retain the form.
+The same welcome works inside the opponent-creation sheet. See the
+[motion notes](../design/research/celebration-motion.md) for timing and replay.
+
 ## Data model
 
 Two kinds of thing exist.
