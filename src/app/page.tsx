@@ -1,20 +1,24 @@
 import Link from "next/link";
 import { Crown } from "@/components/crown";
 import { Dock } from "@/components/dock";
+import { ActivityCard } from "@/components/activity-card";
+import { activitySummary } from "@/lib/activity";
 import { formatRating } from "@/lib/format";
-import { leaderboard } from "@/lib/queries";
+import { leaderboard, matchLog } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 const hexClass = ["gold", "silver", "bronze"];
 
 export default async function HomePage() {
-  const rows = await leaderboard();
+  const [rows, log] = await Promise.all([leaderboard(), matchLog()]);
+  const activity = activitySummary(log[0]);
   return (
     <>
       <p className="lead">
         The table tennis ladder for Ashdown House. Add your name, record who won, climb.
       </p>
+      <ActivityCard activity={activity} />
       <div className="board slab pop-in">
         <div className="board-head">
           <h1 className="shout">Leaderboard</h1>

@@ -15,3 +15,6 @@ export const START_RATING = 1000;
 
 /** Maximum length of a player name, in characters. */
 export const MAX_NAME_LENGTH = 60;
+
+/** WhatsApp group for arranging games. Public invite, no approval gate. */
+export const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/DWpOT0r3aUF3liyoaVOd8c";

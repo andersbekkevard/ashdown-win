@@ -41,3 +41,14 @@ committed. The invite link is a constant in `src/lib/config.ts`.
 
 No word like LIVE or REC as the label. No bare dot without a container. No
 mint or gold. No tab bar.
+
+## Revision, same day
+
+After seeing it on a phone Anders moved the indicator out of the top bar. The
+top bar now holds the logo, How, and a green WhatsApp chip. The live
+indicator is a card above the leaderboard that links to the log: the
+recording dot (blinking under ten minutes, hollow when quiet), "Live at the
+table" or "Recent activity", the time since the latest entry, and one line
+naming it, such as "Priya Raman beat Anders Bekkevard". The green WhatsApp
+row on the home page was too dominant and is gone; the welcome card after
+creating a player keeps a small one.

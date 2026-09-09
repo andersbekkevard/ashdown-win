@@ -40,7 +40,7 @@ export function CreatePlayerForm({
         if (variant === "sheet" && onCreated) {
           onCreated(result.value);
         } else {
-          router.push(`/players/${result.value.id}`);
+          router.push(`/players/${result.value.id}?welcome`);
           router.refresh();
         }
       }

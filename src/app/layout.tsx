@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Crown } from "@/components/crown";
+import { WhatsAppGlyph } from "@/components/whatsapp-row";
+import { WHATSAPP_GROUP_URL } from "@/lib/config";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -37,7 +39,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </Link>
             <nav className="chips">
               <Link href="/algorithm" className="chip">How?</Link>
-              <Link href="/log" className="chip">Log</Link>
+              <a href={WHATSAPP_GROUP_URL} className="chip wa" target="_blank" rel="noopener" aria-label="Join the WhatsApp group">
+                <WhatsAppGlyph className="wa-mini" />
+                WhatsApp
+              </a>
             </nav>
           </header>
           <main>{children}</main>

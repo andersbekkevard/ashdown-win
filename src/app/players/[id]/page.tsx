@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Dock } from "@/components/dock";
+import { WhatsAppRow } from "@/components/whatsapp-row";
 import { PlayerHistory, type HistoryMatch } from "@/components/player-history";
 import type { GraphPoint } from "@/components/rating-graph";
 import { START_RATING } from "@/lib/config";
@@ -17,8 +18,15 @@ const shortDate = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 
-export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PlayerPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ welcome?: string }>;
+}) {
   const { id: raw } = await params;
+  const { welcome } = await searchParams;
   const id = Number(raw);
   if (!Number.isInteger(id) || id <= 0) notFound();
 
@@ -64,6 +72,12 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
   return (
     <>
+      {welcome !== undefined && (
+        <div className="welcome pop-in">
+          <b>You&apos;re on the board.</b> Find someone to play in the group.
+          <WhatsAppRow text="Ashdown ping-pong on WhatsApp" />
+        </div>
+      )}
       <div className="hero-card slab pop-in">
         <div className={`hex ${hexClass[rank - 1] ?? ""}`}>{rank || "–"}</div>
         <div>
