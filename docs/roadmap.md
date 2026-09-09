@@ -37,6 +37,14 @@ opponent from inside the match form, and log backups.
 
 ## Later, if wanted
 
+- Finality: a match older than about seven days can no longer be deleted or
+  restored by anyone. One check in the two actions. Stops quiet voiding of
+  old losses. Not yet wanted; revisit if old-match deletions appear in the log.
+- Proof of work on player creation, a half-second hash puzzle in the browser,
+  if scripted flooding ever happens. Invisible to a person, no sign-in.
+- Signing keys per device instead of the cookie label, so attribution is
+  verifiable in a dispute. Deferred: keys vanish when storage is cleared.
+
 - A second game such as pool: a `game` column on matches with a default of
   table tennis, replay grouped by game, one toggle at the top, same names.
 - Seasons: a `seasons` table; the board shows the current season, history
@@ -46,6 +54,10 @@ opponent from inside the match form, and log backups.
 - A second house on the same code: a `venue` column, one deployment.
 
 ## Not planned
+
+- Hash-chained log, a published head hash, and a verifier script. These
+  protect against the operator, and residents know the operator. Considered
+  2026-09-09 and dropped.
 
 - Accounts or passwords. Verification of a phone is enough.
 - Score lines per match. A margin-of-victory rating is not worth the extra
