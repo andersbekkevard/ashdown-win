@@ -62,8 +62,8 @@ cannot replay a success animation.
 ## Replay and verification
 
 In development, open `/dev/celebrations` for repeatable Recorded, Welcome,
-slow-save and failed-save previews. This route writes no data and returns
-404 in production.
+slow-save and failed-save previews. This route writes no data and shows the not-found page in production.
+The production response was checked for the absence of preview controls.
 
 Browser checks against the local development database:
 
