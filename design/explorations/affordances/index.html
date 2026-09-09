@@ -425,9 +425,9 @@ body { font-family: var(--body); font-weight: 500; color: var(--ink); background
 .x-label { display: inline-flex; align-items: center; gap: 8px; color: #222126; background: #ffd046; border: 3px solid #222126; border-radius: 999px; padding: 4px 12px 4px 6px; font-weight: 700; font-size: 14px; box-shadow: 0 3px 0 #222126; align-self: flex-start; }
 .x-label b { font-family: var(--display); font-weight: 400; background: #222126; color: #fff; border-radius: 999px; padding: 2px 10px; font-size: 14px; }
 .x-note { color: #fff; font-size: 13px; font-weight: 600; max-width: 390px; opacity: .92; }
-.frame { width: 354px; box-sizing: content-box; background: var(--blue) repeating-radial-gradient(circle at 50% 18%, rgba(255,255,255,0.14) 0 28px, rgba(255,255,255,0) 28px 72px); border-radius: 26px; border: 4px solid #222126; overflow: hidden; padding: 0 14px 14px; box-shadow: 0 8px 0 #222126; }
-.frame .topbar { padding-left: 0; padding-right: 0; }
-.frame .chips { gap: 5px; }
+.frame { width: 390px; box-sizing: content-box; padding: 0; background: var(--blue) repeating-radial-gradient(circle at 50% 18%, rgba(255,255,255,0.14) 0 28px, rgba(255,255,255,0) 28px 72px); border-radius: 26px; border: 4px solid #222126; overflow: hidden; box-shadow: 0 8px 0 #222126; }
+.frame-main { padding: 0 14px 14px; }
+.frame .state { margin-left: 18px; }
 .frame .state { color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; opacity: .85; margin: 0 4px 6px; }
 .mini-board .row { padding: 7px 12px 7px 10px; }
 .mini-board .hex { width: 36px; height: 36px; font-size: 16px; }
@@ -538,7 +538,7 @@ function card(state, when, line, extra='') {
   return `<a class="activity slab ${state} ${extra}"><span class="dot"></span><span class="a-body"><span class="a-head"><b>${head}</b><span class="a-when">${when}</span></span><span class="a-line" data-when="${when}">${line}</span></span><span class="a-go">Log ›</span></a>`;
 }
 function frame(cls, inner, stateLabel) {
-  return `<div class="frame ${cls}">${bar()}${stateLabel?`<div class="state">${stateLabel}</div>`:''}${inner}</div>`;
+  return `<div class="frame ${cls}">${bar()}${stateLabel?`<div class="state">${stateLabel}</div>`:''}<div class="frame-main">${inner}</div></div>`;
 }
 function caseBox(num, title, note, frames) {
   return `<div class="x-case"><span class="x-label"><b>${num}</b>${title}</span><div class="x-row" style="margin:0">${frames}</div>${note?`<div class="x-note">${note}</div>`:''}</div>`;
