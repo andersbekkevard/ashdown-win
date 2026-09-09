@@ -95,8 +95,8 @@ a { color: inherit; text-decoration: none; }
 .logo {
   display: inline-flex; align-items: center; gap: 8px;
   background: var(--pink); color: var(--paper);
-  font-family: var(--display); font-size: 20px;
-  padding: 8px 17px 8px 12px; border-radius: 999px; border: 3px solid var(--paper);
+  font-family: var(--display); font-size: 19px;
+  padding: 8px 16px 8px 12px; border-radius: 999px; border: 3px solid var(--paper);
   box-shadow: 0 5px 0 var(--ink); transform: rotate(-2deg);
   text-shadow: 0 2px 0 var(--raspberry);
 }
@@ -402,8 +402,8 @@ h2.shout { font-size: 26px; margin: 0; }
 .chip.ind {
   background: var(--paper); color: var(--ink);
   border: 3px solid color-mix(in oklab, #e8232a calc(var(--fb, 0) * 100%), var(--ink));
-  box-shadow: 0 3px 0 var(--ink); gap: 6px; padding: 5px 11px 5px 9px;
-  font-variant-numeric: tabular-nums; min-width: 54px; justify-content: center;
+  box-shadow: 0 3px 0 var(--ink); gap: 7px; padding: 5px 14px 5px 12px;
+  font-variant-numeric: tabular-nums; min-width: 74px; justify-content: center;
 }
 .chip.ind .d { width: 9px; height: 9px; border-radius: 50%; background: color-mix(in oklab, #e8232a calc(var(--fd, 0) * 100%), #b9bdcc); flex: none; }
 .chip.ind.hot { animation: chip-glow 1.4s ease-in-out infinite; }
@@ -429,3 +429,17 @@ h2.shout { font-size: 26px; margin: 0; }
 .welcome { background: var(--cream); border: 4px solid var(--paper); border-radius: 24px; box-shadow: 0 6px 0 var(--ink); padding: 14px 16px 4px; margin-bottom: 16px; font-weight: 600; font-size: 15px; }
 .welcome b { display: block; font-family: var(--display); font-weight: 400; font-size: 20px; text-transform: uppercase; margin-bottom: 2px; }
 .welcome .wa-row { margin: 10px 0 10px; }
+
+/* the latest log entry carries the same liveness as the top-bar pill */
+.log-row.latest {
+  border: 3px solid color-mix(in oklab, #e8232a calc(var(--fb, 0) * 100%), #e9ecf4);
+  background: color-mix(in oklab, #ffe1e3 calc(var(--fb, 0) * 70%), #fff);
+  border-radius: 14px; padding: 10px 12px; margin: 0 -4px 6px; border-bottom-width: 3px;
+}
+.log-row.latest .what { display: flex; align-items: center; gap: 8px; }
+.log-row.latest .d { width: 10px; height: 10px; border-radius: 50%; flex: none; background: color-mix(in oklab, #e8232a calc(var(--fd, 0) * 100%), #b9bdcc); }
+.log-row.latest.hot .d { animation: dot-pump 1s ease-in-out infinite; }
+.log-row.latest.warm .d { animation: dot-pump-soft 1.6s ease-in-out infinite; }
+.log-row.latest.cool .d { animation: dot-breathe 4s ease-in-out infinite; }
+.log-row.latest.cold .d { background: transparent; box-shadow: inset 0 0 0 2px #b9bdcc; }
+.log-row.latest .when::before { content: "latest · "; font-weight: 700; color: color-mix(in oklab, #c8102e calc(var(--fb, 0) * 100%), var(--muted)); }

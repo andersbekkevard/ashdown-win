@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Dock } from "@/components/dock";
 import { MatchLogActions } from "@/components/match-log-actions";
+import { liveness } from "@/lib/activity";
 import { formatDate } from "@/lib/format";
 import { matchLog, type MatchView, type Participant } from "@/lib/queries";
 
@@ -37,6 +38,10 @@ function Device({ label }: { label: string | null }) {
 
 export default async function LogPage() {
   const entries = await matchLog();
+  const live = entries.length ? liveness(entries[0].at) : null;
+  const latestClass = (i: number) => (i === 0 && live ? ` latest ${live.motion}` : "");
+  const latestStyle = (i: number) =>
+    i === 0 && live ? ({ "--fb": live.border.toFixed(3), "--fd": live.dot.toFixed(3) } as React.CSSProperties) : undefined;
   return (
     <>
       <h1 className="shout">The log</h1>
@@ -51,12 +56,13 @@ export default async function LogPage() {
         {entries.length === 0 ? (
           <p className="empty">Nothing recorded yet.</p>
         ) : (
-          entries.map((e) =>
+          entries.map((e, i) =>
             e.kind === "match" ? (
-              <div key={`m${e.match.id}`} className="log-row">
+              <div key={`m${e.match.id}`} className={`log-row${latestClass(i)}`} style={latestStyle(i)}>
                 <div>
                   <div className={`what${e.match.deleted ? " gone" : ""}`}>
-                    <MatchLine match={e.match} />
+                    {i === 0 && <span className="d" aria-hidden="true" />}
+                    <span><MatchLine match={e.match} /></span>
                   </div>
                   <div className="when">
                     #{e.match.id} · {formatDate(e.at)} <Device label={e.match.device} />
@@ -65,10 +71,11 @@ export default async function LogPage() {
                 <MatchLogActions matchId={e.match.id} deleted={e.match.deleted} />
               </div>
             ) : (
-              <div key={`${e.kind[0]}${e.id}`} className="log-row">
+              <div key={`${e.kind[0]}${e.id}`} className={`log-row${latestClass(i)}`} style={latestStyle(i)}>
                 <div>
                   <div className="what">
-                    {e.kind === "deletion" ? "Deleted" : "Restored"} #{e.match.id}: <MatchLine match={e.match} />
+                    {i === 0 && <span className="d" aria-hidden="true" />}
+                    <span>{e.kind === "deletion" ? "Deleted" : "Restored"} #{e.match.id}: <MatchLine match={e.match} /></span>
                   </div>
                   <div className="when">
                     {e.kind} · {formatDate(e.at)} <Device label={e.device} />

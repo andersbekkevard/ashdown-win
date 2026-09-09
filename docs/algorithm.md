@@ -3,7 +3,7 @@
 Everyone starts at 1000. When you beat someone, you take points
 from them; how many depends on how surprising the result was. Beating a
 stronger player earns more than beating a weaker one. There are no accounts, every
-match is public, and a mistake can be undone.
+match is public, and a mistake can be [undone](/log).
 
 ## Update
 
@@ -35,10 +35,11 @@ doubles result says less about any one player.
 The log is append-only. Recording a match adds an entry. Deleting adds an
 entry that voids a match, and restoring adds an entry that cancels a deletion.
 Every entry stays visible, so a wrong tap is always reversible and never
-hidden.
+hidden. To undo a deletion, open [the log](/log) and tap Restore on it.
 
 Each entry also stores a short anonymous label derived from a random cookie on
 the phone that made it. It identifies no one and holds no personal data; it
 only lets the log show when several actions came from the same phone.
 
-The code that implements this is open: github.com/andersbekkevard/ashdown-win.
+The code that implements this is open:
+[github.com/andersbekkevard/ashdown-win](https://github.com/andersbekkevard/ashdown-win).
