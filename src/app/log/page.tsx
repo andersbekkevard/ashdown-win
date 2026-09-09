@@ -31,11 +31,6 @@ function MatchLine({ match }: { match: MatchView }) {
   );
 }
 
-function Device({ label }: { label: string | null }) {
-  if (!label) return null;
-  return <span className="device" title="Anonymous label of the phone that did this">phone {label.slice(0, 4)}</span>;
-}
-
 export default async function LogPage() {
   const entries = await matchLog();
   // Only a match carries the liveness; a deletion or restore is bookkeeping.
@@ -67,7 +62,7 @@ export default async function LogPage() {
                     <span><MatchLine match={e.match} /></span>
                   </div>
                   <div className="when">
-                    #{e.match.id} · {formatDate(e.at)} <Device label={e.match.device} />
+                    #{e.match.id} · {formatDate(e.at)}
                   </div>
                 </div>
                 <MatchLogActions matchId={e.match.id} deleted={e.match.deleted} />
@@ -79,7 +74,7 @@ export default async function LogPage() {
                     <span>{e.kind === "deletion" ? "Deleted" : "Restored"} #{e.match.id}: <MatchLine match={e.match} /></span>
                   </div>
                   <div className="when">
-                    {e.kind} · {formatDate(e.at)} <Device label={e.device} />
+                    {e.kind} · {formatDate(e.at)}
                   </div>
                 </div>
               </div>

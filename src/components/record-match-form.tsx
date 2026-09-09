@@ -35,6 +35,10 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
 
   const sideA = doubles ? [a1, a2] : [a1];
   const sideB = doubles ? [b1, b2] : [b1];
+  // The next empty slot, in reading order, gets focus and an open list.
+  const order = doubles ? ["a1", "a2", "b1", "b2"] : ["a1", "b1"];
+  const filled: Record<string, Selected | null> = { a1, a2, b1, b2 };
+  const next = order.find((k) => filled[k] === null) ?? null;
   const complete =
     sideA.every((p) => p !== null) && sideB.every((p) => p !== null) && winner !== null;
 
@@ -115,17 +119,17 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
 
       <div className="side a slab">
         <div className="label">Side A</div>
-        <PlayerSearch placeholder="Player" value={a1} onChange={adopt(setA1)} exclude={exclude} roster={known} autoFocus />
+        <PlayerSearch placeholder="Player" value={a1} onChange={adopt(setA1)} exclude={exclude} roster={known} autoFocus active={next === "a1"} />
         {doubles && (
-          <PlayerSearch placeholder="Partner" value={a2} onChange={adopt(setA2)} exclude={exclude} roster={known} />
+          <PlayerSearch placeholder="Partner" value={a2} onChange={adopt(setA2)} exclude={exclude} roster={known} active={next === "a2"} />
         )}
       </div>
       <div className="vs">VS</div>
       <div className="side b slab">
         <div className="label">Side B</div>
-        <PlayerSearch placeholder="Player" value={b1} onChange={adopt(setB1)} exclude={exclude} roster={known} />
+        <PlayerSearch placeholder="Player" value={b1} onChange={adopt(setB1)} exclude={exclude} roster={known} active={next === "b1"} />
         {doubles && (
-          <PlayerSearch placeholder="Partner" value={b2} onChange={adopt(setB2)} exclude={exclude} roster={known} />
+          <PlayerSearch placeholder="Partner" value={b2} onChange={adopt(setB2)} exclude={exclude} roster={known} active={next === "b2"} />
         )}
       </div>
 

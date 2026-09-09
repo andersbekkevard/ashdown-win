@@ -28,17 +28,17 @@ export function liveness(lastMatchAt: Date | null, now = Date.now()): Liveness {
   let short: string;
   let long: string;
   if (mins < 2) {
-    short = "now";
+    short = "just now";
     long = "just now";
   } else if (hours < 1) {
-    short = `${mins}m`;
-    long = `${mins}m ago`;
+    short = `${mins}m ago`;
+    long = short;
   } else if (hours < 24) {
-    short = `${Math.round(hours)}h`;
-    long = `${Math.round(hours)}h ago`;
+    short = `${Math.round(hours)}h ago`;
+    long = short;
   } else {
     const d = Math.round(hours / 24);
-    short = `${d}d`;
+    short = `${d}d ago`;
     long = d === 1 ? "yesterday" : `${d} days ago`;
   }
   return { motion, border: Math.pow(base, 6.5), dot: Math.pow(base, 3), short, long };

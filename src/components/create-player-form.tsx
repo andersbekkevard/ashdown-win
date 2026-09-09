@@ -100,8 +100,7 @@ export function CreatePlayerForm({
           </p>
         )}
         <p className="hint">
-          Once is enough. You start at 1000, and anyone can record a match against you by
-          finding this name.
+          Anyone can record a match against you by finding this name.
         </p>
         <details>
           <summary>I&apos;d rather not use my full name</summary>

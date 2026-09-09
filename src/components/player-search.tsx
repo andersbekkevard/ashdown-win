@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MAX_NAME_LENGTH } from "@/lib/config";
 import { normalizeName } from "@/lib/names";
@@ -35,6 +35,7 @@ export function PlayerSearch({
   exclude,
   roster,
   autoFocus = false,
+  active = false,
 }: {
   placeholder: string;
   value: Selected | null;
@@ -43,12 +44,20 @@ export function PlayerSearch({
   exclude: number[];
   roster: Selected[];
   autoFocus?: boolean;
+  /** True for the slot the form wants filled next; it focuses and opens. */
+  active?: boolean;
 }) {
   const inputId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   // The autofocused first field gets no focus event, so start open there.
   const [open, setOpen] = useState(autoFocus);
   const [creating, setCreating] = useState<string | null>(null);
+
+  // Focusing fires onFocus, which opens the list; no state is set here.
+  useEffect(() => {
+    if (active && !value) inputRef.current?.focus();
+  }, [active, value]);
 
   if (value) {
     return (
@@ -84,6 +93,7 @@ export function PlayerSearch({
     <div className="field">
       <PaddleIcon />
       <input
+        ref={inputRef}
         id={inputId}
         type="search"
         value={query}

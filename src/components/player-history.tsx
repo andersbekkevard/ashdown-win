@@ -86,7 +86,6 @@ export function PlayerHistory({
           <span><i className="up" />win</span>
           <span><i className="down" />loss</span>
           <span><i className="base" />start</span>
-          <span className="hint">drag across the line</span>
         </div>
       </div>
 

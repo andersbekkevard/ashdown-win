@@ -91,9 +91,6 @@ export function RatingGraph({
           </g>
         ))}
         <line className="base-line" x1={pad.left} x2={width - pad.right} y1={y(startRating)} y2={y(startRating)} />
-        <text className="base-cap" x={width - pad.right} y={y(startRating) - 6} textAnchor="end">
-          start {startRating}
-        </text>
 
         {n > 1 && <polyline className="ink" points={path} />}
         {points.slice(1).map((p, i) => (

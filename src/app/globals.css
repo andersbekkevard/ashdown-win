@@ -95,15 +95,15 @@ a { color: inherit; text-decoration: none; }
 .logo {
   display: inline-flex; align-items: center; gap: 8px;
   background: var(--pink); color: var(--paper);
-  font-family: var(--display); font-size: 19px;
-  padding: 8px 16px 8px 12px; border-radius: 999px; border: 3px solid var(--paper);
+  font-family: var(--display); font-size: 18px;
+  padding: 8px 14px 8px 11px; border-radius: 999px; border: 3px solid var(--paper);
   box-shadow: 0 5px 0 var(--ink); transform: rotate(-2deg);
   text-shadow: 0 2px 0 var(--raspberry);
 }
 .logo svg { width: 28px; height: 22px; }
-.chips { display: flex; gap: 5px; flex: none; }
+.chips { display: flex; gap: 4px; flex: none; }
 .chip {
-  background: var(--ink); color: var(--paper); font-weight: 700; font-size: 13px;
+  background: var(--ink); color: var(--paper); font-weight: 700; font-size: 12.5px;
   padding: 8px 14px; border-radius: 999px; border: 0; font-family: var(--body); cursor: pointer;
   display: inline-flex; align-items: center; gap: 6px;
 }
@@ -346,9 +346,9 @@ h2.shout { font-size: 26px; margin: 0; }
 
 /* history: range tabs and linked highlighting */
 .ranges { display: inline-flex; gap: 4px; }
-.ranges button { font-family: var(--body); font-weight: 700; font-size: 12px; color: var(--muted); background: #f0f2f8; border: 2px solid transparent; border-radius: 999px; padding: 4px 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
-.ranges button.on { background: var(--gold); color: var(--ink); border-color: var(--ink); box-shadow: 0 2px 0 var(--ink); }
-.ranges button[disabled] { opacity: 0.4; cursor: default; }
+.ranges button { font-family: var(--body); font-weight: 700; font-size: 12px; color: var(--muted); background: #fff; border: 2px solid #d5d9e6; border-radius: 999px; padding: 4px 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
+.ranges button.on { background: #6b7080; color: #fff; border-color: #6b7080; }
+.ranges button[disabled] { color: #c3c7d4; border-color: #eceef5; cursor: default; }
 .legend .hint { margin-left: auto; color: var(--deep); }
 .match { cursor: pointer; border-radius: 12px; padding-left: 6px; padding-right: 6px; margin: 0 -6px; transition: background 120ms; }
 .match.hot { background: var(--cream); }
@@ -402,10 +402,10 @@ h2.shout { font-size: 26px; margin: 0; }
    hot (to 30 min): glow and pump. warm (to 1 h): smaller pump. cool (to 6 h):
    slow breathe. still: no motion. cold (a day): hollow dot. */
 .chip.ind {
-  background: var(--paper); color: var(--ink);
+  background: var(--paper); color: var(--ink); white-space: nowrap;
   border: 3px solid color-mix(in oklab, #e8232a calc(var(--fb, 0) * 100%), var(--ink));
-  box-shadow: 0 3px 0 var(--ink); gap: 7px; padding: 5px 14px 5px 12px;
-  font-variant-numeric: tabular-nums; min-width: 74px; justify-content: center;
+  box-shadow: 0 3px 0 var(--ink); gap: 6px; padding: 5px 11px 5px 10px;
+  font-variant-numeric: tabular-nums; justify-content: center;
 }
 .chip.ind .d { width: 9px; height: 9px; border-radius: 50%; background: color-mix(in oklab, #e8232a calc(var(--fd, 0) * 100%), #b9bdcc); flex: none; }
 .chip.ind.hot { animation: chip-glow 1.4s ease-in-out infinite; }
