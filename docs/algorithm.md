@@ -1,4 +1,4 @@
-# How the rating works
+# How it works
 
 Everyone starts at 1000. When you beat someone, you take points
 from them; how many depends on how surprising the result was. Beating a
@@ -41,5 +41,4 @@ Each entry also stores a short anonymous label derived from a random cookie on
 the phone that made it. It identifies no one and holds no personal data; it
 only lets the log show when several actions came from the same phone.
 
-The code that implements this is open:
-[github.com/andersbekkevard/ashdown-win](https://github.com/andersbekkevard/ashdown-win).
+The code is open, so anyone in the house can check the maths or send a change.

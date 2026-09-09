@@ -326,7 +326,13 @@ h2.shout { font-size: 26px; margin: 0; }
 /* algorithm */
 .prose-card { padding: 18px; font-size: 15px; line-height: 1.5; }
 .prose-card h1 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0 0 12px; }
-.prose-card h2 { font-family: var(--display); font-weight: 400; font-size: 18px; text-transform: uppercase; margin: 22px 0 8px; }
+.prose-card h2 { font-family: var(--display); font-weight: 400; font-size: 18px; margin: 22px 0 8px; }
+.prose-card a { color: var(--deep); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: var(--blue); }
+.prose-card a::after { content: " ›"; }
+.prose-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 18px; }
+.prose-actions .btn { font-size: 15px; padding: 13px 8px; gap: 8px; }
+.btn.ink { background: var(--ink); color: var(--paper); border-color: var(--paper); }
+.btn .gh { width: 20px; height: 20px; }
 .prose-card p { margin: 0 0 12px; }
 .prose-card .katex-display { margin: 12px 0; overflow: visible; padding: 2px 0; }
 .prose-card .katex-display > .katex { white-space: normal; }
