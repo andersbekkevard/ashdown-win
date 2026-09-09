@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Crown } from "@/components/crown";
+import { CelebrationProvider } from "@/components/celebration";
 import { LivePill } from "@/components/live-pill";
 import { WhatsAppGlyph } from "@/components/whatsapp-row";
 import { WHATSAPP_GROUP_URL } from "@/lib/config";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
+        <CelebrationProvider>
         <div className="phone">
           <header className="topbar">
             <Link href="/" className="logo" aria-label="ashdown.win home">
@@ -48,6 +50,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </header>
           <main>{children}</main>
         </div>
+        </CelebrationProvider>
       </body>
     </html>
   );

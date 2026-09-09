@@ -6,12 +6,14 @@ import { useState, useTransition } from "react";
 import { recordMatch } from "@/app/actions";
 import { Crown } from "./crown";
 import { Dock } from "./dock";
+import { useCelebration } from "./celebration";
 import { PlayerSearch, type Selected } from "./player-search";
 
 type Side = "a" | "b";
 
 export function RecordMatchForm({ roster }: { roster: Selected[] }) {
   const router = useRouter();
+  const celebrate = useCelebration();
   const [doubles, setDoubles] = useState(false);
   const [a1, setA1] = useState<Selected | null>(null);
   const [known, setKnown] = useState<Selected[]>(roster);
@@ -52,16 +54,23 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
   }
 
   function submit() {
-    if (!complete || winner === null) return;
+    if (!complete || winner === null || pending) return;
     setError(null);
+    const celebration = celebrate("record");
     const toIds = (members: (Selected | null)[]) => members.map((p) => (p as Selected).id);
     startTransition(async () => {
-      const result = await recordMatch({ a: toIds(sideA), b: toIds(sideB), winner });
-      if (result.ok) {
-        router.push("/?recorded=1");
-        router.refresh();
-      } else {
-        setError(result.error);
+      try {
+        const result = await recordMatch({ a: toIds(sideA), b: toIds(sideB), winner });
+        if (result.ok) {
+          celebration.confirm();
+          router.push("/");
+        } else {
+          celebration.cancel();
+          setError(result.error);
+        }
+      } catch {
+        celebration.cancel();
+        setError("Could not confirm the save. Check the log before trying again.");
       }
     });
   }

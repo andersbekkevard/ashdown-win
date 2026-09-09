@@ -24,15 +24,10 @@ export default async function AlgorithmPage() {
   return (
     <>
       <article className="prose-card slab pop-in" dangerouslySetInnerHTML={{ __html: html }} />
-      <div className="prose-actions">
-        <Link href="/log" className="btn ghost">
-          Open the log ›
-        </Link>
-        <a href={REPO} className="btn ink" target="_blank" rel="noopener">
-          <GitHubMark className="gh" />
-          Source on GitHub
-        </a>
-      </div>
+      <a href={REPO} className="repo-line" target="_blank" rel="noopener">
+        <GitHubMark className="gh" />
+        <span>github.com/andersbekkevard/ashdown-win</span>
+      </a>
       <Dock one>
         <Link href="/" className="btn ghost">
           Back to the board

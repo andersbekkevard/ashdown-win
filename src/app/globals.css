@@ -329,10 +329,8 @@ h2.shout { font-size: 26px; margin: 0; }
 .prose-card h2 { font-family: var(--display); font-weight: 400; font-size: 18px; margin: 22px 0 8px; }
 .prose-card a { color: var(--deep); font-weight: 700; white-space: nowrap; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: var(--blue); }
 .prose-card a::after { content: " ›"; }
-.prose-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 18px; }
-.prose-actions .btn { font-size: 15px; padding: 13px 8px; gap: 8px; }
-.btn.ink { background: var(--ink); color: var(--paper); border-color: var(--paper); }
-.btn .gh { width: 20px; height: 20px; }
+.repo-line { display: inline-flex; align-items: center; gap: 8px; margin: -6px 4px 18px; color: var(--paper); font-weight: 700; font-size: 14px; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-shadow: 0 2px 0 rgba(0,0,0,0.3); cursor: pointer; }
+.repo-line .gh { width: 18px; height: 18px; flex: none; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.3)); }
 .prose-card p { margin: 0 0 12px; }
 .prose-card .katex-display { margin: 12px 0; overflow: visible; padding: 2px 0; }
 .prose-card .katex-display > .katex { white-space: normal; }
@@ -452,18 +450,48 @@ h2.shout { font-size: 26px; margin: 0; }
 .log-row.latest.cold .d { background: transparent; box-shadow: inset 0 0 0 2px #b9bdcc; }
 .log-row.latest .when::before { content: "latest · "; font-weight: 700; color: color-mix(in oklab, #c8102e calc(var(--fb, 0) * 100%), var(--muted)); }
 
-/* the moment after recording: one shot, then the board is underneath */
-.flash { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; pointer-events: none; animation: flash-out 1.9s ease-in forwards; }
-.flash-word { font-size: 64px; transform: rotate(-4deg); animation: flash-in 1.9s cubic-bezier(.2,1.4,.3,1) forwards; }
-@keyframes flash-in { 0% { transform: rotate(-4deg) scale(0.2); opacity: 0; } 18% { transform: rotate(-4deg) scale(1.15); opacity: 1; } 30% { transform: rotate(-4deg) scale(1); } 75% { transform: rotate(-4deg) scale(1.02); opacity: 1; } 100% { transform: rotate(-4deg) scale(1.3); opacity: 0; } }
-@keyframes flash-out { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
-.flash-confetti { position: absolute; left: 50%; top: 45%; width: 0; height: 0; }
-.flash-confetti i { position: absolute; left: 0; top: 0; border-radius: 2px; border: 2px solid var(--ink); box-sizing: content-box; opacity: 0; animation: confetti-fly 1.7s cubic-bezier(.15,.7,.4,1) forwards; }
-.flash-confetti i.round { border-radius: 50%; }
-@keyframes confetti-fly {
-  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
-  35% { transform: translate(var(--dx), var(--dy)) rotate(calc(var(--r) * 0.4)); opacity: 1; }
-  100% { transform: translate(calc(var(--dx) * 1.15), calc(var(--dy) + var(--fall))) rotate(var(--r)); opacity: 0; }
+/* Root-level overlay: layout owns centering; only the inner word scales.
+   No translated origin, transformed card, or scrolling parent can offset it. */
+.celebration {
+  position: fixed; inset: 0; z-index: 200; pointer-events: none;
+  isolation: isolate; overflow: hidden;
+  background: radial-gradient(ellipse at center, rgba(8, 52, 116, 0.28), transparent 72%);
 }
-@media (prefers-reduced-motion: reduce) { .flash-confetti i { animation: none; opacity: 0; } .flash-word { animation: flash-in-still 1.9s forwards; } }
-@keyframes flash-in-still { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+.celebration.confirmed { animation: celebration-clear 1800ms linear both; }
+.celebration-confetti { position: absolute; inset: 0; width: 100%; height: 100%; }
+.celebration-center { position: absolute; inset: 0; display: grid; place-items: center; }
+.celebration-arrival {
+  display: grid; place-items: center;
+  animation: celebration-arrive 440ms cubic-bezier(.16, 1, .3, 1) both;
+}
+.celebration-word {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(24px, 12vw, 120px); line-height: 1.15;
+  white-space: nowrap; text-align: center; text-transform: uppercase;
+  color: var(--paper); -webkit-text-stroke: .10em var(--pink); paint-order: stroke fill;
+  filter: drop-shadow(0 .065em 0 var(--raspberry)) drop-shadow(0 .04em 0 var(--ink));
+  transform-origin: center;
+}
+.celebration-welcome .celebration-word {
+  -webkit-text-stroke-color: var(--lilac);
+  filter: drop-shadow(0 .065em 0 #514db1) drop-shadow(0 .04em 0 var(--ink));
+}
+.celebration.confirmed .celebration-word { animation: celebration-confirm 1800ms linear both; }
+.celebration-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@keyframes celebration-arrive {
+  0% { transform: scale(.32) rotate(-7deg); opacity: .5; }
+  65% { transform: scale(1.06) rotate(1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes celebration-confirm {
+  0% { transform: scale(.94); animation-timing-function: cubic-bezier(.16, 1, .3, 1); }
+  18% { transform: scale(1.08, 1.12); animation-timing-function: ease-out; }
+  30% { transform: scale(1); }
+  80% { transform: scale(1.025); opacity: 1; animation-timing-function: cubic-bezier(.4, 0, 1, 1); }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes celebration-clear { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .celebration, .celebration-arrival, .celebration.confirmed .celebration-word { animation: none; }
+  .celebration-confetti { display: none; }
+}

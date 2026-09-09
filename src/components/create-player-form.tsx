@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { createPlayer, type ActionResult } from "@/app/actions";
 import { MAX_NAME_LENGTH } from "@/lib/config";
 import { Dock } from "./dock";
+import { useCelebration } from "./celebration";
 
 type Created = { id: number; name: string };
 
@@ -27,22 +28,31 @@ export function CreatePlayerForm({
   onCancel?: () => void;
 }) {
   const router = useRouter();
+  const celebrate = useCelebration();
   const [name, setName] = useState(initialName);
   const [state, setState] = useState<ActionResult<Created> | null>(null);
   const [pending, start] = useTransition();
 
   function submit() {
-    if (pending) return;
+    if (pending || !name.trim()) return;
+    const celebration = celebrate("welcome");
     start(async () => {
-      const result = await createPlayer(name);
-      setState(result);
-      if (result.ok) {
-        if (variant === "sheet" && onCreated) {
-          onCreated(result.value);
+      try {
+        const result = await createPlayer(name);
+        setState(result);
+        if (result.ok) {
+          celebration.confirm();
+          if (variant === "sheet" && onCreated) {
+            onCreated(result.value);
+          } else {
+            router.push(`/players/${result.value.id}?welcome`);
+          }
         } else {
-          router.push(`/players/${result.value.id}?welcome`);
-          router.refresh();
+          celebration.cancel();
         }
+      } catch {
+        celebration.cancel();
+        setState({ ok: false, error: "Could not confirm the save. Check the board before trying again." });
       }
     });
   }
