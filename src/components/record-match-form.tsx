@@ -132,7 +132,7 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
 
       <div className="side a slab">
         <div className="label">Side A</div>
-        <PlayerSearch placeholder="Player" value={a1} onChange={adopt(setA1)} exclude={exclude} roster={known} autoFocus active={next === "a1"} />
+        <PlayerSearch placeholder="Player" value={a1} onChange={adopt(setA1)} exclude={exclude} roster={known} active={next === "a1"} />
         {doubles && (
           <PlayerSearch placeholder="Partner" value={a2} onChange={adopt(setA2)} exclude={exclude} roster={known} active={next === "a2"} />
         )}

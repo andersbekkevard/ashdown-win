@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MAX_NAME_LENGTH } from "@/lib/config";
 import { normalizeName } from "@/lib/names";
@@ -11,21 +11,21 @@ export interface Selected {
   name: string;
 }
 
-function PaddleIcon() {
+function PaddleIcon({ className = "ico" }: { className?: string }) {
   return (
-    <svg className="ico" viewBox="0 0 24 24" aria-hidden="true">
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="10" cy="9" r="7" fill="#FB3AA3" stroke="#222126" strokeWidth="2" />
       <path d="M14.5 14.5 L20 20" stroke="#222126" strokeWidth="3.5" strokeLinecap="round" />
     </svg>
   );
 }
 
-
 /**
- * One picker. The whole roster is already on the client, most recently
- * active first, so the list opens the moment the box is focused and filters
- * as you type with no round trip. A name that matches nobody offers to
- * create that player in a sheet; it never creates one silently.
+ * One slot of the match form. The slot itself is a button; choosing opens a
+ * full-height picker sheet in the iOS manner: a search field pinned at the
+ * top and a scrolling list under it. The sheet closes only on a pick, the
+ * Done button, or Escape, never because the field lost focus, so the list
+ * can be scrolled freely with or without the keyboard.
  */
 export function PlayerSearch({
   placeholder,
@@ -33,7 +33,6 @@ export function PlayerSearch({
   onChange,
   exclude,
   roster,
-  autoFocus = false,
   active = false,
 }: {
   placeholder: string;
@@ -42,49 +41,38 @@ export function PlayerSearch({
   /** Ids already used elsewhere in the match; hidden from results. */
   exclude: number[];
   roster: Selected[];
-  autoFocus?: boolean;
-  /** True for the slot the form wants filled next; it focuses and opens. */
+  /** True for the slot the form wants filled next; it opens the sheet. */
   active?: boolean;
+  /** Kept for callers; the sheet handles focus itself. */
+  autoFocus?: boolean;
 }) {
-  const inputId = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+  const [opened, setOpened] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [query, setQuery] = useState("");
-  // The autofocused first field gets no focus event, so start open there.
-  const [open, setOpen] = useState(autoFocus);
   const [creating, setCreating] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Focusing fires onFocus, which opens the list; no state is set here.
-  // Focusing fires onFocus, which opens the list; then bring the field to the
-  // top of the scroll area so the whole list is visible above the dock.
+  // The form asks the next empty slot to open; Done or Escape dismisses it
+  // until the slot is tapped again. Derived, so no state is set in an effect.
+  const open = opened || (active && !value && !dismissed);
+  const setOpen = (next: boolean) => {
+    setOpened(next);
+    setDismissed(!next);
+  };
+
+  // Focus the search field once the sheet is up. iOS raises the keyboard when
+  // this follows a tap, and leaves the list usable when it does not.
   useEffect(() => {
-    if (active && !value) {
-      const el = inputRef.current;
-      el?.focus({ preventScroll: true });
-      el?.scrollIntoView({ block: "start", behavior: "smooth" });
-    }
-  }, [active, value]);
+    if (open) inputRef.current?.focus({ preventScroll: true });
+  }, [open]);
 
-  // Size the open list to the room between the field and the dock, so it is
-  // never hidden under the action bar however far the page could scroll.
   useEffect(() => {
     if (!open) return;
-    const fit = () => {
-      const el = listRef.current;
-      const inp = inputRef.current;
-      if (!el || !inp) return;
-      const dock = document.querySelector(".dock");
-      const dockTop = dock ? dock.getBoundingClientRect().top : window.innerHeight;
-      const room = dockTop - inp.getBoundingClientRect().bottom - 14;
-      el.style.maxHeight = `${Math.max(150, Math.round(room))}px`;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
     };
-    fit();
-    const t = setTimeout(fit, 450);
-    window.addEventListener("resize", fit);
-    return () => {
-      clearTimeout(t);
-      window.removeEventListener("resize", fit);
-    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
   if (value) {
@@ -96,6 +84,7 @@ export function PlayerSearch({
           onClick={() => {
             onChange(null);
             setQuery("");
+            setOpen(true);
           }}
         >
           change
@@ -107,7 +96,6 @@ export function PlayerSearch({
   const q = normalizeName(query).toLowerCase();
   const available = roster.filter((p) => !exclude.includes(p.id));
   const hits = q ? available.filter((p) => p.name.toLowerCase().includes(q)) : available;
-  const shown = hits;
   const exact = q && available.some((p) => p.name.toLowerCase() === q);
   const trimmed = normalizeName(query);
 
@@ -118,56 +106,62 @@ export function PlayerSearch({
   }
 
   return (
-    <div className={`field${open ? " open" : ""}`}>
-      <PaddleIcon />
-      <input
-        ref={inputRef}
-        id={inputId}
-        type="search"
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-        onClick={() => setOpen(true)}
-        onBlur={(e) => {
-          const el = e.currentTarget;
-          setTimeout(() => {
-            if (document.activeElement !== el) setOpen(false);
-          }, 150);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && shown.length > 0) {
-            e.preventDefault();
-            pick(shown[0]);
-          }
-        }}
-        maxLength={MAX_NAME_LENGTH}
-        placeholder={placeholder}
-        autoComplete="off"
-        autoCapitalize="words"
-        enterKeyHint="search"
-        autoFocus={autoFocus}
-        aria-label={placeholder}
-      />
-      {open && (
-        <div className="sugg pop-in" role="listbox" ref={listRef}>
-          {!q && shown.length > 0 && <div className="hint">Recently at the table</div>}
-          {shown.map((h) => (
-            <button key={h.id} type="button" role="option" aria-selected={false} onPointerDown={(e) => { e.preventDefault(); pick(h); }} onClick={() => pick(h)}>
-              {h.name}
-            </button>
-          ))}
-          {q && !exact && trimmed && (
-            <button type="button" className="create" onPointerDown={(e) => { e.preventDefault(); setCreating(trimmed); }} onClick={() => setCreating(trimmed)}>
-              <span>{shown.length ? "Not them?" : `No one called “${trimmed}”`}</span>
-              <b>Create &ldquo;{trimmed}&rdquo;</b>
-            </button>
-          )}
-          {!q && available.length === 0 && <div className="hint">No other players yet. Type a name to create one.</div>}
-        </div>
-      )}
+    <>
+      <button type="button" className="slot" onClick={() => setOpen(true)}>
+        <PaddleIcon />
+        <span>{placeholder}</span>
+        <span className="slot-go">Choose ›</span>
+      </button>
+
+      {open &&
+        createPortal(
+          <div className="picker" role="dialog" aria-modal="true" aria-label={`Choose ${placeholder.toLowerCase()}`}>
+            <div className="picker-head">
+              <div className="field picker-field">
+                <PaddleIcon />
+                <input
+                  ref={inputRef}
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && hits.length > 0) {
+                      e.preventDefault();
+                      pick(hits[0]);
+                    }
+                  }}
+                  maxLength={MAX_NAME_LENGTH}
+                  placeholder="Type a name, or scroll"
+                  autoComplete="off"
+                  autoCapitalize="words"
+                  enterKeyHint="search"
+                  aria-label={placeholder}
+                />
+              </div>
+              <button type="button" className="chip picker-done" onClick={() => setOpen(false)}>
+                Done
+              </button>
+            </div>
+            <div className="picker-list" role="listbox">
+              {!q && hits.length > 0 && <div className="hint">Recently at the table</div>}
+              {hits.map((h) => (
+                <button key={h.id} type="button" role="option" aria-selected={false} onClick={() => pick(h)}>
+                  {h.name}
+                </button>
+              ))}
+              {q && !exact && trimmed && (
+                <button type="button" className="create" onClick={() => setCreating(trimmed)}>
+                  <span>{hits.length ? "Not them?" : `No one called “${trimmed}”`}</span>
+                  <b>Create &ldquo;{trimmed}&rdquo;</b>
+                </button>
+              )}
+              {!q && available.length === 0 && <div className="hint">No other players yet. Type a name to create one.</div>}
+              {q && hits.length === 0 && exact && <div className="hint">Already in this match.</div>}
+            </div>
+          </div>,
+          document.body,
+        )}
+
       {creating !== null &&
         createPortal(
           <div className="sheet-wrap" role="dialog" aria-modal="true" aria-label="Create player">
@@ -185,6 +179,6 @@ export function PlayerSearch({
           </div>,
           document.body,
         )}
-    </div>
+    </>
   );
 }
