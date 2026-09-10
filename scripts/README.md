@@ -6,6 +6,7 @@
 | `export-log.sh` | Exports every table as JSON into the private backup repo and pushes. Daily timer on Europa; also the first step of `migrate-prod.sh`. |
 | `migrate-prod.sh` | Exports the log, then applies pending migrations to production. The only sanctioned way to migrate. |
 | `db.sh` | `psql` against the production Neon database using `.env.production.local`. Interactive, `-c "sql"`, or stdin. |
+| `reset-prod.sh` | Launch wipe: exports the log, then truncates every table with sequences restarted so ids begin at 1. Asks for the word RESET. |
 | `delete-player.sh "Name"` | Owner cleanup: hard-deletes a player with their matches and related deletions. Not a site feature. |
 
 `.env.production.local` comes from `vercel env pull .env.production.local
