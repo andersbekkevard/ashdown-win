@@ -13,8 +13,7 @@ const burst = z.object({
 });
 
 export const confettiSettingsSchema = z.object({
-  left: cannon,
-  right: cannon,
+  cannon,
   bursts: z.tuple([burst, burst]),
   gravity: z.number().min(-2).max(4),
   decay: z.number().min(0).max(1),
@@ -35,8 +34,7 @@ export type ConfettiSettings = z.infer<typeof confettiSettingsSchema>;
 /** The production defaults and the workbench presets have one owner. */
 export function defaultConfettiSettings(mobile: boolean): ConfettiSettings {
   return {
-    left: { x: -0.04, y: 0.84, angle: 65 },
-    right: { x: 1.04, y: 0.84, angle: 115 },
+    cannon: { x: -0.04, y: 0.84, angle: 65 },
     bursts: [
       { particleCount: 48, spread: 48, startVelocity: mobile ? 28 : 43, scalar: mobile ? 2.16 : 2.52 },
       { particleCount: 36, spread: 88, startVelocity: mobile ? 19 : 29, scalar: mobile ? 1.62 : 1.8 },

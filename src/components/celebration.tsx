@@ -60,15 +60,16 @@ function Celebration({ moment, onDone }: { moment: Moment; onDone: (id: number) 
     const fire = confetti.create(canvas.current, { resize: true, disableForReducedMotion: true });
     const shapes = (Object.keys(settings.shapes) as (keyof ConfettiSettings["shapes"])[])
       .flatMap((shape) => Array.from({ length: settings.shapes[shape] }, () => shape));
-    for (const cannon of [settings.left, settings.right]) {
+    const cannon = settings.cannon;
+    for (const mirrored of [false, true]) {
       for (const burst of settings.bursts) {
         const base: confetti.Options = {
-          origin: { x: cannon.x, y: cannon.y },
-          angle: cannon.angle,
+          origin: { x: mirrored ? 1 - cannon.x : cannon.x, y: cannon.y },
+          angle: mirrored ? (540 - cannon.angle) % 360 : cannon.angle,
           colors: settings.colors,
           gravity: settings.gravity,
           decay: settings.decay,
-          drift: settings.drift,
+          drift: mirrored ? -settings.drift : settings.drift,
           ticks: settings.ticks,
           flat: settings.flat,
           shapes,

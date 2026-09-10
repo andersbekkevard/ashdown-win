@@ -5,7 +5,7 @@ import { useCelebration } from "@/components/celebration";
 import { confettiSettingsSchema, defaultConfettiSettings, type ConfettiSettings } from "@/lib/confetti-settings";
 import styles from "./preview.module.css";
 
-const STORAGE_KEY = "ashdown-confetti-workbench-v1";
+const STORAGE_KEY = "ashdown-confetti-workbench-v2";
 const subscribe = () => () => {};
 
 /** Mount after hydration so saved, device-specific settings never change server HTML. */
@@ -16,7 +16,12 @@ export function CelebrationPreview() {
 
 function initialSettings(): ConfettiSettings {
   try {
-    const saved = confettiSettingsSchema.safeParse(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null"));
+    const raw: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem("ashdown-confetti-workbench-v1") ?? "null");
+    // Preserve prior tuning, using the old left cannon as the shared config.
+    const candidate = raw !== null && typeof raw === "object" && "left" in raw && !("cannon" in raw)
+      ? { ...raw, cannon: raw.left }
+      : raw;
+    const saved = confettiSettingsSchema.safeParse(candidate);
     if (saved.success) return saved.data;
   } catch { /* A private browser may not allow local storage. */ }
   return defaultConfettiSettings(window.innerWidth < 600);
@@ -125,19 +130,14 @@ function ConfettiControls() {
       </div>
 
       <details className={`${styles.section} slab`} open>
-        <summary>Cannon positions & angles</summary>
-        <p>0–100% is on screen. Go below 0 or above 100 to launch from outside. At 90°, a cannon shoots straight up.</p>
-        {(["left", "right"] as const).map((side) => (
-          <div key={side} className={styles.group}>
-            <h2>{side === "left" ? "Left cannon" : "Right cannon"}</h2>
-            <Slider label="Horizontal position" value={settings[side].x * 100} min={-50} max={150} unit="%"
-              onChange={(x) => update({ [side]: { ...settings[side], x: x / 100 } })} />
-            <Slider label="Vertical position" value={settings[side].y * 100} min={-50} max={150} unit="%"
-              onChange={(y) => update({ [side]: { ...settings[side], y: y / 100 } })} />
-            <Slider label="Launch angle" value={settings[side].angle} min={0} max={360} unit="°"
-              onChange={(angle) => update({ [side]: { ...settings[side], angle } })} />
-          </div>
-        ))}
+        <summary>Mirrored cannons</summary>
+        <p>One configuration for both sides. Position and angle below describe the left cannon; the right always mirrors it. Negative horizontal positions launch from outside the edges. At 90°, both shoot straight up.</p>
+        <Slider label="Position from left edge" value={settings.cannon.x * 100} min={-50} max={150} unit="%"
+          onChange={(x) => update({ cannon: { ...settings.cannon, x: x / 100 } })} />
+        <Slider label="Vertical position" value={settings.cannon.y * 100} min={-50} max={150} unit="%"
+          onChange={(y) => update({ cannon: { ...settings.cannon, y: y / 100 } })} />
+        <Slider label="Launch angle" value={settings.cannon.angle} min={0} max={360} unit="°"
+          onChange={(angle) => update({ cannon: { ...settings.cannon, angle } })} />
       </details>
 
       <details className={`${styles.section} slab`} open>
@@ -167,7 +167,7 @@ function ConfettiControls() {
 
       <details className={`${styles.section} slab`}>
         <summary>Physics & lifetime</summary>
-        <p>Less gravity floats; negative gravity rises. Speed retention closer to 1 carries pieces farther. Negative drift goes left.</p>
+        <p>Less gravity floats; negative gravity rises. Speed retention closer to 1 carries pieces farther. Drift is mirrored: positive pushes the left burst right and the right burst left.</p>
         <Slider label="Gravity" value={settings.gravity} min={-2} max={4} step={0.05} onChange={(gravity) => update({ gravity })} />
         <Slider label="Speed retention" value={settings.decay} min={0} max={1} step={0.005} onChange={(decay) => update({ decay })} />
         <Slider label="Sideways drift" value={settings.drift} min={-5} max={5} step={0.1} onChange={(drift) => update({ drift })} />
