@@ -20,7 +20,9 @@ export function WelcomeCard() {
           router.replace(window.location.pathname, { scroll: false });
         }}
       >
-        ×
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M5 5 L15 15 M15 5 L5 15" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
       </button>
       <b>You&apos;re on board.</b> Find someone to play in the group.
       <WhatsAppRow text="Ashdown ping-pong on WhatsApp" />
