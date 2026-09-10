@@ -5,7 +5,7 @@ ratings derived from a public append-only match log. Read `README.md` for
 orientation and `docs/architecture.md` for a structural change.
 
 Human commitments for operating or developing this app belong in Google Tasks
-`Hub`. Use the installed `anders-environment` skill for current list IDs and
+`Hub`. Use the installed `anders-services` skill for current list IDs and
 verified writes.
 
 ## Boundaries and routes
