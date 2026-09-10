@@ -20,7 +20,6 @@ function PaddleIcon() {
   );
 }
 
-const SHOWN = 8;
 
 /**
  * One picker. The whole roster is already on the client, most recently
@@ -108,7 +107,7 @@ export function PlayerSearch({
   const q = normalizeName(query).toLowerCase();
   const available = roster.filter((p) => !exclude.includes(p.id));
   const hits = q ? available.filter((p) => p.name.toLowerCase().includes(q)) : available;
-  const shown = hits.slice(0, SHOWN);
+  const shown = hits;
   const exact = q && available.some((p) => p.name.toLowerCase() === q);
   const trimmed = normalizeName(query);
 
@@ -160,7 +159,6 @@ export function PlayerSearch({
               {h.name}
             </button>
           ))}
-          {hits.length > SHOWN && <div className="hint">{hits.length - SHOWN} more, keep typing</div>}
           {q && !exact && trimmed && (
             <button type="button" className="create" onPointerDown={(e) => { e.preventDefault(); setCreating(trimmed); }} onClick={() => setCreating(trimmed)}>
               <span>{shown.length ? "Not them?" : `No one called “${trimmed}”`}</span>

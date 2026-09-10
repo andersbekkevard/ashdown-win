@@ -191,7 +191,8 @@ h2.shout { font-size: 26px; margin: 0; }
 .sugg {
   position: absolute; left: 0; right: 0; top: 100%; background: var(--paper);
   border: 3px solid var(--ink); border-top: 0; border-radius: 0 0 18px 18px; box-shadow: 0 6px 0 var(--ink); z-index: 20;
-  overflow-y: auto; max-height: min(330px, calc(100dvh - var(--dock-h) - 230px));
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  max-height: min(330px, calc(100dvh - var(--dock-h) - 230px));
 }
 .field.open input { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 .field.open input:focus { box-shadow: none; border-color: var(--ink); }
