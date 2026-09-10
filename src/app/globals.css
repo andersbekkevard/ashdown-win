@@ -340,7 +340,8 @@ h2.shout { font-size: 26px; margin: 0; }
 .ranges { display: inline-flex; gap: 4px; }
 .ranges button { font-family: var(--display); font-weight: 400; font-size: 11px; color: var(--ink); background: var(--paper); border: 2.5px solid var(--ink); border-radius: 999px; padding: 5px 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; box-shadow: 0 2.5px 0 var(--ink); transition: transform 80ms, box-shadow 80ms; }
 .ranges button:active { transform: translateY(2px); box-shadow: 0 0.5px 0 var(--ink); }
-.ranges button.on { background: var(--ink); color: var(--paper); }
+/* selected reads as pressed in: no shadow, sitting lower, a light grey fill */
+.ranges button.on { background: #eceef5; color: var(--ink); box-shadow: none; transform: translateY(2.5px); }
 .ranges button[disabled] { color: #b9bdcc; border-color: #d5d9e6; box-shadow: none; cursor: default; }
 .legend .hint { margin-left: auto; color: var(--deep); }
 .match { cursor: pointer; border-radius: 12px; padding-left: 6px; padding-right: 6px; margin: 0 -6px; transition: background 120ms; }
