@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Crown } from "@/components/crown";
 import { CelebrationProvider } from "@/components/celebration";
+import { GhostInput } from "@/components/focus-link";
 import { LivePill } from "@/components/live-pill";
 import { WhatsAppGlyph } from "@/components/whatsapp-row";
 import { WHATSAPP_GROUP_URL } from "@/lib/config";
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </nav>
           </header>
           <main>{children}</main>
+          <GhostInput />
         </div>
         </CelebrationProvider>
       </body>

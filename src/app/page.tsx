@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Crown } from "@/components/crown";
 import { Dock } from "@/components/dock";
+import { FocusLink } from "@/components/focus-link";
 import { formatRating } from "@/lib/format";
 import { leaderboard } from "@/lib/queries";
 
@@ -57,12 +58,12 @@ export default async function HomePage() {
         )}
       </div>
       <Dock>
-        <Link href="/players/new" className="btn lilac">
+        <FocusLink href="/players/new" className="btn lilac">
           Create player
-        </Link>
-        <Link href="/matches/new" className="btn">
+        </FocusLink>
+        <FocusLink href="/matches/new" className="btn">
           Record match
-        </Link>
+        </FocusLink>
       </Dock>
     </>
   );

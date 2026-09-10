@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { createPlayer, type ActionResult } from "@/app/actions";
 import { MAX_NAME_LENGTH } from "@/lib/config";
 import { Dock } from "./dock";
@@ -32,6 +32,10 @@ export function CreatePlayerForm({
   const [name, setName] = useState(initialName);
   const [state, setState] = useState<ActionResult<Created> | null>(null);
   const [pending, start] = useTransition();
+  const nameRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    nameRef.current?.focus({ preventScroll: true });
+  }, []);
 
   function submit() {
     if (pending || !name.trim()) return;
@@ -81,6 +85,7 @@ export function CreatePlayerForm({
         <label htmlFor="name">Your name</label>
         <div className="field plain">
           <input
+            ref={nameRef}
             id="name"
             type="text"
             name="name"

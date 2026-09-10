@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Dock } from "@/components/dock";
+import { FocusLink } from "@/components/focus-link";
 import { WelcomeCard } from "@/components/welcome-card";
 import { PlayerHistory, type HistoryMatch } from "@/components/player-history";
 import type { GraphPoint } from "@/components/rating-graph";
@@ -95,9 +96,9 @@ export default async function PlayerPage({
         <Link href="/" className="btn ghost">
           Board
         </Link>
-        <Link href="/matches/new" className="btn">
+        <FocusLink href="/matches/new" className="btn">
           Record match
-        </Link>
+        </FocusLink>
       </Dock>
     </>
   );

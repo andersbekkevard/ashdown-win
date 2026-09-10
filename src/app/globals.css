@@ -506,3 +506,6 @@ h2.shout { font-size: 26px; margin: 0; }
   .celebration.confirmed, .celebration-arrival, .celebration.confirmed .celebration-word { animation: none; }
   .celebration-confetti { display: none; }
 }
+
+/* focusable during a tap, never seen; 16px so iOS does not zoom */
+.ghost-focus { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; font-size: 16px; border: 0; padding: 0; pointer-events: none; }
