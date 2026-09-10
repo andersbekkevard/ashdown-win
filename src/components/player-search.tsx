@@ -56,7 +56,6 @@ export function PlayerSearch({
   const [query, setQuery] = useState("");
   const [creating, setCreating] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
   const colour = TONES[side];
   // Portals need document; render them only once mounted on the client.
   const mounted = useSyncExternalStore(
@@ -79,18 +78,17 @@ export function PlayerSearch({
     if (open) inputRef.current?.focus({ preventScroll: true });
   }, [open]);
 
-  // Keep the sheet exactly the size of the visible area, so when the iOS
-  // keyboard comes up the search field stays put and only the list scrolls.
+  // The sheet covers the whole screen; the list ends above the iOS keyboard,
+  // so the search field stays put and the blue runs all the way down.
+  const listRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
     const vv = window.visualViewport;
     const fit = () => {
-      const el = sheetRef.current;
-      if (!el) return;
-      const h = vv ? vv.height : window.innerHeight;
-      const top = vv ? vv.offsetTop : 0;
-      el.style.height = `${Math.round(h)}px`;
-      el.style.top = `${Math.round(top)}px`;
+      const list = listRef.current;
+      if (!list) return;
+      const hidden = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
+      list.style.marginBottom = `${Math.round(hidden + 14)}px`;
     };
     fit();
     vv?.addEventListener("resize", fit);
@@ -153,7 +151,7 @@ export function PlayerSearch({
       {open &&
         mounted &&
         createPortal(
-          <div className="picker" role="dialog" aria-modal="true" aria-label={`Choose ${placeholder.toLowerCase()}`} ref={sheetRef}>
+          <div className="picker" role="dialog" aria-modal="true" aria-label={`Choose ${placeholder.toLowerCase()}`}>
             <div className="picker-head">
               <span className="picker-side" style={{ background: colour }}>
                 Side {side.toUpperCase()}
@@ -183,7 +181,7 @@ export function PlayerSearch({
                 Done
               </button>
             </div>
-            <div className="picker-list" role="listbox">
+            <div className="picker-list" role="listbox" ref={listRef}>
               {!q && hits.length > 0 && <div className="hint">Recently at the table</div>}
               {hits.map((h) => (
                 <button key={h.id} type="button" role="option" aria-selected={false} onClick={() => pick(h)}>

@@ -29,6 +29,7 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
   const adopt = (setter: (p: Selected | null) => void) => (p: Selected | null) => {
     if (p && !known.some((k) => k.id === p.id)) setKnown([p, ...known]);
     setter(p);
+    setAdvance(p !== null);
   };
   const exclude = chosen.map((p) => p.id);
 
@@ -38,9 +39,9 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
   const order = doubles ? ["a1", "a2", "b1", "b2"] : ["a1", "b1"];
   const filled: Record<string, Selected | null> = { a1, a2, b1, b2 };
   const next = order.find((k) => filled[k] === null) ?? null;
-  // The sheet only opens by itself after the first pick, so the form (and the
-  // doubles switch) is seen first.
-  const touched = chosen.length > 0;
+  // The sheet only opens by itself right after a pick, never on load or when
+  // the doubles switch changes.
+  const [advance, setAdvance] = useState(false);
   // Once every slot is filled, bring the winner tiles into view above the dock.
   const winnersRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -57,6 +58,7 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
   function toggleDoubles() {
     const next = !doubles;
     setDoubles(next);
+    setAdvance(false);
     if (!next) {
       setA2(null);
       setB2(null);
@@ -135,17 +137,17 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
 
       <div className="side a slab">
         <div className="label">Side A</div>
-        <PlayerSearch placeholder="Player" value={a1} onChange={adopt(setA1)} exclude={exclude} roster={known} active={touched && next === "a1"} side="a" />
+        <PlayerSearch placeholder="Player" value={a1} onChange={adopt(setA1)} exclude={exclude} roster={known} active={advance && next === "a1"} side="a" />
         {doubles && (
-          <PlayerSearch placeholder="Partner" value={a2} onChange={adopt(setA2)} exclude={exclude} roster={known} active={touched && next === "a2"} side="a" />
+          <PlayerSearch placeholder="Partner" value={a2} onChange={adopt(setA2)} exclude={exclude} roster={known} active={advance && next === "a2"} side="a" />
         )}
       </div>
       <div className="vs">VS</div>
       <div className="side b slab">
         <div className="label">Side B</div>
-        <PlayerSearch placeholder="Player" value={b1} onChange={adopt(setB1)} exclude={exclude} roster={known} active={touched && next === "b1"} side="b" />
+        <PlayerSearch placeholder="Player" value={b1} onChange={adopt(setB1)} exclude={exclude} roster={known} active={advance && next === "b1"} side="b" />
         {doubles && (
-          <PlayerSearch placeholder="Partner" value={b2} onChange={adopt(setB2)} exclude={exclude} roster={known} active={touched && next === "b2"} side="b" />
+          <PlayerSearch placeholder="Partner" value={b2} onChange={adopt(setB2)} exclude={exclude} roster={known} active={advance && next === "b2"} side="b" />
         )}
       </div>
 

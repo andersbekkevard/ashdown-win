@@ -504,7 +504,7 @@ h2.shout { font-size: 26px; margin: 0; }
 .slot .slot-go { font-family: var(--display); font-size: 13px; text-transform: uppercase; color: var(--ink); background: var(--cream); border: 2px solid var(--ink); border-radius: 999px; padding: 3px 10px; }
 
 /* the picker sheet: search pinned at the top, the list scrolls underneath */
-.picker { position: fixed; top: 0; left: 0; right: 0; height: 100dvh; z-index: 95; display: flex; flex-direction: column; background: var(--blue) repeating-radial-gradient(circle at 50% 18%, rgba(255,255,255,0.14) 0 28px, rgba(255,255,255,0) 28px 72px); }
+.picker { position: fixed; inset: 0; z-index: 95; display: flex; flex-direction: column; background: var(--blue) repeating-radial-gradient(circle at 50% 18%, rgba(255,255,255,0.14) 0 28px, rgba(255,255,255,0) 28px 72px); }
 .picker-head { flex: none; display: flex; align-items: center; gap: 8px; padding: calc(12px + env(safe-area-inset-top)) 14px 10px; }
 .picker-side { flex: none; font-family: var(--display); font-size: 13px; text-transform: uppercase; color: var(--paper); padding: 9px 12px; border-radius: 999px; border: 3px solid var(--paper); box-shadow: 0 3px 0 var(--ink); text-shadow: 0 1px 0 rgba(0,0,0,0.25); white-space: nowrap; }
 .picker-head .field { flex: 1; margin: 0; }
