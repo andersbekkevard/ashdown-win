@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Dock } from "@/components/dock";
-import { WhatsAppRow } from "@/components/whatsapp-row";
+import { WelcomeCard } from "@/components/welcome-card";
 import { PlayerHistory, type HistoryMatch } from "@/components/player-history";
 import type { GraphPoint } from "@/components/rating-graph";
 import { START_RATING } from "@/lib/config";
@@ -72,12 +72,7 @@ export default async function PlayerPage({
 
   return (
     <>
-      {welcome !== undefined && (
-        <div className="welcome pop-in">
-          <b>You&apos;re on the board.</b> Find someone to play in the group.
-          <WhatsAppRow text="Ashdown ping-pong on WhatsApp" />
-        </div>
-      )}
+      {welcome !== undefined && <WelcomeCard />}
       <div className="hero-card slab pop-in">
         <div className={`hex ${hexClass[rank - 1] ?? ""}`}>{rank || "–"}</div>
         <div>
