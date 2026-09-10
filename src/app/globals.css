@@ -378,7 +378,8 @@ h2.shout { font-size: 26px; margin: 0; }
 .counter.full { color: var(--raspberry); }
 
 /* log status line */
-.status { display: block; max-width: 180px; text-align: right; font-size: 12px; font-weight: 700; color: var(--ink); background: var(--cream); border: 2px solid var(--ink); border-radius: 12px; padding: 5px 8px; }
+.status { flex: 1 1 100%; font-size: 12px; font-weight: 700; color: var(--ink); background: var(--cream); border: 2px solid var(--ink); border-radius: 12px; padding: 6px 10px; }
+.actions { flex: none; }
 
 /* WhatsApp chip in the top bar */
 .chip.wa {

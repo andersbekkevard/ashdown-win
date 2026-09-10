@@ -27,34 +27,39 @@ export function MatchLogActions({ matchId, deleted }: { matchId: number; deleted
     });
   }
 
-  const note = status && <span className="status pop-in" role="status">{status}</span>;
+  // The note is a full-width line under the row, never inside the button column.
+  const note = status && <div className="status pop-in" role="status">{status}</div>;
 
   if (deleted) {
     return (
-      <div className="actions">
-        <button
-          type="button"
-          className="mini restore"
-          disabled={pending}
-          onClick={() => run(() => restoreMatch(matchId), `Match #${matchId} counts again. Ratings recomputed.`)}
-        >
-          {pending ? "…" : "Restore"}
-        </button>
+      <>
+        <div className="actions">
+          <button
+            type="button"
+            className="mini restore"
+            disabled={pending}
+            onClick={() => run(() => restoreMatch(matchId), `Match #${matchId} counts again. Ratings recomputed.`)}
+          >
+            {pending ? "…" : "Restore"}
+          </button>
+          {error && <span className="mini-error" role="alert">{error}</span>}
+        </div>
         {note}
-        {error && <span className="mini-error" role="alert">{error}</span>}
-      </div>
+      </>
     );
   }
 
   if (!confirming) {
     return (
-      <div className="actions">
-        <button type="button" className="mini" onClick={() => setConfirming(true)}>
-          Delete
-        </button>
+      <>
+        <div className="actions">
+          <button type="button" className="mini" onClick={() => setConfirming(true)}>
+            Delete
+          </button>
+          {error && <span className="mini-error" role="alert">{error}</span>}
+        </div>
         {note}
-        {error && <span className="mini-error" role="alert">{error}</span>}
-      </div>
+      </>
     );
   }
 
