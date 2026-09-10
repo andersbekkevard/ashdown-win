@@ -46,7 +46,7 @@ inherit the existing profile welcome card's margins or borders.
 | Failure | Cancel the effect and show the form error; retain entered values |
 
 Confetti uses 168 pieces split across two origins and two velocity/spread
-groups per origin. Cannons sit 84% down the viewport, 4% outside each side,
+groups per origin. Cannons sit 73% down the viewport, 4% outside each side,
 so the burst enters from below and the edges. After the larger-particle
 iPhone review, dimensions were reduced by 10%: mobile scalar values are
 2.16 and 1.62; desktop values are 2.52 and 1.8. Smaller mobile velocities
