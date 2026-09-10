@@ -65,9 +65,25 @@ cannot replay a success animation.
 
 ## Replay and verification
 
-In development, open `/dev/celebrations` for repeatable Recorded, Welcome,
-slow-save and failed-save previews. This route writes no data and shows the not-found page in production.
-The production response was checked for the absence of preview controls.
+In development, open `/dev/celebrations` for the confetti control panel.
+It uses the same `CelebrationProvider` and `src/lib/confetti-settings.ts`
+defaults as the real forms. Each cannon has independent horizontal and
+vertical position and launch-angle sliders. Each particle group has count,
+speed, size and spread sliders. Shared controls expose gravity, speed
+retention (decay), drift, lifetime, whole-animation duration, tumbling,
+palette and shape weights, plus simulated save delay and failed-save replay.
+Recorded, Welcome and Stop remain visible while scrolling. Optional
+automatic replay runs after adjustments settle.
+
+Settings persist under a versioned local-storage key on that browser and
+origin; invalid saved settings fall back to the current device defaults.
+Phone and desktop reset buttons load the actual production presets. Copy
+settings exports JSON for review in conversation, with a selectable-text
+fallback on the HTTP Tailnet preview. Tuning does not change production
+defaults or save matches or players. The route shows the not-found page in
+production. The original production response was checked for the absence
+of preview controls; the control-panel revision was not visually inspected,
+as requested.
 
 Browser checks against the local development database:
 

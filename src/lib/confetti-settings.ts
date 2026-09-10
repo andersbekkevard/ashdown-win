@@ -17,7 +17,7 @@ export const confettiSettingsSchema = z.object({
   right: cannon,
   bursts: z.tuple([burst, burst]),
   gravity: z.number().min(-2).max(4),
-  decay: z.number().min(0.8).max(1),
+  decay: z.number().min(0).max(1),
   drift: z.number().min(-5).max(5),
   ticks: z.number().int().min(30).max(600),
   flat: z.boolean(),
