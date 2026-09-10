@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Dock } from "@/components/dock";
+import { Flame } from "@/components/flame";
 import { FocusLink } from "@/components/focus-link";
 import { WelcomeCard } from "@/components/welcome-card";
 import { PlayerHistory, type HistoryMatch } from "@/components/player-history";
@@ -8,6 +9,7 @@ import type { GraphPoint } from "@/components/rating-graph";
 import { START_RATING } from "@/lib/config";
 import { formatRating } from "@/lib/format";
 import { leaderboard, playerPage } from "@/lib/queries";
+import { STREAK_MIN } from "@/lib/streak";
 
 export const dynamic = "force-dynamic";
 
@@ -86,6 +88,12 @@ export default async function PlayerPage({
             <span className="w">{wins} W</span>
             <span className="l">{losses} L</span>
             <span>#{rank} of {board.length}</span>
+            {player.streak >= STREAK_MIN && (
+              <span className="streak-pill">
+                <Flame />
+                {player.streak} in a row
+              </span>
+            )}
           </div>
         </div>
       </div>

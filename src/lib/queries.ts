@@ -16,6 +16,7 @@ import {
 } from "@/db/schema";
 import { START_RATING } from "./config";
 import { deletedMatchIds, effectiveDeletions, type MatchState } from "./log";
+import { currentStreak } from "./streak";
 import {
   compareByCreation,
   isDoubles,
@@ -56,6 +57,8 @@ export interface LeaderboardRow {
   rating: number;
   matchesPlayed: number;
   wins: number;
+  /** Consecutive wins at the end of the player's history. */
+  streak: number;
 }
 
 /** Every player, including those with no matches, best rating first. */
@@ -69,6 +72,7 @@ export async function leaderboard(): Promise<LeaderboardRow[]> {
       rating: ratings.get(p.id) ?? START_RATING,
       matchesPlayed: history.get(p.id)?.length ?? 0,
       wins: (history.get(p.id) ?? []).filter((h) => h.delta > 0).length,
+      streak: currentStreak(history.get(p.id) ?? []),
     }))
     .sort((x, y) => y.rating - x.rating || x.name.localeCompare(y.name));
 }
@@ -167,6 +171,8 @@ export interface PlayerPage {
   rating: number;
   /** Rating after each counted match, in log order. */
   history: HistoryPoint[];
+  /** Consecutive wins at the end of the history. */
+  streak: number;
   /** Every match involving this player, newest first, deleted ones flagged. */
   matches: PlayerMatch[];
 }
@@ -233,6 +239,7 @@ export async function playerPage(id: number): Promise<PlayerPage | null> {
     createdAt: player.createdAt,
     rating: ratings.get(id) ?? START_RATING,
     history: own,
+    streak: currentStreak(own),
     matches: involved,
   };
 }

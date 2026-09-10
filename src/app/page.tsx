@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Crown } from "@/components/crown";
+import { Flame } from "@/components/flame";
 import { Dock } from "@/components/dock";
 import { FocusLink } from "@/components/focus-link";
 import { formatRating } from "@/lib/format";
 import { leaderboard } from "@/lib/queries";
+import { STREAK_MIN } from "@/lib/streak";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +43,12 @@ export default async function HomePage() {
                 <div className="name">
                   {i === 0 && <Crown />}
                   <span>{r.name}</span>
+                  {r.streak >= STREAK_MIN && (
+                    <span className="streak" title={`${r.streak} wins in a row`}>
+                      <Flame />
+                      {r.streak}
+                    </span>
+                  )}
                 </div>
                 <div className="rec">
                   {r.matchesPlayed === 0 ? (

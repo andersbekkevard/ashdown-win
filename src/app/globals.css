@@ -524,3 +524,9 @@ h2.shout { font-size: 26px; margin: 0; }
 .picker-list .hint { padding: 12px 18px 6px; font-weight: 700; color: var(--faint); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
 .picker-list .create { color: var(--raspberry); }
 .picker-list .create b { background: var(--pink); color: var(--paper); padding: 3px 10px; border-radius: 999px; font-size: 13px; }
+
+/* win streaks, three or more */
+.who .name .streak { display: inline-flex; align-items: center; gap: 2px; flex: none; font-family: var(--display); font-size: 12px; color: var(--ink); background: #ffe1c2; border: 2px solid var(--ink); border-radius: 999px; padding: 1px 7px 1px 4px; }
+.who .name .streak svg { width: 13px; height: 15px; }
+.hero-card .rec span.streak-pill { display: inline-flex; align-items: center; gap: 4px; background: #ffe1c2; }
+.hero-card .rec span.streak-pill svg { width: 14px; height: 16px; }
