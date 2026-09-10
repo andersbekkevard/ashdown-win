@@ -30,6 +30,20 @@
 .slider label { font-size: 14px; font-weight: 600; }
 .slider output { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--deep); white-space: nowrap; }
 .slider input { display: block; width: 100%; height: 36px; margin: 2px 0; accent-color: var(--pink); cursor: pointer; }
+.slider .sliderTrack { align-items: center; }
+.sliderTrack input { flex: 1; min-width: 0; width: 0; }
+.sliderReset {
+  flex: none; min-width: 76px; min-height: 40px; padding: 7px 10px;
+  border: 2px solid var(--ink); border-radius: 11px;
+  background: var(--pink); color: var(--paper); box-shadow: 0 3px 0 var(--ink);
+  font: 700 13px var(--body); cursor: pointer;
+  transition: background 100ms, box-shadow 100ms, transform 100ms;
+}
+.sliderReset:hover:not(:disabled) { background: var(--raspberry); }
+.sliderReset:focus-visible { outline: 3px solid var(--deep); outline-offset: 3px; }
+.sliderReset:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.slider .sliderReset:disabled { opacity: 1; color: #9296a2; background: #f0f1f5; border-color: #d8dbe4; box-shadow: none; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .sliderReset { transition: none; } }
 .colors { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
 .colors > div { display: flex; align-items: center; gap: 2px; }
 .colors input { width: 48px; height: 44px; border: 0; padding: 0; background: transparent; cursor: pointer; }

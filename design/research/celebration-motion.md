@@ -76,6 +76,12 @@ palette and shape weights, plus simulated save delay and failed-save replay.
 Recorded, Welcome and Stop remain visible while scrolling. Optional
 automatic replay runs after adjustments settle.
 
+Every slider has its own reset button. It restores only that value to the
+selected phone or desktop preset, which is remembered on the device.
+Changed values get a highlighted, raised button with hover, keyboard-focus
+and pressed states; unchanged values have a muted disabled button. Shape
+reset is also disabled when it would remove the only enabled shape.
+
 Settings persist under a versioned local-storage key on that browser and
 origin; invalid saved settings fall back to the current device defaults.
 The earlier separate-cannon format migrates using its saved left cannon

@@ -27,16 +27,25 @@ function initialSettings(): ConfettiSettings {
   return defaultConfettiSettings(window.innerWidth < 600);
 }
 
-function Slider({ label, value, min, max, step = 1, unit = "", onChange }: {
-  label: string; value: number; min: number; max: number; step?: number; unit?: string;
+function Slider({ label, value, defaultValue, min, max, step = 1, unit = "", resetDisabled = false, onChange }: {
+  label: string; value: number; defaultValue: number; min: number; max: number; step?: number; unit?: string;
+  resetDisabled?: boolean;
   onChange: (value: number) => void;
 }) {
   const id = useId();
+  const changed = Math.abs(value - defaultValue) > 0.000001;
+  const defaultLabel = `${Number(defaultValue.toFixed(3))}${unit}`;
   return (
     <div className={styles.slider}>
       <div><label htmlFor={id}>{label}</label><output htmlFor={id}>{Number(value.toFixed(3))}{unit}</output></div>
-      <input id={id} type="range" min={min} max={max} step={step} value={value}
-        onChange={(e) => onChange(Number(e.target.value))} />
+      <div className={styles.sliderTrack}>
+        <input id={id} type="range" min={min} max={max} step={step} value={value}
+          onChange={(e) => onChange(Number(e.target.value))} />
+        <button type="button" className={styles.sliderReset} disabled={!changed || resetDisabled}
+          aria-label={`Reset ${label.toLowerCase()} to ${defaultLabel}`}
+          title={resetDisabled ? "Keep at least one shape enabled" : changed ? `Reset to ${defaultLabel}` : `Already at default (${defaultLabel})`}
+          onClick={() => onChange(defaultValue)}>↺ Reset</button>
+      </div>
     </div>
   );
 }
@@ -44,6 +53,14 @@ function Slider({ label, value, min, max, step = 1, unit = "", onChange }: {
 function ConfettiControls() {
   const celebrate = useCelebration();
   const [settings, setSettings] = useState(initialSettings);
+  const [mobileDefaults, setMobileDefaults] = useState(() => {
+    try {
+      const preset = localStorage.getItem(`${STORAGE_KEY}-preset`);
+      if (preset === "phone" || preset === "desktop") return preset === "phone";
+    } catch { /* Use this device's defaults when storage is disabled. */ }
+    return window.innerWidth < 600;
+  });
+  const defaults = defaultConfettiSettings(mobileDefaults);
   const [delay, setDelay] = useState(150);
   const [autoReplay, setAutoReplay] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -58,9 +75,12 @@ function ConfettiControls() {
   useEffect(() => stop, [stop]);
 
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+      localStorage.setItem(`${STORAGE_KEY}-preset`, mobileDefaults ? "phone" : "desktop");
+    }
     catch { /* Copy settings remains available when storage is disabled. */ }
-  }, [settings]);
+  }, [settings, mobileDefaults]);
 
   const play = useCallback((kind: "record" | "welcome", fail = false) => {
     stop();
@@ -82,6 +102,7 @@ function ConfettiControls() {
 
   function reset(mobile: boolean) {
     stop();
+    setMobileDefaults(mobile);
     setSettings(defaultConfettiSettings(mobile));
     setFeedback(mobile ? "Phone defaults restored." : "Desktop defaults restored.");
   }
@@ -115,6 +136,7 @@ function ConfettiControls() {
           <button onClick={() => reset(true)}>Reset to phone</button>
           <button onClick={() => reset(false)}>Reset to desktop</button>
         </div>
+        <p>Individual resets use {mobileDefaults ? "phone" : "desktop"} defaults.</p>
       </header>
 
       <div className={styles.replay}>
@@ -132,11 +154,11 @@ function ConfettiControls() {
       <details className={`${styles.section} slab`} open>
         <summary>Mirrored cannons</summary>
         <p>One configuration for both sides. Position and angle below describe the left cannon; the right always mirrors it. Negative horizontal positions launch from outside the edges. At 90°, both shoot straight up.</p>
-        <Slider label="Position from left edge" value={settings.cannon.x * 100} min={-50} max={150} unit="%"
+        <Slider label="Position from left edge" value={settings.cannon.x * 100} defaultValue={defaults.cannon.x * 100} min={-50} max={150} unit="%"
           onChange={(x) => update({ cannon: { ...settings.cannon, x: x / 100 } })} />
-        <Slider label="Vertical position" value={settings.cannon.y * 100} min={-50} max={150} unit="%"
+        <Slider label="Vertical position" value={settings.cannon.y * 100} defaultValue={defaults.cannon.y * 100} min={-50} max={150} unit="%"
           onChange={(y) => update({ cannon: { ...settings.cannon, y: y / 100 } })} />
-        <Slider label="Launch angle" value={settings.cannon.angle} min={0} max={360} unit="°"
+        <Slider label="Launch angle" value={settings.cannon.angle} defaultValue={defaults.cannon.angle} min={0} max={360} unit="°"
           onChange={(angle) => update({ cannon: { ...settings.cannon, angle } })} />
       </details>
 
@@ -152,13 +174,13 @@ function ConfettiControls() {
           return (
             <div key={index} className={styles.group}>
               <h2>{index === 0 ? "Main burst" : "Broad flutter"}</h2>
-              <Slider label="Count per cannon" value={burst.particleCount} min={0} max={200}
+              <Slider label="Count per cannon" value={burst.particleCount} defaultValue={defaults.bursts[index].particleCount} min={0} max={200}
                 onChange={(particleCount) => change({ particleCount })} />
-              <Slider label="Launch speed" value={burst.startVelocity} min={0} max={100}
+              <Slider label="Launch speed" value={burst.startVelocity} defaultValue={defaults.bursts[index].startVelocity} min={0} max={100}
                 onChange={(startVelocity) => change({ startVelocity })} />
-              <Slider label="Particle size" value={burst.scalar} min={0.1} max={6} step={0.01} unit="×"
+              <Slider label="Particle size" value={burst.scalar} defaultValue={defaults.bursts[index].scalar} min={0.1} max={6} step={0.01} unit="×"
                 onChange={(scalar) => change({ scalar })} />
-              <Slider label="Spread" value={burst.spread} min={0} max={360} unit="°"
+              <Slider label="Spread" value={burst.spread} defaultValue={defaults.bursts[index].spread} min={0} max={360} unit="°"
                 onChange={(spread) => change({ spread })} />
             </div>
           );
@@ -168,11 +190,11 @@ function ConfettiControls() {
       <details className={`${styles.section} slab`}>
         <summary>Physics & lifetime</summary>
         <p>Less gravity floats; negative gravity rises. Speed retention closer to 1 carries pieces farther. Drift is mirrored: positive pushes the left burst right and the right burst left.</p>
-        <Slider label="Gravity" value={settings.gravity} min={-2} max={4} step={0.05} onChange={(gravity) => update({ gravity })} />
-        <Slider label="Speed retention" value={settings.decay} min={0} max={1} step={0.005} onChange={(decay) => update({ decay })} />
-        <Slider label="Sideways drift" value={settings.drift} min={-5} max={5} step={0.1} onChange={(drift) => update({ drift })} />
-        <Slider label="Particle lifetime" value={settings.ticks} min={30} max={600} unit=" ticks" onChange={(ticks) => update({ ticks })} />
-        <Slider label="Whole animation duration" value={settings.durationMs} min={500} max={10000} step={100} unit=" ms" onChange={(durationMs) => update({ durationMs })} />
+        <Slider label="Gravity" value={settings.gravity} defaultValue={defaults.gravity} min={-2} max={4} step={0.05} onChange={(gravity) => update({ gravity })} />
+        <Slider label="Speed retention" value={settings.decay} defaultValue={defaults.decay} min={0} max={1} step={0.005} onChange={(decay) => update({ decay })} />
+        <Slider label="Sideways drift" value={settings.drift} defaultValue={defaults.drift} min={-5} max={5} step={0.1} onChange={(drift) => update({ drift })} />
+        <Slider label="Particle lifetime" value={settings.ticks} defaultValue={defaults.ticks} min={30} max={600} unit=" ticks" onChange={(ticks) => update({ ticks })} />
+        <Slider label="Whole animation duration" value={settings.durationMs} defaultValue={defaults.durationMs} min={500} max={10000} step={100} unit=" ms" onChange={(durationMs) => update({ durationMs })} />
         <p>The whole animation duration also controls the text and final fade; it can end before a particle&apos;s lifetime.</p>
         <label className={styles.check}><input type="checkbox" checked={settings.flat} onChange={(e) => update({ flat: e.target.checked })} />Flat pieces · no tumbling</label>
       </details>
@@ -194,7 +216,9 @@ function ConfettiControls() {
         <p>Shape weights control the mix. Zero removes a shape; at least one must remain.</p>
         {(["square", "circle", "star"] as const).map((shape) => (
           <Slider key={shape} label={`${shape === "square" ? "Paper" : shape === "circle" ? "Circle" : "Star"} weight`}
-            value={settings.shapes[shape]} min={0} max={5} onChange={(weight) => {
+            value={settings.shapes[shape]} defaultValue={defaults.shapes[shape]}
+            resetDisabled={defaults.shapes[shape] === 0 && Object.entries(settings.shapes).every(([key, weight]) => key === shape || weight === 0)}
+            min={0} max={5} onChange={(weight) => {
               const shapes = { ...settings.shapes, [shape]: weight };
               if (Object.values(shapes).some((value) => value > 0)) update({ shapes });
             }} />
@@ -203,7 +227,7 @@ function ConfettiControls() {
 
       <details className={`${styles.section} slab`}>
         <summary>Save timing</summary>
-        <Slider label="Simulated save delay" value={delay} min={0} max={5000} step={50} unit=" ms" onChange={setDelay} />
+        <Slider label="Simulated save delay" value={delay} defaultValue={150} min={0} max={5000} step={50} unit=" ms" onChange={setDelay} />
         <button className={styles.secondary} onClick={() => play("record", true)}>Preview failed save</button>
       </details>
 
