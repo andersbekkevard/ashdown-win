@@ -11,10 +11,12 @@ export interface Selected {
   name: string;
 }
 
-function PaddleIcon({ className = "ico" }: { className?: string }) {
+const TONES = { a: "#00b5fe", b: "#fb3aa3" } as const;
+
+function PaddleIcon({ className = "ico", colour = "#FB3AA3" }: { className?: string; colour?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="10" cy="9" r="7" fill="#FB3AA3" stroke="#222126" strokeWidth="2" />
+      <circle cx="10" cy="9" r="7" fill={colour} stroke="#222126" strokeWidth="2" />
       <path d="M14.5 14.5 L20 20" stroke="#222126" strokeWidth="3.5" strokeLinecap="round" />
     </svg>
   );
@@ -34,6 +36,7 @@ export function PlayerSearch({
   exclude,
   roster,
   active = false,
+  side = "a",
 }: {
   placeholder: string;
   value: Selected | null;
@@ -43,6 +46,8 @@ export function PlayerSearch({
   roster: Selected[];
   /** True for the slot the form wants filled next; it opens the sheet. */
   active?: boolean;
+  /** Which side the slot belongs to; colours the paddle and the sheet label. */
+  side?: "a" | "b";
   /** Kept for callers; the sheet handles focus itself. */
   autoFocus?: boolean;
 }) {
@@ -51,6 +56,8 @@ export function PlayerSearch({
   const [query, setQuery] = useState("");
   const [creating, setCreating] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const colour = TONES[side];
   // Portals need document; render them only once mounted on the client.
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -70,6 +77,30 @@ export function PlayerSearch({
   // this follows a tap, and leaves the list usable when it does not.
   useEffect(() => {
     if (open) inputRef.current?.focus({ preventScroll: true });
+  }, [open]);
+
+  // Keep the sheet exactly the size of the visible area, so when the iOS
+  // keyboard comes up the search field stays put and only the list scrolls.
+  useEffect(() => {
+    if (!open) return;
+    const vv = window.visualViewport;
+    const fit = () => {
+      const el = sheetRef.current;
+      if (!el) return;
+      const h = vv ? vv.height : window.innerHeight;
+      const top = vv ? vv.offsetTop : 0;
+      el.style.height = `${Math.round(h)}px`;
+      el.style.top = `${Math.round(top)}px`;
+    };
+    fit();
+    vv?.addEventListener("resize", fit);
+    vv?.addEventListener("scroll", fit);
+    window.addEventListener("resize", fit);
+    return () => {
+      vv?.removeEventListener("resize", fit);
+      vv?.removeEventListener("scroll", fit);
+      window.removeEventListener("resize", fit);
+    };
   }, [open]);
 
   useEffect(() => {
@@ -114,7 +145,7 @@ export function PlayerSearch({
   return (
     <>
       <button type="button" className="slot" onClick={() => setOpen(true)}>
-        <PaddleIcon />
+        <PaddleIcon colour={colour} />
         <span>{placeholder}</span>
         <span className="slot-go">Choose ›</span>
       </button>
@@ -122,10 +153,13 @@ export function PlayerSearch({
       {open &&
         mounted &&
         createPortal(
-          <div className="picker" role="dialog" aria-modal="true" aria-label={`Choose ${placeholder.toLowerCase()}`}>
+          <div className="picker" role="dialog" aria-modal="true" aria-label={`Choose ${placeholder.toLowerCase()}`} ref={sheetRef}>
             <div className="picker-head">
+              <span className="picker-side" style={{ background: colour }}>
+                Side {side.toUpperCase()}
+              </span>
               <div className="field picker-field">
-                <PaddleIcon />
+                <PaddleIcon colour={colour} />
                 <input
                   ref={inputRef}
                   type="search"
