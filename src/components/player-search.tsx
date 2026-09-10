@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { MAX_NAME_LENGTH } from "@/lib/config";
 import { normalizeName } from "@/lib/names";
@@ -51,6 +51,12 @@ export function PlayerSearch({
   const [query, setQuery] = useState("");
   const [creating, setCreating] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Portals need document; render them only once mounted on the client.
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   // The form asks the next empty slot to open; Done or Escape dismisses it
   // until the slot is tapped again. Derived, so no state is set in an effect.
@@ -114,6 +120,7 @@ export function PlayerSearch({
       </button>
 
       {open &&
+        mounted &&
         createPortal(
           <div className="picker" role="dialog" aria-modal="true" aria-label={`Choose ${placeholder.toLowerCase()}`}>
             <div className="picker-head">
@@ -163,6 +170,7 @@ export function PlayerSearch({
         )}
 
       {creating !== null &&
+        mounted &&
         createPortal(
           <div className="sheet-wrap" role="dialog" aria-modal="true" aria-label="Create player">
             <div className="sheet pop-in">
