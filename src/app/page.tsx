@@ -43,12 +43,6 @@ export default async function HomePage() {
                 <div className="name">
                   {i === 0 && <Crown />}
                   <span>{r.name}</span>
-                  {r.streak >= STREAK_MIN && (
-                    <span className="streak" title={`${r.streak} wins in a row`}>
-                      <Flame />
-                      {r.streak}
-                    </span>
-                  )}
                 </div>
                 <div className="rec">
                   {r.matchesPlayed === 0 ? (
@@ -56,6 +50,12 @@ export default async function HomePage() {
                   ) : (
                     <>
                       <b>{r.wins}W</b> · {r.matchesPlayed - r.wins}L
+                      {r.streak >= STREAK_MIN && (
+                        <span className="streak" title={`${r.streak} wins in a row`}>
+                          <Flame />
+                          {r.streak} in a row
+                        </span>
+                      )}
                     </>
                   )}
                 </div>
