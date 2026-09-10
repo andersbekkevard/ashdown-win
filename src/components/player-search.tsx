@@ -172,7 +172,7 @@ export function PlayerSearch({
                     }
                   }}
                   maxLength={MAX_NAME_LENGTH}
-                  placeholder="Type a name, or scroll"
+                  placeholder="Search"
                   autoComplete="off"
                   autoCapitalize="words"
                   enterKeyHint="search"
