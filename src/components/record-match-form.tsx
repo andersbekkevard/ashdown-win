@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { recordMatch } from "@/app/actions";
 import { Crown } from "./crown";
 import { Dock } from "./dock";
@@ -38,6 +38,13 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
   const order = doubles ? ["a1", "a2", "b1", "b2"] : ["a1", "b1"];
   const filled: Record<string, Selected | null> = { a1, a2, b1, b2 };
   const next = order.find((k) => filled[k] === null) ?? null;
+  // Once every slot is filled, bring the winner tiles into view above the dock.
+  const winnersRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (next === null && winner === null) {
+      winnersRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
+    }
+  }, [next, winner]);
   const complete =
     sideA.every((p) => p !== null) && sideB.every((p) => p !== null) && winner !== null;
 
@@ -140,7 +147,7 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
       </div>
 
       <div className="winner-title">Who won?</div>
-      <div className="winners">
+      <div className="winners" ref={winnersRef}>
         {tile("a", sideA)}
         {tile("b", sideB)}
       </div>

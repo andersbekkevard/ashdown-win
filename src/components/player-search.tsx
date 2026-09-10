@@ -49,15 +49,44 @@ export function PlayerSearch({
 }) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   // The autofocused first field gets no focus event, so start open there.
   const [open, setOpen] = useState(autoFocus);
   const [creating, setCreating] = useState<string | null>(null);
 
   // Focusing fires onFocus, which opens the list; no state is set here.
+  // Focusing fires onFocus, which opens the list; then bring the field to the
+  // top of the scroll area so the whole list is visible above the dock.
   useEffect(() => {
-    if (active && !value) inputRef.current?.focus();
+    if (active && !value) {
+      const el = inputRef.current;
+      el?.focus({ preventScroll: true });
+      el?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
   }, [active, value]);
+
+  // Size the open list to the room between the field and the dock, so it is
+  // never hidden under the action bar however far the page could scroll.
+  useEffect(() => {
+    if (!open) return;
+    const fit = () => {
+      const el = listRef.current;
+      const inp = inputRef.current;
+      if (!el || !inp) return;
+      const dock = document.querySelector(".dock");
+      const dockTop = dock ? dock.getBoundingClientRect().top : window.innerHeight;
+      const room = dockTop - inp.getBoundingClientRect().bottom - 14;
+      el.style.maxHeight = `${Math.max(150, Math.round(room))}px`;
+    };
+    fit();
+    const t = setTimeout(fit, 450);
+    window.addEventListener("resize", fit);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("resize", fit);
+    };
+  }, [open]);
 
   if (value) {
     return (
@@ -90,7 +119,7 @@ export function PlayerSearch({
   }
 
   return (
-    <div className="field">
+    <div className={`field${open ? " open" : ""}`}>
       <PaddleIcon />
       <input
         ref={inputRef}
@@ -124,7 +153,7 @@ export function PlayerSearch({
         aria-label={placeholder}
       />
       {open && (
-        <div className="sugg pop-in" role="listbox">
+        <div className="sugg pop-in" role="listbox" ref={listRef}>
           {!q && shown.length > 0 && <div className="hint">Recently at the table</div>}
           {shown.map((h) => (
             <button key={h.id} type="button" role="option" aria-selected={false} onPointerDown={(e) => { e.preventDefault(); pick(h); }} onClick={() => pick(h)}>

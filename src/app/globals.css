@@ -184,12 +184,17 @@ h2.shout { font-size: 26px; margin: 0; }
 }
 .field.plain input { padding-left: 16px; }
 .field input:focus { border-color: var(--deep); box-shadow: 0 0 0 4px rgba(0,181,254,0.35); }
+/* scroll-margin so scrollIntoView leaves the label above the field visible */
+.field input { scroll-margin-top: 28px; }
 .field input::placeholder { color: #a0a5b8; font-weight: 500; }
 .field .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; pointer-events: none; }
 .sugg {
-  position: absolute; left: 0; right: 0; top: calc(100% + 6px); background: var(--paper);
-  border: 3px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); z-index: 20; overflow: hidden;
+  position: absolute; left: 0; right: 0; top: 100%; background: var(--paper);
+  border: 3px solid var(--ink); border-top: 0; border-radius: 0 0 18px 18px; box-shadow: 0 6px 0 var(--ink); z-index: 20;
+  overflow-y: auto; max-height: min(330px, calc(100dvh - var(--dock-h) - 230px));
 }
+.field.open input { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.field.open input:focus { box-shadow: none; border-color: var(--ink); }
 .sugg button, .sugg a {
   display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left;
   padding: 12px 16px; font-weight: 600; font-size: 16px; border: 0; background: none; font-family: var(--body); color: var(--ink);
@@ -457,7 +462,7 @@ h2.shout { font-size: 26px; margin: 0; }
   isolation: isolate; overflow: hidden;
   background: radial-gradient(ellipse at center, rgba(8, 52, 116, 0.28), transparent 72%);
 }
-.celebration.confirmed { animation: celebration-clear 1800ms linear both; }
+.celebration.confirmed { animation: celebration-clear var(--celebration-duration, 1800ms) linear both; }
 .celebration-confetti { position: absolute; inset: 0; width: 100%; height: 100%; }
 .celebration-center { position: absolute; inset: 0; display: grid; place-items: center; }
 .celebration-arrival {
@@ -476,7 +481,7 @@ h2.shout { font-size: 26px; margin: 0; }
   -webkit-text-stroke-color: var(--lilac);
   filter: drop-shadow(0 .065em 0 #514db1) drop-shadow(0 .04em 0 var(--ink));
 }
-.celebration.confirmed .celebration-word { animation: celebration-confirm 1800ms linear both; }
+.celebration.confirmed .celebration-word { animation: celebration-confirm var(--celebration-duration, 1800ms) linear both; }
 .celebration-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @keyframes celebration-arrive {
   0% { transform: scale(.32) rotate(-7deg); opacity: .5; }
