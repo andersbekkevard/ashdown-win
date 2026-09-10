@@ -15,7 +15,13 @@ select id, name from players where lower(name) = lower(:'name') \gset
     select id from matches where :id in (a1, a2, b1, b2));
   delete from matches where :id in (a1, a2, b1, b2);
   delete from players where id = :id;
-  \echo deleted player :name (id :id) with their matches
+  -- Hand the numbers back: continue from the highest remaining id, or from 1
+  -- when a table is empty, so the next real entry is not numbered after ghosts.
+  select setval('players_id_seq', coalesce(max(id), 1), max(id) is not null) from players;
+  select setval('matches_id_seq', coalesce(max(id), 1), max(id) is not null) from matches;
+  select setval('deletions_id_seq', coalesce(max(id), 1), max(id) is not null) from deletions;
+  select setval('restores_id_seq', coalesce(max(id), 1), max(id) is not null) from restores;
+  \echo deleted player :name (id :id) with their matches; sequences resynced
 \else
   \echo no player named :name
 \endif
