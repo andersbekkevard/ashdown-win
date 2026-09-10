@@ -61,17 +61,17 @@ function Celebration({ moment, onDone }: { moment: Moment; onDone: (id: number) 
     const burst = () => {
       for (const left of [true, false]) {
         const base: confetti.Options = {
-          origin: { x: left ? 0.12 : 0.88, y: 0.62 },
+          origin: { x: left ? -0.04 : 1.04, y: 0.84 },
           angle: left ? 65 : 115,
           colors: ["#fb3aa3", "#ffd046", "#5eeac0", "#ffffff", "#7c7be8"],
           gravity: 1.05, decay: 0.92, ticks: 160,
           shapes: ["square", "square", "circle"],
-          scalar: mobile ? 2.4 : 2.8,
+          scalar: mobile ? 2.16 : 2.52,
         };
         // Mix fast narrow pieces with a slower broad flutter, following the
         // library's Realistic Look recipe rather than a uniform particle fan.
         void fire({ ...base, particleCount: 48, spread: 48, startVelocity: mobile ? 28 : 43 });
-        void fire({ ...base, particleCount: 36, spread: 88, startVelocity: mobile ? 19 : 29, scalar: mobile ? 1.8 : 2 });
+        void fire({ ...base, particleCount: 36, spread: 88, startVelocity: mobile ? 19 : 29, scalar: mobile ? 1.62 : 1.8 });
       }
     };
     burst();

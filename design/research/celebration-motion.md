@@ -46,11 +46,11 @@ inherit the existing profile welcome card's margins or borders.
 | Failure | Cancel the effect and show the form error; retain entered values |
 
 Confetti uses 168 pieces split across two origins and two velocity/spread
-groups per origin. After iPhone review, particle dimensions were increased
-to roughly three times the initial mobile size, with 50% more pieces, so
-the burst reads as substantial paper confetti. Mobile scalar values are
-2.4 and 1.8; desktop values are 2.8 and 2. Smaller mobile velocities keep
-the burst on screen.
+groups per origin. Cannons sit 84% down the viewport, 4% outside each side,
+so the burst enters from below and the edges. After the larger-particle
+iPhone review, dimensions were reduced by 10%: mobile scalar values are
+2.16 and 1.62; desktop values are 2.52 and 1.8. Smaller mobile velocities
+keep the burst on screen.
 The canvas is loaded with the shared component, so no click-time import is
 needed. Reduced motion keeps the message static and omits confetti. The
 effect never captures pointer input. Only a confirmed write gets success
