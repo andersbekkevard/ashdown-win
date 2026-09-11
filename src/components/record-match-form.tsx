@@ -118,7 +118,7 @@ export function RecordMatchForm({ roster }: { roster: Selected[] }) {
       >
         <div className="tlabel">
           <b>{doubles ? "Doubles" : "Singles"}</b>
-          <span>{doubles ? "Two on each side, half the K" : "Flip for doubles"}</span>
+          <span>{doubles ? "Flip for singles" : "Flip for doubles"}</span>
         </div>
         <button
           type="button"
