@@ -42,3 +42,7 @@ conversation, unless a later date is given.
 | 31 | A WhatsApp group (invite link in `design/poster/poster-whatsapp.html`) is the contact layer. No approval gate. The second-edition poster carries its QR as a pop-up more prominent than the site QR. Decided 2026-09-09. | Zero data collected by the site; one tap on a thing everyone has. | Never. |
 | 32 | The brand mark is the crown on a pink disc (`design/brand/icon.svg`), used as favicon, Apple touch icon, and the WhatsApp group image. Decided 2026-09-09. | One mark everywhere. | Never. |
 | 33 | Match recording and player creation share a root-level celebration: immediate pending motion, success copy and canvas-confetti only after confirmation, automatic exit, static reduced-motion alternative. Decided 2026-09-09. [Motion notes](../design/research/celebration-motion.md) | Remove navigation latency, keep text centered, and give inline creation the same welcome without losing the match. | Motion review or accessibility evidence calls for adjustment. |
+
+On 18 September 2026, the backup checkout moved under the XDG data directory
+(`backups/ashdown-win`) to keep generated operational data out of visible home.
+The private Git repository, daily export and retention remain unchanged.

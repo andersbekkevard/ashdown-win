@@ -102,7 +102,9 @@ The match log is the only irreplaceable data. Three rules protect it:
   continue if the export fails. The Vercel build only applies migrations when
   `ALLOW_BUILD_MIGRATIONS=1` is set, so a push cannot migrate by accident.
 - A daily export of every table lands in the private repository
-  `andersbekkevard/ashdown-win-backups` from a timer on Europa.
+  `andersbekkevard/ashdown-win-backups` from a timer on Europa. Its checkout
+  defaults to `${XDG_DATA_HOME:-$HOME/.local/share}/backups/ashdown-win`;
+  `BACKUP_DIR` overrides the location.
 - Neon's own point-in-time restore covers the hours between exports.
 
 ## Hosting

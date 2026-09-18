@@ -2,11 +2,11 @@
 # Export every log table from the production database as JSON into the
 # private backup repository and push it. Safe to run any time; used by the
 # daily timer on Europa and by migrate-prod.sh before a migration.
-#   scripts/export-log.sh            -> ~/ashdown-win-backups
+#   scripts/export-log.sh            -> ~/.local/share/backups/ashdown-win
 #   BACKUP_DIR=/path scripts/export-log.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
-dir=${BACKUP_DIR:-$HOME/ashdown-win-backups}
+dir=${BACKUP_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/backups/ashdown-win}
 [[ -d "$dir/.git" ]] || { echo "backup repo missing at $dir (git clone andersbekkevard/ashdown-win-backups)" >&2; exit 1; }
 stamp=$(date -u +%Y-%m-%dT%H%M%SZ)
 # Export every table that exists; a table that a pending migration will add
