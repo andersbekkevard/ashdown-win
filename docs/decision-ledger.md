@@ -46,3 +46,7 @@ conversation, unless a later date is given.
 On 18 September 2026, the backup checkout moved under the XDG data directory
 (`backups/ashdown-win`) to keep generated operational data out of visible home.
 The private Git repository, daily export and retention remain unchanged.
+
+On 11 November 2026, security updates disable framing, MIME sniffing and the
+framework response header, restrict referrers across origins, and move private
+development origins to the ignored local environment.

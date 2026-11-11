@@ -38,6 +38,17 @@ is handled, is on the algorithm page of the site and in
 Ratings are never stored. They are recomputed from the match log every time,
 so a change to the constants or the formula applies to all of history at once.
 
+## Local setup
+
+Use Node.js 20 or newer and the pnpm version in `package.json`. Run
+`pnpm install` and `pnpm dev`. Builds and checks do not require `DATABASE_URL`;
+set it in the ignored `.env.local` only when local database access is needed.
+
+Development origins default to `127.0.0.1,localhost`. To access the dev server
+from another host, set `DEV_ORIGINS` in `.env.local` to a comma-separated list
+of allowed hostnames or IP addresses. Keep private machine addresses there.
+Production does not use this setting.
+
 ## Contributing
 
 The code is open so that anyone in the house can check the maths or add a
