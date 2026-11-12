@@ -113,6 +113,13 @@ Vercel serves the site and Neon provides Postgres. Both are on free tiers and
 the site is designed to stay within them indefinitely, so a future resident
 can inherit it without a bill. See ADR 0004.
 
+Since 11 November 2026 a Vercel Firewall rule on the project, `Limit Server Actions per IP`,
+denies a client more than 30 POST requests carrying the `next-action` header in 60 seconds.
+It lives in the Vercel project, not in this repository (`vercel firewall rules add` stages,
+`vercel firewall publish` applies). Preview deployments use the production Neon database, so
+checks against a preview are read-only: no form submissions or server actions. (Recorded on
+12 November 2026 from the security fixes of 11 November, found in Codex's memory store.)
+
 Deploys happen on every push to `main`. The build runs `scripts/migrate.mjs`
 first, which applies pending Drizzle migrations against `DATABASE_URL` when
 one is set, so a schema change ships with the code that needs it. The Neon
